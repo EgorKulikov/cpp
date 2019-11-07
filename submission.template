@@ -1,0 +1,14 @@
+#include <iostream>
+#include <fstream>
+
+%Code%
+
+int main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(0);
+	%ClassName% solver;
+	%Input%
+	%Output%
+	%SolverCall%
+	return 0;
+}
