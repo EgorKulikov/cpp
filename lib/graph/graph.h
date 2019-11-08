@@ -132,7 +132,7 @@ public:
     int id;
 
     BidirectionalEdge(int from, int to) : from(from), to(to) {
-        transposedEdge = new BidirectionalEdge(*this);
+        transposedEdge = new BidirectionalEdge(this);
     }
 
     BidirectionalEdge* transposed() { return transposedEdge; }

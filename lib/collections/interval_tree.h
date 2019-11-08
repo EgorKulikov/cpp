@@ -13,10 +13,10 @@ template<typename Value, typename Delta, Value defaultValue = 0, Delta defaultDe
 class IntervalTree {
 private:
     const int size;
-    const function<Value(Value, Value)> &joinValue;
-    const function<Delta(Delta, Delta)> &joinDelta;
-    const function<Value(Value, Delta, int, int)> &accumulate;
-    const function<Value(int)> &initValue;
+    function<Value(Value, Value)> joinValue;
+    function<Delta(Delta, Delta)> joinDelta;
+    function<Value(Value, Delta, int, int)> accumulate;
+    function<Value(int)> initValue;
     vector<Value> value;
     vector<Delta> delta;
 
@@ -25,8 +25,8 @@ private:
             value[root] = initValue(left);
         } else {
             int mid = (left + right) >> 1;
-            initValue(2 * root + 1, left, mid);
-            initValue(2 * root + 2, mid, right);
+            init(2 * root + 1, left, mid);
+            init(2 * root + 2, mid, right);
             value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
         }
     }
@@ -69,10 +69,10 @@ private:
     }
 
 public:
-    IntervalTree(int size, const function<Value(Value, Value)> &joinValue,
-                 const function<Delta(Delta, Delta)> &joinDelta,
-                 function<Value(Value, Delta, int, int)> &accumulate,
-                 const function<Value(int)> &initValue = [](int at) -> Value { return defaultValue; }) :
+    IntervalTree(int size, function<Value(Value, Value)> &joinValue,
+                 function<Delta(Delta, Delta)> &joinDelta,
+                 function<Value(Value, Delta, int, int)> accumulate,
+                 function<Value(int)> initValue = [](int at) -> Value { return defaultValue; }) :
             size(size), joinValue(joinValue), joinDelta(joinDelta), accumulate(accumulate), initValue(initValue) {
         int vertexSize = size * 4;
         value = vector<Value>(vertexSize);
@@ -82,6 +82,50 @@ public:
 
     void update(int from, int to, Delta delta) {
         update(0, 0, size, from, to, delta);
+    }
+
+    Value query(int from, int to) {
+        return query(0, 0, size, from, to);
+    }
+};
+
+template <typename Value, Value defaultValue = 0>
+class ReadOnlyIntervalTree {
+private:
+    const int size;
+    function<Value(Value, Value)> joinValue;
+    vector<Value> value;
+
+    void init(int root, int left, int right, const vector<Value>& array) {
+        if (left + 1 == right) {
+            value[root] = array[left];
+        } else {
+            int mid = (left + right) >> 1;
+            init(2 * root + 1, left, mid, array);
+            init(2 * root + 2, mid, right, array);
+            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
+        }
+    }
+
+    Value query(int root, int left, int right, int from, int to) {
+        if (left >= from && right <= to) {
+            return value[root];
+        }
+        if (right <= from || left >= to) {
+            return defaultValue;
+        }
+        int mid = (left + right) >> 1;
+        Value lValue = query(2 * root + 1, left, mid, from, to);
+        Value rValue = query(2 * root + 2, mid, right, from, to);
+        return joinValue(lValue, rValue);
+    }
+
+public:
+    ReadOnlyIntervalTree(const vector<Value>& array, function<Value(Value, Value)> joinValue) :
+            size(array.size()), joinValue(joinValue) {
+        int vertexSize = size * 4;
+        value = vector<Value>(vertexSize);
+        init(0, 0, size, array);
     }
 
     Value query(int from, int to) {
