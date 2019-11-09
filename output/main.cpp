@@ -107,6 +107,7 @@ public:
     template<typename T> vector<vector<T> > readTable(int rows, int cols);
 
     string readLine();
+    double readDouble();
 };
 
 inline bool isWhitespace(int c) {
@@ -140,6 +141,49 @@ template<typename T>
 T Input::readType() {
     error = INVALID_CALL;
     return nullptr;
+}
+
+template<>
+double Input::readType() {
+    error = OK;
+    int c = skipWhitespace();
+    if (error != OK) {
+        return 0;
+    }
+    int sgn = 1;
+    if (c == '-') {
+        sgn = -1;
+        c = get();
+    }
+    double res = 0;
+    do {
+        if (!isdigit(c)) {
+            error = UNEXPECTED_SYMBOL;
+            return 0;
+        }
+        res *= 10;
+        res += c - '0';
+        c = get();
+    } while (!isWhitespace(c) && c != '.');
+    if (c == '.') {
+        vi digits;
+        c = get();
+        do {
+            if (!isdigit(c)) {
+                error = UNEXPECTED_SYMBOL;
+                return 0;
+            }
+            digits.push_back(c - '0');
+            c = get();
+        } while (!isWhitespace(c));
+        double add = 0;
+        for (int i = int(digits.size()) - 1; i >= 0; i--) {
+            add += digits[i];
+            add /= 10;
+        }
+        res += add;
+    }
+    return res;
 }
 
 template<typename T>
@@ -278,6 +322,10 @@ string Input::readLine() {
     return string(res.begin(), res.begin() + length);
 }
 
+double Input::readDouble() {
+    return readType<double>();
+}
+
 template<typename T1, typename T2, typename T3>
 tuple<vector<T1>, vector<T2>, vector<T3> > Input::readArrays(int size) {
     vector<T1> v1;
@@ -410,438 +458,51 @@ void Output::printSingle(const pair<T, U>& value) {
 
 #endif //JHELPER_EXAMPLE_PROJECT_OUTPUT_H
 
-//
-// Created by egor on 04.11.2019.
-//
 
-#ifndef JHELPER_EXAMPLE_PROJECT_GRAPH_H
-#define JHELPER_EXAMPLE_PROJECT_GRAPH_H
+struct ship {
+    int x, y, z, r, id;
 
-
-
-template <typename W, typename C>
-class WeightedFlowEdge {
-private:
-    WeightedFlowEdge<W, C>* reverseEdge;
-
-public:
-    const int from;
-    const int to;
-    W weight;
-    C capacity;
-    int id;
-
-    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
-        reverseEdge = new WeightedFlowEdge(this);
-    }
-
-    WeightedFlowEdge<W, C>* transposed() { return nullptr; }
-    WeightedFlowEdge<W, C>* reverse() { return reverseEdge; }
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight), capacity(0) {
-        reverseEdge = reverse;
-    }
+    ship(int x, int y, int z, int r, int id) : x(x), y(y), z(z), r(r), id(id) {}
 };
 
-template <typename C>
-class FlowEdge {
-private:
-    FlowEdge<C>* reverseEdge;
+bool operator <(const ship& a, const ship& b) {
+    return a.r > b.r;
+}
 
-public:
-    const int from;
-    const int to;
-    C capacity;
-    int id;
-
-    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
-        reverseEdge = new FlowEdge(this);
-    }
-
-    FlowEdge<C>* transposed() { return nullptr; }
-    FlowEdge<C>* reverse() { return reverseEdge; }
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    FlowEdge(FlowEdge<C>* reverse) : from(reverse->to), to(reverse->from), capacity(0) {
-        reverseEdge = reverse;
-    }
-};
-
-template <typename W>
-class WeightedEdge {
-public:
-    const int from;
-    const int to;
-    W weight;
-    int id;
-
-    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-    }
-
-    WeightedEdge<W>* transposed() { return nullptr; }
-    WeightedEdge<W>* reverse() { return nullptr; }
-};
-
-template <typename W>
-class BidirectionalWeightedEdge {
-private:
-    BidirectionalWeightedEdge<W>* transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    W weight;
-    int id;
-
-    BidirectionalWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-        transposedEdge = new BidirectionalWeightedEdge(this);
-    }
-
-    BidirectionalWeightedEdge<W>* transposed() { return transposedEdge; }
-    BidirectionalWeightedEdge<W>* reverse() { return nullptr; }
-
-private:
-    BidirectionalWeightedEdge(BidirectionalWeightedEdge<W>* transposed) : from(transposed->to), to(transposed->from), weight(transposed->weight) {
-        transposedEdge = transposed;
-    }
-};
-
-class SimpleEdge {
-public:
-    const int from;
-    const int to;
-    int id;
-
-    SimpleEdge(int from, int to) : from(from), to(to) {
-    }
-
-    SimpleEdge* transposed() { return nullptr; }
-    SimpleEdge* reverse() { return nullptr; }
-};
-
-class BidirectionalEdge {
-private:
-    BidirectionalEdge* transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    int id;
-
-    BidirectionalEdge(int from, int to) : from(from), to(to) {
-        transposedEdge = new BidirectionalEdge(this);
-    }
-
-    BidirectionalEdge* transposed() { return transposedEdge; }
-    BidirectionalEdge* reverse() { return nullptr; }
-
-private:
-    BidirectionalEdge(BidirectionalEdge* transposed) : from(transposed->to), to(transposed->from) {
-        transposedEdge = transposed;
-    }
-};
-
-template <class Edge>
-class Graph {
-public:
-    int vertexCount;
-    int edgeCount = 0;
-    vector<vector<Edge*> > edges;
-
-    Graph(int vertexCount) : vertexCount(vertexCount) {
-        edges.resize(vertexCount);
-    }
-
-    void addEdge(Edge* edge) {
-        edge->id = edgeCount;
-        edges[edge->from].push_back(edge);
-        if (edge->reverse() != nullptr) {
-            edge->reverse()->id = edgeCount;
-            edges[edge->reverse()->from].push_back(edge->reverse());
-        }
-        if (edge->transposed() != nullptr) {
-            edges[edge->transposed()->from].push_back(edge->transposed());
-            edge->transposed()->id = edgeCount;
-            if (edge->transposed()->reverse() != nullptr) {
-                edges[edge->transposed()->reverse()->from].push_back(edge->transposed()->reverse());
-                edge->transposed()->reverse()->id = edgeCount;
-            }
-        }
-        edgeCount++;
-    }
-};
-
-typedef FlowEdge<ll> LongFlowEdge;
-typedef WeightedEdge<ll> LongWeightedEdge;
-typedef FlowEdge<int> IntFlowEdge;
-typedef WeightedEdge<int> IntWeightedEdge;
-typedef BidirectionalWeightedEdge<ll> LongBiWeightedEdge;
-typedef BidirectionalWeightedEdge<int> IntBiWeightedEdge;
-
-#endif //JHELPER_EXAMPLE_PROJECT_GRAPH_H
-
-#ifndef CPP_LCA_H
-#define CPP_LCA_H
-
-
-//
-// Created by kulikov on 11/7/2019.
-//
-
-#include <functional>
-
-#ifndef JHELPER_EXAMPLE_PROJECT_INTERVAL_TREE_H
-#define JHELPER_EXAMPLE_PROJECT_INTERVAL_TREE_H
-
-
-
-template<typename Value, typename Delta, Value defaultValue = 0, Delta defaultDelta = 0>
-class IntervalTree {
-private:
-    const int size;
-    function<Value(Value, Value)> joinValue;
-    function<Delta(Delta, Delta)> joinDelta;
-    function<Value(Value, Delta, int, int)> accumulate;
-    function<Value(int)> initValue;
-    vector<Value> value;
-    vector<Delta> delta;
-
-    void init(int root, int left, int right) {
-        if (left + 1 == right) {
-            value[root] = initValue(left);
-        } else {
-            int mid = (left + right) >> 1;
-            init(2 * root + 1, left, mid);
-            init(2 * root + 2, mid, right);
-            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
-        }
-    }
-
-    void apply(int root, Delta dlt, int left, int right) {
-        value[root] = accumulate(value[root], dlt, left, right);
-        delta[root] = joinDelta(delta[root], dlt);
-    }
-
-    void pushDown(int root, int left, int mid, int right) {
-        apply(2 * root + 1, delta[root], left, mid);
-        apply(2 * root + 2, delta[root], mid, right);
-        delta[root] = defaultDelta;
-    }
-
-    void update(int root, int left, int right, int from, int to, Delta dlt) {
-        if (left >= from && right <= to) {
-            apply(root, dlt, left, right);
-            return;
-        }
-        if (right <= from || left >= to) {
-            return;
-        }
-        int mid = (left + right) >> 1;
-        pushDown(root, left, mid, right);
-        update(2 * root + 1, left, mid, from, to, dlt);
-        update(2 * root + 2, mid, right, from, to, dlt);
-    }
-
-    Value query(int root, int left, int right, int from, int to) {
-        if (left >= from && right <= to) {
-            return value[root];
-        }
-        if (right <= from || left >= to) {
-            return defaultValue;
-        }
-        int mid = (left + right) >> 1;
-        pushDown(root, left, mid, right);
-        return joinValue(query(2 * root + 1, left, mid, from, to), query(2 * root + 2, mid, right, from, to));
-    }
-
-public:
-    IntervalTree(int size, function<Value(Value, Value)> &joinValue,
-                 function<Delta(Delta, Delta)> &joinDelta,
-                 function<Value(Value, Delta, int, int)> accumulate,
-                 function<Value(int)> initValue = [](int at) -> Value { return defaultValue; }) :
-            size(size), joinValue(joinValue), joinDelta(joinDelta), accumulate(accumulate), initValue(initValue) {
-        int vertexSize = size * 4;
-        value = vector<Value>(vertexSize);
-        delta = vector<Delta>(vertexSize, defaultDelta);
-        init(0, 0, size);
-    }
-
-    void update(int from, int to, Delta delta) {
-        update(0, 0, size, from, to, delta);
-    }
-
-    Value query(int from, int to) {
-        return query(0, 0, size, from, to);
-    }
-};
-
-template <typename Value, Value defaultValue = 0>
-class ReadOnlyIntervalTree {
-private:
-    const int size;
-    function<Value(Value, Value)> joinValue;
-    vector<Value> value;
-
-    void init(int root, int left, int right, const vector<Value>& array) {
-        if (left + 1 == right) {
-            value[root] = array[left];
-        } else {
-            int mid = (left + right) >> 1;
-            init(2 * root + 1, left, mid, array);
-            init(2 * root + 2, mid, right, array);
-            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
-        }
-    }
-
-    Value query(int root, int left, int right, int from, int to) {
-        if (left >= from && right <= to) {
-            return value[root];
-        }
-        if (right <= from || left >= to) {
-            return defaultValue;
-        }
-        int mid = (left + right) >> 1;
-        Value lValue = query(2 * root + 1, left, mid, from, to);
-        Value rValue = query(2 * root + 2, mid, right, from, to);
-        return joinValue(lValue, rValue);
-    }
-
-public:
-    ReadOnlyIntervalTree(const vector<Value>& array, function<Value(Value, Value)> joinValue) :
-            size(array.size()), joinValue(joinValue) {
-        int vertexSize = size * 4;
-        value = vector<Value>(vertexSize);
-        init(0, 0, size, array);
-    }
-
-    Value query(int from, int to) {
-        return query(0, 0, size, from, to);
-    }
-};
-
-
-#endif //JHELPER_EXAMPLE_PROJECT_INTERVAL_TREE_H
-
-
-
-template <class Edge>
-class LCA {
-private:
-    vi order;
-    vi position;
-    Graph<Edge>* graph;
-    ReadOnlyIntervalTree<int, -1>* lcaTree;
-    vi level;
-
-public:
-    LCA(Graph<Edge>* graph, int root = 0) : graph(graph) {
-        int vertexCount = graph->vertexCount;
-        order = vi(2 * vertexCount - 1);
-        position = vi(vertexCount, -1);
-        level = vi(vertexCount);
-        vi index = vi(vertexCount);
-        vi last = vi(vertexCount);
-        vi stack = vi(vertexCount);
-        stack[0] = root;
-        int size = 1;
-        int j = 0;
-        last[root] = -1;
-        while (size > 0) {
-            int vertex = stack[--size];
-            if (position[vertex] == -1) {
-                position[vertex] = j;
-            }
-            order[j++] = vertex;
-            if (last[vertex] != -1) {
-                level[vertex] = level[last[vertex]] + 1;
-            }
-            while (index[vertex] < graph->edges[vertex].size() && last[vertex] == graph->edges[vertex][index[vertex]]->to) {
-                index[vertex]++;
-            }
-            if (index[vertex] < graph->edges[vertex].size()) {
-                stack[size++] = vertex;
-                int to = graph->edges[vertex][index[vertex]]->to;
-                stack[size++] = graph->edges[vertex][index[vertex]]->to;
-                last[to] = vertex;
-                index[vertex]++;
-            }
-        }
-        lcaTree = new ReadOnlyIntervalTree<int, -1>(order, [this](int left, int right) -> int {
-            if (left == -1) {
-                return right;
-            }
-            if (right == -1) {
-                return left;
-            }
-            if (level[left] < level[right]) {
-                return left;
-            }
-            return right;
-        });
-    }
-
-    int getPosition(int vertex) { return position[vertex]; }
-    int getLCA(int first, int second) {
-        return lcaTree->query(min(position[first], position[second]), max(position[first], position[second]) + 1);
-    }
-    int getLevel(int vertex) {
-        return level[vertex];
-    }
-    int getPathLength(int first, int second) {
-        return level[first] + level[second] - 2 * level[getLCA(first, second)];
-    }
-};
-
-#endif //CPP_LCA_H
-
-
-class Task1471 {
-    void fillDist(int vertex, int last, Graph<IntBiWeightedEdge>& graph, vi& dist, int total) {
-        dist[vertex] = total;
-        for (auto edge : graph.edges[vertex]) {
-            if (edge->to != last) {
-                fillDist(edge->to, vertex, graph, dist, total + edge->weight);
-            }
-        }
-    }
+class TaskE {
 public:
 	void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        vi u, v, w;
-        tie(u, v, w) = in.readArrays<int, int, int>(n - 1);
+        vector<ship> ships;
 
-        Graph<IntBiWeightedEdge> graph(n);
-        for (int i = 0; i < n - 1; ++i) {
-            graph.addEdge(new IntBiWeightedEdge(u[i], v[i], w[i]));
+        for (int i = 0; i < n; ++i) {
+            int x = in.readInt();
+            int y = in.readInt();
+            int z = in.readInt();
+            int r = in.readInt();
+            ships.emplace_back(x, y, z, r, i + 1);
         }
-        vi dist(n);
-        fillDist(0, -1, graph, dist, 0);
-        LCA<IntBiWeightedEdge> lca(&graph);
+        sort(all(ships));
 
-        int m = in.readInt();
-        for (int i = 0; i < m; ++i) {
-            int a = in.readInt();
-            int b = in.readInt();
-            out.printLine(dist[a] + dist[b] - 2 * dist[lca.getLCA(a, b)]);
+        vector<bool> removed(n);
+        vi answer;
+        for (int i = 0; i < n; i++) {
+            if (removed[i]) {
+                continue;
+            }
+            answer.push_back(ships[i].id);
+            for (int j = i + 1; j < n; j++) {
+                if (removed[j]) {
+                    continue;
+                }
+                removed[j] = hypot(hypot(ships[i].x - ships[j].x, ships[i].y - ships[j].y), ships[i].z - ships[j].z) < ships[i].r + ships[j].r - 1e-8;
+            }
         }
+        out.printLine(answer.size());
+        out.printLine(answer);
 	}
 };
 
@@ -849,7 +510,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-	Task1471 solver;
+	TaskE solver;
 	std::istream& in(std::cin);
 	std::ostream& out(std::cout);
 	solver.solve(in, out);

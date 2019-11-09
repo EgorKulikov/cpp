@@ -38,6 +38,7 @@ public:
     template<typename T> vector<vector<T> > readTable(int rows, int cols);
 
     string readLine();
+    double readDouble();
 };
 
 inline bool isWhitespace(int c) {
@@ -71,6 +72,49 @@ template<typename T>
 T Input::readType() {
     error = INVALID_CALL;
     return nullptr;
+}
+
+template<>
+double Input::readType() {
+    error = OK;
+    int c = skipWhitespace();
+    if (error != OK) {
+        return 0;
+    }
+    int sgn = 1;
+    if (c == '-') {
+        sgn = -1;
+        c = get();
+    }
+    double res = 0;
+    do {
+        if (!isdigit(c)) {
+            error = UNEXPECTED_SYMBOL;
+            return 0;
+        }
+        res *= 10;
+        res += c - '0';
+        c = get();
+    } while (!isWhitespace(c) && c != '.');
+    if (c == '.') {
+        vi digits;
+        c = get();
+        do {
+            if (!isdigit(c)) {
+                error = UNEXPECTED_SYMBOL;
+                return 0;
+            }
+            digits.push_back(c - '0');
+            c = get();
+        } while (!isWhitespace(c));
+        double add = 0;
+        for (int i = int(digits.size()) - 1; i >= 0; i--) {
+            add += digits[i];
+            add /= 10;
+        }
+        res += add;
+    }
+    return res;
 }
 
 template<typename T>
@@ -207,6 +251,10 @@ string Input::readLine() {
         c = get();
     } while (c != '\n' && c != '\r' && c != EOF);
     return string(res.begin(), res.begin() + length);
+}
+
+double Input::readDouble() {
+    return readType<double>();
 }
 
 template<typename T1, typename T2, typename T3>

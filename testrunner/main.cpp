@@ -1,4 +1,4 @@
-#include "C:/Users/kulikov/proj/cpp/tasks/Task1471.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/TaskE.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"3\n1 0 1\n2 0 1\n3\n0 1\n0 2\n1 2\n", "1\n1\n2\n", true, true},
+		{"4\n1 0 0 1\n2 0 0 1\n7 0 0 1\n10 0 0 3\n", "2\n2 4 \n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -48,7 +48,7 @@ int main() {
 			std::stringstream in(test.input);
 			std::ostringstream out;
 			std::clock_t start = std::clock();
-			Task1471 solver;
+			TaskE solver;
 			solver.solve(in, out);
 			std::clock_t finish = std::clock();
 			double currentTime = double(finish - start) / CLOCKS_PER_SEC;
