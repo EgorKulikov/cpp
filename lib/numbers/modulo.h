@@ -19,7 +19,7 @@ private:
 
 public:
     ModuloInt() : n(0) {}
-    ModuloInt(int n) {
+    ModuloInt(ll n) {
         n %= mod;
         if (n < 0) {
             n += mod;

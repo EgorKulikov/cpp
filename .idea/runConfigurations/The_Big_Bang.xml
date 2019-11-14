@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="The Big Bang" type="name.admitriev.jhelper.configuration.TaskConfigurationType" factoryName="Task" className="TheBigBang" cppPath="tasks/TheBigBang.cpp" inputType="STANDARD" inputFile="input.txt" outputType="STANDARD" outputFile="output.txt" testType="SINGLE">
+    <tests>
+      <test input="4&#10;2&#10;3&#10;1344&#10;70&#10;100" output="2&#10;1&#10;0" active="true" />
+    </tests>
+    <method v="2" />
+  </configuration>
+</component>

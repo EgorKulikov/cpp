@@ -459,50 +459,27 @@ void Output::printSingle(const pair<T, U>& value) {
 #endif //JHELPER_EXAMPLE_PROJECT_OUTPUT_H
 
 
-struct ship {
-    int x, y, z, r, id;
-
-    ship(int x, int y, int z, int r, int id) : x(x), y(y), z(z), r(r), id(id) {}
-};
-
-bool operator <(const ship& a, const ship& b) {
-    return a.r > b.r;
-}
-
-class TaskE {
+class IPL {
 public:
 	void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        vector<ship> ships;
-
-        for (int i = 0; i < n; ++i) {
-            int x = in.readInt();
-            int y = in.readInt();
-            int z = in.readInt();
-            int r = in.readInt();
-            ships.emplace_back(x, y, z, r, i + 1);
-        }
-        sort(all(ships));
-
-        vector<bool> removed(n);
-        vi answer;
-        for (int i = 0; i < n; i++) {
-            if (removed[i]) {
-                continue;
+        auto supw = in.readIntArray(n);
+        vi answer(n + 1);
+        for (int i = 1; i <= n; i++) {
+            int res = MAX_INT;
+            for (int j = i - 1; j >= i - 3 && j >= 0; j--) {
+                minim(res, answer[j]);
             }
-            answer.push_back(ships[i].id);
-            for (int j = i + 1; j < n; j++) {
-                if (removed[j]) {
-                    continue;
-                }
-                removed[j] = hypot(hypot(ships[i].x - ships[j].x, ships[i].y - ships[j].y), ships[i].z - ships[j].z) < ships[i].r + ships[j].r - 1e-8;
-            }
+            answer[i] = res + supw[i - 1];
         }
-        out.printLine(answer.size());
-        out.printLine(answer);
+        int res = MAX_INT;
+        for (int i = n; i >= n - 2 && i >= 0; i--) {
+            minim(res, answer[i]);
+        }
+        out.printLine(accumulate(all(supw), 0) - res);
 	}
 };
 
@@ -510,7 +487,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-	TaskE solver;
+	IPL solver;
 	std::istream& in(std::cin);
 	std::ostream& out(std::cout);
 	solver.solve(in, out);
