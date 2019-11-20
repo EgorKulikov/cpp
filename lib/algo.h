@@ -45,4 +45,17 @@ inline void addAll(vector<T>& v, const vector<T>& toAdd) {
     v.insert(v.end(), toAdd.begin(), toAdd.end());
 }
 
+vi getQty(const vi& arr, int length) {
+    vi res(length);
+    int n = arr.size();
+    for (int i : arr) {
+        res[i]++;
+    }
+    return res;
+}
+
+vi getQty(const vi& arr) {
+    return getQty(arr, *max_element(all(arr)) + 1);
+}
+
 #endif //JHELPER_EXAMPLE_PROJECT_ALGO_H

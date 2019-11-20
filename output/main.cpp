@@ -10,10 +10,6 @@
 #ifndef JHELPER_EXAMPLE_PROJECT_INPUT_H
 #define JHELPER_EXAMPLE_PROJECT_INPUT_H
 
-//
-// Created by egor on 30.10.2019.
-//
-
 #ifndef JHELPER_EXAMPLE_PROJECT_GENERAL_H
 #define JHELPER_EXAMPLE_PROJECT_GENERAL_H
 
@@ -35,38 +31,44 @@ const int DX_KNIGHT[] = {2, 1, -1, -2, -2, -1, 1, 2};
 const int DY_KNIGHT[] = {1, 2, 2, 1, -1, -2, -2, -1};
 const int DX4[] = {1, 0, -1, 0};
 const int DY4[] = {0, 1, 0, -1};
+const int DX8[] = {1, 1, 1, 0, -1, -1, -1, 0};
+const int DY8[] = {-1, 0, 1, 1, 1, 0, -1, -1};
 
-bool isValidCell(int x, int y, int rows, int cols) {
-    return x >= 0 && y >= 0 && x < rows && y < cols;
-}
-
-void decreaseByOne() {
-}
-
-template <typename T, class...Vargs>
-void decreaseByOne(vector<T>& arr, Vargs&...arrs) {
-    for (int& i : arr) {
-        i--;
-    }
-    decreaseByOne(arrs...);
-}
-
-template <typename T>
-T minim(T& was, T cand) {
+template<typename T>
+T minim(T &was, T cand) {
     return was = min(was, cand);
 }
 
-template <typename T>
-T maxim(T& was, T cand) {
+template<typename T>
+T maxim(T &was, T cand) {
     return was = max(was, cand);
 }
 
-inline int bitCount(int number) {
-    return __builtin_popcount(number);
+bool isValidCell(int r, int c, int n, int m) {
+    return r >= 0 && c >= 0 && r < n && c < m;
 }
 
-inline int bitCount(ll number) {
-    return __builtin_popcount(number);
+template<typename T, typename U>
+void decreaseByOne(vector<pair<T, U> > &v) {
+    for (auto &p : v) {
+        p.first--;
+        p.second--;
+    }
+}
+
+void decreaseByOne() {}
+
+template<typename T, class...Vs>
+void decreaseByOne(vector<T> &arr, Vs &...vs) {
+    int n = arr.size();
+    for (int i = 0; i < n; ++i) {
+        arr[i]--;
+    }
+    decreaseByOne(vs...);
+}
+
+inline bool isSubset(int set, int subSet) {
+    return (set & subSet) == subSet;
 }
 
 #endif //JHELPER_EXAMPLE_PROJECT_GENERAL_H
@@ -82,32 +84,60 @@ public:
     };
 
 private:
-    istream& in;
+    istream &in;
     bool exhausted = false;
     ErrorType error = OK;
+
     int get();
-    template<typename T> T readInteger();
+
+    template<typename T>
+    T readInteger();
+
     int skipWhitespace();
 
 public:
-    Input(istream& in);
+    Input(istream &in);
+
     int readInt();
+
     ll readLong();
+
     string readString();
+
     vector<int> readIntArray(int size);
-    template<typename T> T readType();
-    template<typename T, typename U> pair<T, U> readType();
-    template<typename T> vector<T> readArray(int size);
-    template<typename T1, typename T2> tuple<vector<T1>, vector<T2> > readArrays(int size);
-    template<typename T1, typename T2, typename T3> tuple<vector<T1>, vector<T2>, vector<T3> > readArrays(int size);
+
+    template<typename T>
+    T readType();
+
+    template<typename T, typename U>
+    pair<T, U> readType();
+
+    template<typename T>
+    vector<T> readArray(int size);
+
+    template<typename T, typename U>
+    vector<pair<T, U> > readArray(int size);
+
+    template<typename T1, typename T2>
+    tuple<vector<T1>, vector<T2> > readArrays(int size);
+
+    template<typename T1, typename T2, typename T3>
+    tuple<vector<T1>, vector<T2>, vector<T3> > readArrays(int size);
+
     template<typename T1, typename T2, typename T3, typename T4>
-        tuple<vector<T1>, vector<T2>, vector<T3>, vector<T4> > readArrays(int size);
+    tuple<vector<T1>, vector<T2>, vector<T3>, vector<T4> > readArrays(int size);
+
     template<typename T1, typename T2, typename T3, typename T4, typename T5>
-        tuple<vector<T1>, vector<T2>, vector<T3>, vector<T4>, vector<T5> > readArrays(int size);
-    template<typename T> vector<vector<T> > readTable(int rows, int cols);
+    tuple<vector<T1>, vector<T2>, vector<T3>, vector<T4>, vector<T5> > readArrays(int size);
+
+    template<typename T>
+    vector<vector<T> > readTable(int rows, int cols);
 
     string readLine();
+
     double readDouble();
+
+    bool isExhausted() { return exhausted; }
 };
 
 inline bool isWhitespace(int c) {
@@ -270,6 +300,27 @@ vector<T> Input::readArray(int size) {
     return res;
 }
 
+template<typename U, typename V>
+pair<U, V> Input::readType() {
+    U first = readType<U>();
+    V second = readType<V>();
+    return make_pair(first, second);
+}
+
+template<typename U, typename V>
+vector<pair<U, V> > Input::readArray(int size) {
+    vector<pair<U, V> > res;
+    res.reserve(size);
+    for (int i = 0; i < size; i++) {
+        res.push_back(readType<U, V>());
+        if (error != OK) {
+            res.clear();
+            return res;
+        }
+    }
+    return res;
+}
+
 vector<int> Input::readIntArray(int size) {
     return readArray<int>(size);
 }
@@ -393,20 +444,29 @@ tuple<vector<T1>, vector<T2>, vector<T3>, vector<T4>, vector<T5> > Input::readAr
 #define JHELPER_EXAMPLE_PROJECT_OUTPUT_H
 
 
-
 class Output {
 private:
-    ostream& out;
-    template<typename T> void printSingle(const T& value);
-    template<typename T> void printSingle(const vector<T>& value);
-    template<typename T, typename U> void printSingle(const pair<T, U>& value);
+    ostream &out;
+
+    template<typename T>
+    void printSingle(const T &value);
+
+    template<typename T>
+    void printSingle(const vector<T> &value);
+
+    template<typename T, typename U>
+    void printSingle(const pair<T, U> &value);
 
 public:
-    Output(ostream& out);
+    Output(ostream &out);
+
     void print();
-    template<typename T, typename...Targs>void print(const T& first, const Targs... args);
-    template<typename...Targs>void printLine(const Targs... args);
-    void flush();
+
+    template<typename T, typename...Targs>
+    void print(const T &first, const Targs... args);
+
+    template<typename...Targs>
+    void printLine(const Targs... args);
 };
 
 Output::Output(ostream &out) : out(out) {
@@ -417,7 +477,7 @@ void Output::print() {
 }
 
 template<typename T, typename... Targs>
-void Output::print(const T& first, const Targs... args) {
+void Output::print(const T &first, const Targs... args) {
     printSingle(first);
     if (sizeof...(args) != 0) {
         out << ' ';
@@ -426,7 +486,7 @@ void Output::print(const T& first, const Targs... args) {
 }
 
 template<typename T>
-void Output::printSingle(const T& value) {
+void Output::printSingle(const T &value) {
     out << value;
 }
 
@@ -436,12 +496,8 @@ void Output::printLine(const Targs... args) {
     out << '\n';
 }
 
-void Output::flush() {
-    out.flush();
-}
-
 template<typename T>
-void Output::printSingle(const vector<T>& array) {
+void Output::printSingle(const vector<T> &array) {
     unsigned int size = array.size();
     for (int i = 0; i < size; ++i) {
         out << array[i];
@@ -452,44 +508,89 @@ void Output::printSingle(const vector<T>& array) {
 }
 
 template<typename T, typename U>
-void Output::printSingle(const pair<T, U>& value) {
+void Output::printSingle(const pair<T, U> &value) {
     out << value.first << ' ' << value.second;
 }
 
 #endif //JHELPER_EXAMPLE_PROJECT_OUTPUT_H
 
 
-class IPL {
+//#pragma comment(linker, "/STACK:200000000")
+
+class TaskA {
 public:
-	void solve(istream& inp, ostream& outp) {
+    void solve(istream &inp, ostream &outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        auto supw = in.readIntArray(n);
-        vi answer(n + 1);
-        for (int i = 1; i <= n; i++) {
-            int res = MAX_INT;
-            for (int j = i - 1; j >= i - 3 && j >= 0; j--) {
-                minim(res, answer[j]);
+        vector<pair<pair<ll, ll>, ll> > masters;
+
+        for (int i = 0; i < n; ++i) {
+            pair<ll, ll> seg = in.readType<ll, ll>();
+            ll t = in.readLong();
+            masters.emplace_back(seg, t);
+        }
+        sort(all(masters));
+        ll answer = 0;
+
+        priority_queue<pair<ll, ll> > q;
+
+        ll lastDone = 0;
+
+        for (int i = 0; i < n; i++) {
+            bool skip = false;
+            while (true) {
+                while (!q.empty() &&
+                       (q.top().second <= masters[i].first.first || lastDone - q.top().first > q.top().second)) {
+                    ll times = max((min(masters[i].first.first, q.top().second) - lastDone) / (-q.top().first), ll(0));
+                    answer += times;
+                    lastDone += times * (-q.top().first);
+                    q.pop();
+                }
+                if (q.empty()) {
+                    q.emplace(-masters[i].second, masters[i].first.second);
+                    lastDone = masters[i].first.first;
+                    skip = true;
+                    break;
+                }
+                ll times = max((masters[i].first.first - lastDone) / (-q.top().first), ll(0));
+                answer += times;
+                lastDone += times * (-q.top().first);
+                if (times == 0) {
+                    break;
+                }
             }
-            answer[i] = res + supw[i - 1];
+            if (skip) {
+                continue;
+            }
+            ll ends = lastDone - q.top().first;
+            while (i < n && masters[i].first.first < ends) {
+                minim(ends, masters[i].first.first + masters[i].second);
+                q.emplace(-masters[i].second, masters[i].first.second);
+                i++;
+            }
+            i--;
+            lastDone = ends;
+            answer++;
         }
-        int res = MAX_INT;
-        for (int i = n; i >= n - 2 && i >= 0; i--) {
-            minim(res, answer[i]);
+        while (!q.empty()) {
+            ll times = max((q.top().second - lastDone) / (-q.top().first), ll(0));
+            answer += times;
+            lastDone += times * (-q.top().first);
+            q.pop();
         }
-        out.printLine(accumulate(all(supw), 0) - res);
-	}
+        out.printLine(answer);
+    }
 };
 
 
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-	IPL solver;
-	std::istream& in(std::cin);
-	std::ostream& out(std::cout);
-	solver.solve(in, out);
-	return 0;
+    TaskA solver;
+    std::istream &in(std::cin);
+    std::ostream &out(std::cout);
+    solver.solve(in, out);
+    return 0;
 }

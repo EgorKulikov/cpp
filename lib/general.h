@@ -1,7 +1,3 @@
-//
-// Created by egor on 30.10.2019.
-//
-
 #ifndef JHELPER_EXAMPLE_PROJECT_GENERAL_H
 #define JHELPER_EXAMPLE_PROJECT_GENERAL_H
 
@@ -23,21 +19,8 @@ const int DX_KNIGHT[] = {2, 1, -1, -2, -2, -1, 1, 2};
 const int DY_KNIGHT[] = {1, 2, 2, 1, -1, -2, -2, -1};
 const int DX4[] = {1, 0, -1, 0};
 const int DY4[] = {0, 1, 0, -1};
-
-bool isValidCell(int x, int y, int rows, int cols) {
-    return x >= 0 && y >= 0 && x < rows && y < cols;
-}
-
-void decreaseByOne() {
-}
-
-template <typename T, class...Vargs>
-void decreaseByOne(vector<T>& arr, Vargs&...arrs) {
-    for (int& i : arr) {
-        i--;
-    }
-    decreaseByOne(arrs...);
-}
+const int DX8[] = {1, 1, 1, 0, -1, -1, -1, 0};
+const int DY8[] = {-1, 0, 1, 1, 1, 0, -1, -1};
 
 template <typename T>
 T minim(T& was, T cand) {
@@ -49,12 +32,31 @@ T maxim(T& was, T cand) {
     return was = max(was, cand);
 }
 
-inline int bitCount(int number) {
-    return __builtin_popcount(number);
+bool isValidCell(int r, int c, int n, int m) {
+    return r >= 0 && c >= 0 && r < n && c < m;
 }
 
-inline int bitCount(ll number) {
-    return __builtin_popcount(number);
+template <typename T, typename U>
+void decreaseByOne(vector<pair<T, U> >& v) {
+    for (auto& p : v) {
+        p.first--;
+        p.second--;
+    }
+}
+
+void decreaseByOne() {}
+
+template <typename T, class...Vs>
+void decreaseByOne(vector<T>& arr, Vs&...vs) {
+    int n = arr.size();
+    for (int i = 0; i < n; ++i) {
+        arr[i]--;
+    }
+    decreaseByOne(vs...);
+}
+
+inline bool isSubset(int set, int subSet) {
+    return (set & subSet) == subSet;
 }
 
 #endif //JHELPER_EXAMPLE_PROJECT_GENERAL_H

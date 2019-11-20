@@ -29,6 +29,7 @@ public:
     template<typename T> T readType();
     template<typename T, typename U> pair<T, U> readType();
     template<typename T> vector<T> readArray(int size);
+    template<typename T, typename U> vector<pair<T, U> > readArray(int size);
     template<typename T1, typename T2> tuple<vector<T1>, vector<T2> > readArrays(int size);
     template<typename T1, typename T2, typename T3> tuple<vector<T1>, vector<T2>, vector<T3> > readArrays(int size);
     template<typename T1, typename T2, typename T3, typename T4>
@@ -39,6 +40,7 @@ public:
 
     string readLine();
     double readDouble();
+    bool isExhausted() { return exhausted; }
 };
 
 inline bool isWhitespace(int c) {
@@ -193,6 +195,27 @@ vector<T> Input::readArray(int size) {
     res.reserve(size);
     for (int i = 0; i < size; i++) {
         res.push_back(readType<T>());
+        if (error != OK) {
+            res.clear();
+            return res;
+        }
+    }
+    return res;
+}
+
+template <typename U, typename V>
+pair<U, V > Input::readType() {
+    U first = readType<U>();
+    V second = readType<V>();
+    return make_pair(first, second);
+}
+
+template <typename U, typename V>
+vector<pair<U, V> > Input::readArray(int size) {
+    vector<pair<U, V> > res;
+    res.reserve(size);
+    for (int i = 0; i < size; i++) {
+        res.push_back(readType<U, V>());
         if (error != OK) {
             res.clear();
             return res;

@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Fibonacci Inspiration" type="name.admitriev.jhelper.configuration.TaskConfigurationType" factoryName="Task" className="FibonacciInspiration" cppPath="tasks/FibonacciInspiration.cpp" inputType="STANDARD" outputType="STANDARD" testType="MULTI_NUMBER">
-    <tests>
-      <test input="1&#10;2 4 5 6 6 5" output="25" active="true" />
-    </tests>
-    <method v="2" />
-  </configuration>
-</component>

@@ -17,6 +17,7 @@ private:
 public:
     DSU(int n);
     int get(int i);
+    int operator[](int i) { return get(i); }
     int getSize(int i) { return size[get(i)]; }
     int getSetCount() { return setCount; }
     bool join(int a, int b);

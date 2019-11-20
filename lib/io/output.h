@@ -19,7 +19,6 @@ public:
     void print();
     template<typename T, typename...Targs>void print(const T& first, const Targs... args);
     template<typename...Targs>void printLine(const Targs... args);
-    void flush();
 };
 
 Output::Output(ostream &out) : out(out) {
@@ -47,10 +46,6 @@ template<typename... Targs>
 void Output::printLine(const Targs... args) {
     print(args...);
     out << '\n';
-}
-
-void Output::flush() {
-    out.flush();
 }
 
 template<typename T>

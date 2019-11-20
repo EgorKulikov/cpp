@@ -20,6 +20,11 @@ T gcd(T a, T b) {
 }
 
 template <typename T>
+T lcm(T a, T b) {
+    return a / gcd(a, b) * b;
+}
+
+template <typename T>
 T power(const T& a, ll b) {
     if (b == 0) {
         return 1;

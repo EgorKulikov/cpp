@@ -2,5 +2,6 @@
 <project version="4">
   <component name="Configurator">
     <option name="author" value="Egor Kulikov" />
+    <option name="codeReformattingOn" value="true" />
   </component>
 </project>

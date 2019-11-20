@@ -18,12 +18,6 @@ private:
     vi nextEdge;
     C inf;
 
-    MaxFlow(Graph<Edge>& graph, int source, int destination) : graph(&graph), source(source), destination(destination) {
-        dist = vi(graph.vertexCount);
-        nextEdge = vi(graph.vertexCount);
-        inf = numeric_limits<C>().max();
-    }
-
     void edgeDistances() {
         fill(all(dist), -1);
         dist[source] = 0;
@@ -70,6 +64,12 @@ private:
     }
 
 public:
+    MaxFlow(Graph<Edge>& graph, int source, int destination) : graph(&graph), source(source), destination(destination) {
+        dist = vi(graph.vertexCount);
+        nextEdge = vi(graph.vertexCount);
+        inf = numeric_limits<C>().max();
+    }
+
     C dinic() {
         C totalFlow = 0;
         while (true) {
