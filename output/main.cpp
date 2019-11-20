@@ -7,11 +7,11 @@
 #include <iostream>
 #include <fstream>
 
-#ifndef JHELPER_EXAMPLE_PROJECT_INPUT_H
-#define JHELPER_EXAMPLE_PROJECT_INPUT_H
+#ifndef CPP_INPUT_H
+#define CPP_INPUT_H
 
-#ifndef JHELPER_EXAMPLE_PROJECT_GENERAL_H
-#define JHELPER_EXAMPLE_PROJECT_GENERAL_H
+#ifndef CPP_GENERAL_H
+#define CPP_GENERAL_H
 
 #include <bits/stdc++.h>
 
@@ -22,8 +22,6 @@ using namespace std;
 typedef long long ll;
 typedef vector<int> vi;
 typedef pair<int, int> pii;
-
-const int MAX_INT = 2147483647;
 
 const double PI = atan(1) * 4;
 
@@ -71,8 +69,12 @@ inline bool isSubset(int set, int subSet) {
     return (set & subSet) == subSet;
 }
 
-#endif //JHELPER_EXAMPLE_PROJECT_GENERAL_H
+#endif
 
+
+inline bool isWhitespace(int c) {
+    return isspace(c) || c == EOF;
+}
 
 class Input {
 public:
@@ -88,15 +90,69 @@ private:
     bool exhausted = false;
     ErrorType error = OK;
 
-    int get();
+    inline int get() {
+        int result = in.get();
+        if (result == EOF) {
+            exhausted = true;
+        }
+        return result;
+    }
 
     template<typename T>
-    T readInteger();
+    T readInteger() {
+        error = OK;
+        int c = skipWhitespace();
+        if (error != OK) {
+            return 0;
+        }
+        int sgn = 1;
+        if (c == '-') {
+            sgn = -1;
+            c = get();
+        }
+        T res = 0;
+        do {
+            if (!isdigit(c)) {
+                error = UNEXPECTED_SYMBOL;
+                return 0;
+            }
+            res *= 10;
+            res += c - '0';
+            c = get();
+        } while (!isWhitespace(c));
+        return res * sgn;
+    }
 
-    int skipWhitespace();
+    inline int skipWhitespace() {
+        int c;
+        do {
+            c = get();
+            if (exhausted) {
+                error = END_OF_FILE;
+                return c;
+            }
+        } while (isWhitespace(c));
+        return c;
+    }
+
+    void initArrays(int n) {}
+
+    template<typename T, class...Vs>
+    void initArrays(int n, vector<T> &arr, Vs &...vs) {
+        arr.resize(n);
+        initArrays(n, vs...);
+    }
+
+    void readImpl(int i) {}
+
+    template<typename T, class...Vs>
+    void readImpl(int i, vector<T> &arr, Vs &...vs) {
+        arr[i] = readType<T>();
+        readImpl(i, vs...);
+    }
 
 public:
-    Input(istream &in);
+    Input(istream &in) : in(in) {};
 
     int readInt();
 
@@ -104,74 +160,95 @@ public:
 
     string readString();
 
-    vector<int> readIntArray(int size);
+    vector<int> readIntArray(int size) {
+        return readArray<int>(size);
+    }
 
     template<typename T>
-    T readType();
+    T readType() {
+        error = INVALID_CALL;
+        return nullptr;
+    }
 
-    template<typename T, typename U>
-    pair<T, U> readType();
-
-    template<typename T>
-    vector<T> readArray(int size);
-
-    template<typename T, typename U>
-    vector<pair<T, U> > readArray(int size);
-
-    template<typename T1, typename T2>
-    tuple<vector<T1>, vector<T2> > readArrays(int size);
-
-    template<typename T1, typename T2, typename T3>
-    tuple<vector<T1>, vector<T2>, vector<T3> > readArrays(int size);
-
-    template<typename T1, typename T2, typename T3, typename T4>
-    tuple<vector<T1>, vector<T2>, vector<T3>, vector<T4> > readArrays(int size);
-
-    template<typename T1, typename T2, typename T3, typename T4, typename T5>
-    tuple<vector<T1>, vector<T2>, vector<T3>, vector<T4>, vector<T5> > readArrays(int size);
+    template<typename U, typename V>
+    pair<U, V> readType() {
+        U first = readType<U>();
+        V second = readType<V>();
+        return make_pair(first, second);
+    }
 
     template<typename T>
-    vector<vector<T> > readTable(int rows, int cols);
+    vector<T> readArray(int size) {
+        vector<T> res;
+        res.reserve(size);
+        for (int i = 0; i < size; i++) {
+            res.push_back(readType<T>());
+            if (error != OK) {
+                res.clear();
+                return res;
+            }
+        }
+        return res;
+    }
 
-    string readLine();
+
+    template<class...Vs>
+    void readArrays(int n, Vs &...vs) {
+        initArrays(n, vs...);
+        for (int i = 0; i < n; i++) {
+            readImpl(i, vs...);
+        }
+    }
+
+    template<typename U, typename V>
+    vector<pair<U, V> > readArray(int size) {
+        vector<pair<U, V> > res;
+        res.reserve(size);
+        for (int i = 0; i < size; i++) {
+            res.push_back(readType<U, V>());
+            if (error != OK) {
+                res.clear();
+                return res;
+            }
+        }
+        return res;
+    }
+
+    template<typename T>
+    vector<vector<T> > readTable(int rows, int cols) {
+        vector<vector<T> > result;
+        result.reserve(rows);
+        for (int i = 0; i < rows; ++i) {
+            result.push_back(readArray<T>(cols));
+        }
+        return result;
+    }
+
+    string readLine() {
+        error = OK;
+        int c = skipWhitespace();
+        if (error != OK) {
+            return "";
+        }
+        int length = 0;
+        vector<char> res;
+        do {
+            if (error != OK) {
+                return "";
+            }
+            res.push_back(c);
+            if (!isWhitespace(c)) {
+                length = res.size();
+            }
+            c = get();
+        } while (c != '\n' && c != '\r' && c != EOF);
+        return string(res.begin(), res.begin() + length);
+    }
 
     double readDouble();
 
     bool isExhausted() { return exhausted; }
 };
-
-inline bool isWhitespace(int c) {
-    return isspace(c) || c == EOF;
-}
-
-int Input::skipWhitespace() {
-    int c;
-    do {
-        c = get();
-        if (exhausted) {
-            error = END_OF_FILE;
-            return c;
-        }
-    } while (isWhitespace(c));
-    return c;
-}
-
-Input::Input(std::istream &in) : in(in) {
-}
-
-inline int Input::get() {
-    int result = in.get();
-    if (result == EOF) {
-        exhausted = true;
-    }
-    return result;
-}
-
-template<typename T>
-T Input::readType() {
-    error = INVALID_CALL;
-    return nullptr;
-}
 
 template<>
 double Input::readType() {
@@ -213,31 +290,6 @@ double Input::readType() {
         }
         res += add;
     }
-    return res;
-}
-
-template<typename T>
-T Input::readInteger() {
-    error = OK;
-    int c = skipWhitespace();
-    if (error != OK) {
-        return 0;
-    }
-    int sgn = 1;
-    if (c == '-') {
-        sgn = -1;
-        c = get();
-    }
-    T res = 0;
-    do {
-        if (!isdigit(c)) {
-            error = UNEXPECTED_SYMBOL;
-            return 0;
-        }
-        res *= 10;
-        res += c - '0';
-        c = get();
-    } while (!isWhitespace(c));
     return res * sgn;
 }
 
@@ -286,162 +338,18 @@ inline ll Input::readLong() {
     return readType<ll>();
 }
 
-template<typename T>
-vector<T> Input::readArray(int size) {
-    vector<T> res;
-    res.reserve(size);
-    for (int i = 0; i < size; i++) {
-        res.push_back(readType<T>());
-        if (error != OK) {
-            res.clear();
-            return res;
-        }
-    }
-    return res;
-}
-
-template<typename U, typename V>
-pair<U, V> Input::readType() {
-    U first = readType<U>();
-    V second = readType<V>();
-    return make_pair(first, second);
-}
-
-template<typename U, typename V>
-vector<pair<U, V> > Input::readArray(int size) {
-    vector<pair<U, V> > res;
-    res.reserve(size);
-    for (int i = 0; i < size; i++) {
-        res.push_back(readType<U, V>());
-        if (error != OK) {
-            res.clear();
-            return res;
-        }
-    }
-    return res;
-}
-
-vector<int> Input::readIntArray(int size) {
-    return readArray<int>(size);
-}
-
-template<typename T1, typename T2>
-tuple<vector<T1>, vector<T2> > Input::readArrays(int size) {
-    vector<T1> v1;
-    vector<T2> v2;
-    v1.reserve(size);
-    v2.reserve(size);
-    for (int i = 0; i < size; ++i) {
-        v1.push_back(readType<T1>());
-        v2.push_back(readType<T2>());
-    }
-    return make_tuple(v1, v2);
-}
-
 string Input::readString() {
     return readType<string>();
-}
-
-template<typename T>
-vector<vector<T>> Input::readTable(int rows, int cols) {
-    vector<vector<T> > result;
-    result.reserve(rows);
-    for (int i = 0; i < rows; ++i) {
-        result.push_back(readArray<T>(cols));
-    }
-    return result;
-}
-
-string Input::readLine() {
-    error = OK;
-    int c = skipWhitespace();
-    if (error != OK) {
-        return "";
-    }
-    int length = 0;
-    vector<char> res;
-    do {
-        if (error != OK) {
-            return "";
-        }
-        res.push_back(c);
-        if (!isWhitespace(c)) {
-            length = res.size();
-        }
-        c = get();
-    } while (c != '\n' && c != '\r' && c != EOF);
-    return string(res.begin(), res.begin() + length);
 }
 
 double Input::readDouble() {
     return readType<double>();
 }
 
-template<typename T1, typename T2, typename T3>
-tuple<vector<T1>, vector<T2>, vector<T3> > Input::readArrays(int size) {
-    vector<T1> v1;
-    vector<T2> v2;
-    vector<T3> v3;
-    v1.reserve(size);
-    v2.reserve(size);
-    v3.reserve(size);
-    for (int i = 0; i < size; ++i) {
-        v1.push_back(readType<T1>());
-        v2.push_back(readType<T2>());
-        v3.push_back(readType<T3>());
-    }
-    return make_tuple(v1, v2, v3);
-}
+#endif
 
-template<typename T1, typename T2, typename T3, typename T4>
-tuple<vector<T1>, vector<T2>, vector<T3>, vector<T4> > Input::readArrays(int size) {
-    vector<T1> v1;
-    vector<T2> v2;
-    vector<T3> v3;
-    vector<T4> v4;
-    v1.reserve(size);
-    v2.reserve(size);
-    v3.reserve(size);
-    v4.reserve(size);
-    for (int i = 0; i < size; ++i) {
-        v1.push_back(readType<T1>());
-        v2.push_back(readType<T2>());
-        v3.push_back(readType<T3>());
-        v4.push_back(readType<T4>());
-    }
-    return make_tuple(v1, v2, v3, v4);
-}
-
-template<typename T1, typename T2, typename T3, typename T4, typename T5>
-tuple<vector<T1>, vector<T2>, vector<T3>, vector<T4>, vector<T5> > Input::readArrays(int size) {
-    vector<T1> v1;
-    vector<T2> v2;
-    vector<T3> v3;
-    vector<T4> v4;
-    vector<T5> v5;
-    v1.reserve(size);
-    v2.reserve(size);
-    v3.reserve(size);
-    v4.reserve(size);
-    v5.reserve(size);
-    for (int i = 0; i < size; ++i) {
-        v1.push_back(readType<T1>());
-        v2.push_back(readType<T2>());
-        v3.push_back(readType<T3>());
-        v4.push_back(readType<T4>());
-        v5.push_back(readType<T5>());
-    }
-    return make_tuple(v1, v2, v3, v4, v5);
-}
-
-#endif //JHELPER_EXAMPLE_PROJECT_INPUT_H
-
-//
-// Created by egor on 31.10.2019.
-//
-
-#ifndef JHELPER_EXAMPLE_PROJECT_OUTPUT_H
-#define JHELPER_EXAMPLE_PROJECT_OUTPUT_H
+#ifndef CPP_OUTPUT_H
+#define CPP_OUTPUT_H
 
 
 class Output {
@@ -512,74 +420,156 @@ void Output::printSingle(const pair<T, U> &value) {
     out << value.first << ' ' << value.second;
 }
 
-#endif //JHELPER_EXAMPLE_PROJECT_OUTPUT_H
+#endif
+
+//
+// Created by egor on 31.10.2019.
+//
+
+#ifndef JHELPER_EXAMPLE_PROJECT_ALGO_H
+#define JHELPER_EXAMPLE_PROJECT_ALGO_H
+
+
+template<typename T>
+inline void unique(vector<T> &v) {
+    v.resize(unique(all(v)) - v.begin());
+}
+
+vi createOrder(int n) {
+    vi order(n);
+    for (int i = 0; i < n; i++) {
+        order[i] = i;
+    }
+    return order;
+}
+
+template<typename T>
+inline vector<vector<T> > makeArray(int a, int b, T init) {
+    return vector<vector<T> >(a, vector<T>(b, init));
+}
+
+template<typename T>
+inline vector<vector<vector<T> > > makeArray(int a, int b, int c, T init) {
+    return vector<vector<vector<T> > >(a, makeArray<T>(b, c, init));
+}
+
+template<typename T>
+inline void addAll(vector<T> &v, const vector<T> &toAdd) {
+    v.insert(v.end(), toAdd.begin(), toAdd.end());
+}
+
+vi getQty(const vi &arr, int length) {
+    vi res(length);
+    int n = arr.size();
+    for (int i : arr) {
+        res[i]++;
+    }
+    return res;
+}
+
+vi getQty(const vi &arr) {
+    return getQty(arr, *max_element(all(arr)) + 1);
+}
+
+#endif //JHELPER_EXAMPLE_PROJECT_ALGO_H
 
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class TaskA {
+class LineSweep {
 public:
     void solve(istream &inp, ostream &outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        vector<pair<pair<ll, ll>, ll> > masters;
-
-        for (int i = 0; i < n; ++i) {
-            pair<ll, ll> seg = in.readType<ll, ll>();
-            ll t = in.readLong();
-            masters.emplace_back(seg, t);
+        int m = in.readInt();
+        int f = in.readInt();
+        vi r, c;
+        in.readArrays(f, r, c);
+        decreaseByOne(r, c);
+        auto map = makeArray(n, m, false);
+        for (int i = 0; i < f; ++i) {
+            map[r[i]][c[i]] = true;
         }
-        sort(all(masters));
-        ll answer = 0;
-
-        priority_queue<pair<ll, ll> > q;
-
-        ll lastDone = 0;
-
-        for (int i = 0; i < n; i++) {
-            bool skip = false;
-            while (true) {
-                while (!q.empty() &&
-                       (q.top().second <= masters[i].first.first || lastDone - q.top().first > q.top().second)) {
-                    ll times = max((min(masters[i].first.first, q.top().second) - lastDone) / (-q.top().first), ll(0));
-                    answer += times;
-                    lastDone += times * (-q.top().first);
-                    q.pop();
+        int width = n;
+        for (int i = 0; i < m; i++) {
+            int current = 0;
+            for (int j = 0; j < n; j++) {
+                if (map[j][i]) {
+                    if (current > 0) {
+                        minim(width, current);
+                    }
+                    current = 0;
+                } else {
+                    current++;
                 }
-                if (q.empty()) {
-                    q.emplace(-masters[i].second, masters[i].first.second);
-                    lastDone = masters[i].first.first;
-                    skip = true;
+            }
+            if (current > 0) {
+                minim(width, current);
+            }
+        }
+        auto next = makeArray(n, m, 0);
+        for (int i = 0; i < m; i++) {
+            int nx = n;
+            for (int j = n - 1; j >= 0; j--) {
+                if (map[j][i]) {
+                    nx = j;
+                }
+                next[j][i] = nx;
+            }
+        }
+        auto sweeped = makeArray(m, n, false);
+        auto trySweep = [&](int i, int j) -> bool {
+            if (next[i][j] < i + width) {
+                return false;
+            }
+            bool freeSpace = false;
+            for (int k = 0; k < width; k++) {
+                if (!sweeped[j][i + k]) {
+                    freeSpace = true;
                     break;
                 }
-                ll times = max((masters[i].first.first - lastDone) / (-q.top().first), ll(0));
-                answer += times;
-                lastDone += times * (-q.top().first);
-                if (times == 0) {
-                    break;
-                }
             }
-            if (skip) {
-                continue;
+            if (!freeSpace) {
+                return false;
             }
-            ll ends = lastDone - q.top().first;
-            while (i < n && masters[i].first.first < ends) {
-                minim(ends, masters[i].first.first + masters[i].second);
-                q.emplace(-masters[i].second, masters[i].first.second);
-                i++;
-            }
-            i--;
-            lastDone = ends;
+            fill(sweeped[j].begin() + i, sweeped[j].begin() + (i + width), true);
+            return true;
+        };
+        int answer = 0;
+        auto sweep = [&](int i, int j) -> void {
             answer++;
+            for (int k = j; k < m; k++) {
+                if (!trySweep(i, k)) {
+                    break;
+                }
+            }
+            for (int k = j - 1; k >= 0; k--) {
+                if (!trySweep(i, k)) {
+                    break;
+                }
+            }
+        };
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (!sweeped[j][i] && !map[i][j]) {
+                    if (i == 0 || map[i - 1][j]) {
+                        sweep(i, j);
+                    } else if (i == n - 1 || map[i + 1][j]) {
+                        sweep(i - width + 1, j);
+                    }
+                }
+            }
         }
-        while (!q.empty()) {
-            ll times = max((q.top().second - lastDone) / (-q.top().first), ll(0));
-            answer += times;
-            lastDone += times * (-q.top().first);
-            q.pop();
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                if (!sweeped[j][i] && !map[i][j]) {
+                    sweep(min(i, n - width), j);
+                }
+            }
         }
+        out.printLine(width);
         out.printLine(answer);
     }
 };
@@ -588,7 +578,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    TaskA solver;
+    LineSweep solver;
     std::istream &in(std::cin);
     std::ostream &out(std::cout);
     solver.solve(in, out);

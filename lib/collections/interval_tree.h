@@ -54,6 +54,7 @@ private:
         pushDown(root, left, mid, right);
         update(2 * root + 1, left, mid, from, to, dlt);
         update(2 * root + 2, mid, right, from, to, dlt);
+        value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
     }
 
     Value query(int root, int left, int right, int from, int to) {
@@ -69,8 +70,8 @@ private:
     }
 
 public:
-    IntervalTree(int size, function<Value(Value, Value)> &joinValue,
-                 function<Delta(Delta, Delta)> &joinDelta,
+    IntervalTree(int size, function<Value(Value, Value)> joinValue,
+                 function<Delta(Delta, Delta)> joinDelta,
                  function<Value(Value, Delta, int, int)> accumulate,
                  function<Value(int)> initValue = [](int at) -> Value { return defaultValue; }) :
             size(size), joinValue(joinValue), joinDelta(joinDelta), accumulate(accumulate), initValue(initValue) {

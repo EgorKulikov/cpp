@@ -1,9 +1,5 @@
-//
-// Created by egor on 31.10.2019.
-//
-
-#ifndef JHELPER_EXAMPLE_PROJECT_OUTPUT_H
-#define JHELPER_EXAMPLE_PROJECT_OUTPUT_H
+#ifndef CPP_OUTPUT_H
+#define CPP_OUTPUT_H
 
 #include "../general.h"
 
@@ -64,4 +60,4 @@ void Output::printSingle(const pair<T, U>& value) {
     out << value.first << ' ' << value.second;
 }
 
-#endif //JHELPER_EXAMPLE_PROJECT_OUTPUT_H
+#endif

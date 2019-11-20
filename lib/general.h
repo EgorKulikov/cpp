@@ -1,5 +1,5 @@
-#ifndef JHELPER_EXAMPLE_PROJECT_GENERAL_H
-#define JHELPER_EXAMPLE_PROJECT_GENERAL_H
+#ifndef CPP_GENERAL_H
+#define CPP_GENERAL_H
 
 #include <bits/stdc++.h>
 
@@ -10,8 +10,6 @@ using namespace std;
 typedef long long ll;
 typedef vector<int> vi;
 typedef pair<int, int> pii;
-
-const int MAX_INT = 2147483647;
 
 const double PI = atan(1) * 4;
 
@@ -59,4 +57,4 @@ inline bool isSubset(int set, int subSet) {
     return (set & subSet) == subSet;
 }
 
-#endif //JHELPER_EXAMPLE_PROJECT_GENERAL_H
+#endif

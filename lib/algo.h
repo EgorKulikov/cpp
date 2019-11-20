@@ -21,16 +21,6 @@ vi createOrder(int n) {
 }
 
 template <typename T>
-inline vector<vector<T> > makeArray(int a, int b) {
-    return vector<vector<T> >(a, vector<T>(b));
-}
-
-//template <typename T>
-//inline vector<vector<vector<T> > > makeArray(int a, int b, int c) {
-//    return vector<vector<vector<T> > >(a, makeArray<T>(b, c));
-//}
-
-template <typename T>
 inline vector<vector<T> > makeArray(int a, int b, T init) {
     return vector<vector<T> >(a, vector<T>(b, init));
 }

@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/TaskA.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/LineSweep.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"3\n1 10 4\n6 12 3\n9 13 2\n", "4\n", true, true},{"2\n1 9 2\n5 7 1\n", "5\n", true, true},
+		{"5 7 2\n3 4\n5 7\n", "2\n4\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -48,7 +48,7 @@ int main() {
 			std::stringstream in(test.input);
 			std::ostringstream out;
 			std::clock_t start = std::clock();
-			TaskA solver;
+			LineSweep solver;
 			solver.solve(in, out);
 			std::clock_t finish = std::clock();
 			double currentTime = double(finish - start) / CLOCKS_PER_SEC;
