@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/LineSweep.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/TollCharges.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"5 7 2\n3 4\n5 7\n", "2\n4\n", true, true},
+		{"4\n4 1\n1 2 10 1000\n2 3 10 1000\n2 4 10 1000\n2 0\n1 2 4 5\n4 0\n1 2 1 1\n3 1 5 5\n3 4 1 10\n4 1\n1 2 1 1\n3 1 5 5\n3 4 1 10\n", "40\n4\n14\n4\n", true, true},{"2\n4 0\n1 2 1 1\n3 1 5 5\n3 4 1 10\n4 1\n1 2 1 1\n3 1 5 5\n3 4 1 10\n", "14\n4\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -48,8 +48,13 @@ int main() {
 			std::stringstream in(test.input);
 			std::ostringstream out;
 			std::clock_t start = std::clock();
-			LineSweep solver;
-			solver.solve(in, out);
+			TollCharges solver;
+			int n;
+in >> n;
+for(int i = 0; i < n; ++i) {
+	solver.solve(in, out);
+}
+
 			std::clock_t finish = std::clock();
 			double currentTime = double(finish - start) / CLOCKS_PER_SEC;
 			maxTime = std::max(currentTime, maxTime);

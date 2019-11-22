@@ -32,13 +32,13 @@ const int DY4[] = {0, 1, 0, -1};
 const int DX8[] = {1, 1, 1, 0, -1, -1, -1, 0};
 const int DY8[] = {-1, 0, 1, 1, 1, 0, -1, -1};
 
-template<typename T>
-T minim(T &was, T cand) {
+template <typename T>
+T minim(T& was, T cand) {
     return was = min(was, cand);
 }
 
-template<typename T>
-T maxim(T &was, T cand) {
+template <typename T>
+T maxim(T& was, T cand) {
     return was = max(was, cand);
 }
 
@@ -46,9 +46,9 @@ bool isValidCell(int r, int c, int n, int m) {
     return r >= 0 && c >= 0 && r < n && c < m;
 }
 
-template<typename T, typename U>
-void decreaseByOne(vector<pair<T, U> > &v) {
-    for (auto &p : v) {
+template <typename T, typename U>
+void decreaseByOne(vector<pair<T, U> >& v) {
+    for (auto& p : v) {
         p.first--;
         p.second--;
     }
@@ -56,8 +56,8 @@ void decreaseByOne(vector<pair<T, U> > &v) {
 
 void decreaseByOne() {}
 
-template<typename T, class...Vs>
-void decreaseByOne(vector<T> &arr, Vs &...vs) {
+template <typename T, class...Vs>
+void decreaseByOne(vector<T>& arr, Vs&...vs) {
     int n = arr.size();
     for (int i = 0; i < n; ++i) {
         arr[i]--;
@@ -137,16 +137,16 @@ private:
 
     void initArrays(int n) {}
 
-    template<typename T, class...Vs>
-    void initArrays(int n, vector<T> &arr, Vs &...vs) {
+    template <typename T, class...Vs>
+    void initArrays(int n, vector<T>& arr, Vs&...vs) {
         arr.resize(n);
         initArrays(n, vs...);
     }
 
     void readImpl(int i) {}
 
-    template<typename T, class...Vs>
-    void readImpl(int i, vector<T> &arr, Vs &...vs) {
+    template <typename T, class...Vs>
+    void readImpl(int i, vector<T>& arr, Vs&...vs) {
         arr[i] = readType<T>();
         readImpl(i, vs...);
     }
@@ -192,8 +192,9 @@ public:
     }
 
 
-    template<class...Vs>
-    void readArrays(int n, Vs &...vs) {
+
+    template <class...Vs>
+    void readArrays(int n, Vs&...vs) {
         initArrays(n, vs...);
         for (int i = 0; i < n; i++) {
             readImpl(i, vs...);
@@ -352,29 +353,19 @@ double Input::readDouble() {
 #define CPP_OUTPUT_H
 
 
+
 class Output {
 private:
-    ostream &out;
-
-    template<typename T>
-    void printSingle(const T &value);
-
-    template<typename T>
-    void printSingle(const vector<T> &value);
-
-    template<typename T, typename U>
-    void printSingle(const pair<T, U> &value);
+    ostream& out;
+    template<typename T> void printSingle(const T& value);
+    template<typename T> void printSingle(const vector<T>& value);
+    template<typename T, typename U> void printSingle(const pair<T, U>& value);
 
 public:
-    Output(ostream &out);
-
+    Output(ostream& out);
     void print();
-
-    template<typename T, typename...Targs>
-    void print(const T &first, const Targs... args);
-
-    template<typename...Targs>
-    void printLine(const Targs... args);
+    template<typename T, typename...Targs>void print(const T& first, const Targs... args);
+    template<typename...Targs>void printLine(const Targs... args);
 };
 
 Output::Output(ostream &out) : out(out) {
@@ -385,7 +376,7 @@ void Output::print() {
 }
 
 template<typename T, typename... Targs>
-void Output::print(const T &first, const Targs... args) {
+void Output::print(const T& first, const Targs... args) {
     printSingle(first);
     if (sizeof...(args) != 0) {
         out << ' ';
@@ -394,7 +385,7 @@ void Output::print(const T &first, const Targs... args) {
 }
 
 template<typename T>
-void Output::printSingle(const T &value) {
+void Output::printSingle(const T& value) {
     out << value;
 }
 
@@ -405,7 +396,7 @@ void Output::printLine(const Targs... args) {
 }
 
 template<typename T>
-void Output::printSingle(const vector<T> &array) {
+void Output::printSingle(const vector<T>& array) {
     unsigned int size = array.size();
     for (int i = 0; i < size; ++i) {
         out << array[i];
@@ -416,171 +407,328 @@ void Output::printSingle(const vector<T> &array) {
 }
 
 template<typename T, typename U>
-void Output::printSingle(const pair<T, U> &value) {
+void Output::printSingle(const pair<T, U>& value) {
     out << value.first << ' ' << value.second;
 }
 
 #endif
 
 //
-// Created by egor on 31.10.2019.
+// Created by egor on 04.11.2019.
 //
 
-#ifndef JHELPER_EXAMPLE_PROJECT_ALGO_H
-#define JHELPER_EXAMPLE_PROJECT_ALGO_H
+#ifndef JHELPER_EXAMPLE_PROJECT_GRAPH_H
+#define JHELPER_EXAMPLE_PROJECT_GRAPH_H
 
 
-template<typename T>
-inline void unique(vector<T> &v) {
-    v.resize(unique(all(v)) - v.begin());
-}
 
-vi createOrder(int n) {
-    vi order(n);
-    for (int i = 0; i < n; i++) {
-        order[i] = i;
+template <typename W, typename C>
+class WeightedFlowEdge {
+private:
+    WeightedFlowEdge<W, C>* reverseEdge;
+
+public:
+    const int from;
+    const int to;
+    W weight;
+    C capacity;
+    int id;
+
+    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
+        reverseEdge = new WeightedFlowEdge(this);
     }
-    return order;
-}
 
-template<typename T>
-inline vector<vector<T> > makeArray(int a, int b, T init) {
-    return vector<vector<T> >(a, vector<T>(b, init));
-}
-
-template<typename T>
-inline vector<vector<vector<T> > > makeArray(int a, int b, int c, T init) {
-    return vector<vector<vector<T> > >(a, makeArray<T>(b, c, init));
-}
-
-template<typename T>
-inline void addAll(vector<T> &v, const vector<T> &toAdd) {
-    v.insert(v.end(), toAdd.begin(), toAdd.end());
-}
-
-vi getQty(const vi &arr, int length) {
-    vi res(length);
-    int n = arr.size();
-    for (int i : arr) {
-        res[i]++;
+    WeightedFlowEdge<W, C>* transposed() { return nullptr; }
+    WeightedFlowEdge<W, C>* reverse() { return reverseEdge; }
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
     }
-    return res;
-}
+    C flow() const {
+        return reverseEdge->capacity;
+    }
 
-vi getQty(const vi &arr) {
-    return getQty(arr, *max_element(all(arr)) + 1);
-}
+private:
+    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight), capacity(0) {
+        reverseEdge = reverse;
+    }
+};
 
-#endif //JHELPER_EXAMPLE_PROJECT_ALGO_H
+template <typename C>
+class FlowEdge {
+private:
+    FlowEdge<C>* reverseEdge;
+
+public:
+    const int from;
+    const int to;
+    C capacity;
+    int id;
+
+    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
+        reverseEdge = new FlowEdge(this);
+    }
+
+    FlowEdge<C>* transposed() { return nullptr; }
+    FlowEdge<C>* reverse() { return reverseEdge; }
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
+    }
+    C flow() const {
+        return reverseEdge->capacity;
+    }
+
+private:
+    FlowEdge(FlowEdge<C>* reverse) : from(reverse->to), to(reverse->from), capacity(0) {
+        reverseEdge = reverse;
+    }
+};
+
+template <typename W>
+class WeightedEdge {
+public:
+    const int from;
+    const int to;
+    W weight;
+    int id;
+
+    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+    }
+
+    WeightedEdge<W>* transposed() { return nullptr; }
+    WeightedEdge<W>* reverse() { return nullptr; }
+};
+
+template <typename W>
+class BidirectionalWeightedEdge {
+private:
+    BidirectionalWeightedEdge<W>* transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    W weight;
+    int id;
+
+    BidirectionalWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+        transposedEdge = new BidirectionalWeightedEdge(this);
+    }
+
+    BidirectionalWeightedEdge<W>* transposed() { return transposedEdge; }
+    BidirectionalWeightedEdge<W>* reverse() { return nullptr; }
+
+private:
+    BidirectionalWeightedEdge(BidirectionalWeightedEdge<W>* transposed) : from(transposed->to), to(transposed->from), weight(transposed->weight) {
+        transposedEdge = transposed;
+    }
+};
+
+class SimpleEdge {
+public:
+    const int from;
+    const int to;
+    int id;
+
+    SimpleEdge(int from, int to) : from(from), to(to) {
+    }
+
+    SimpleEdge* transposed() { return nullptr; }
+    SimpleEdge* reverse() { return nullptr; }
+};
+
+class BidirectionalEdge {
+private:
+    BidirectionalEdge* transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    int id;
+
+    BidirectionalEdge(int from, int to) : from(from), to(to) {
+        transposedEdge = new BidirectionalEdge(this);
+    }
+
+    BidirectionalEdge* transposed() { return transposedEdge; }
+    BidirectionalEdge* reverse() { return nullptr; }
+
+private:
+    BidirectionalEdge(BidirectionalEdge* transposed) : from(transposed->to), to(transposed->from) {
+        transposedEdge = transposed;
+    }
+};
+
+template <class Edge>
+class Graph {
+public:
+    int vertexCount;
+    int edgeCount = 0;
+    vector<vector<Edge*> > edges;
+
+    Graph(int vertexCount) : vertexCount(vertexCount) {
+        edges.resize(vertexCount);
+    }
+
+    void addEdge(Edge* edge) {
+        edge->id = edgeCount;
+        edges[edge->from].push_back(edge);
+        if (edge->reverse() != nullptr) {
+            edge->reverse()->id = edgeCount;
+            edges[edge->reverse()->from].push_back(edge->reverse());
+        }
+        if (edge->transposed() != nullptr) {
+            edges[edge->transposed()->from].push_back(edge->transposed());
+            edge->transposed()->id = edgeCount;
+            if (edge->transposed()->reverse() != nullptr) {
+                edges[edge->transposed()->reverse()->from].push_back(edge->transposed()->reverse());
+                edge->transposed()->reverse()->id = edgeCount;
+            }
+        }
+        edgeCount++;
+    }
+};
+
+typedef FlowEdge<ll> LongFlowEdge;
+typedef WeightedEdge<ll> LongWeightedEdge;
+typedef FlowEdge<int> IntFlowEdge;
+typedef WeightedEdge<int> IntWeightedEdge;
+typedef BidirectionalWeightedEdge<ll> LongBiWeightedEdge;
+typedef BidirectionalWeightedEdge<int> IntBiWeightedEdge;
+
+#endif //JHELPER_EXAMPLE_PROJECT_GRAPH_H
 
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class LineSweep {
+vector<ll> val;
+
+class Predicate {
 public:
-    void solve(istream &inp, ostream &outp) {
+    bool operator()(int a, int b) const {
+        if (val[a] != val[b]) {
+            return val[a] > val[b];
+        }
+        return a < b;
+    }
+};
+
+class TollCharges {
+public:
+	void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        int m = in.readInt();
-        int f = in.readInt();
-        vi r, c;
-        in.readArrays(f, r, c);
-        decreaseByOne(r, c);
-        auto map = makeArray(n, m, false);
-        for (int i = 0; i < f; ++i) {
-            map[r[i]][c[i]] = true;
+        int k = in.readInt();
+        vi x, y, a, b;
+        in.readArrays(n - 1, x, y, a, b);
+        decreaseByOne(x, y);
+        if (k == n - 1) {
+            out.printLine(0);
+            return;
         }
-        int width = n;
-        for (int i = 0; i < m; i++) {
-            int current = 0;
-            for (int j = 0; j < n; j++) {
-                if (map[j][i]) {
-                    if (current > 0) {
-                        minim(width, current);
-                    }
-                    current = 0;
-                } else {
-                    current++;
-                }
-            }
-            if (current > 0) {
-                minim(width, current);
-            }
+        Graph<IntWeightedEdge> graph(n);
+        for (int i = 0; i < n - 1; ++i) {
+            graph.addEdge(new IntWeightedEdge(x[i], y[i], b[i]));
+            graph.addEdge(new IntWeightedEdge(y[i], x[i], a[i]));
         }
-        auto next = makeArray(n, m, 0);
-        for (int i = 0; i < m; i++) {
-            int nx = n;
-            for (int j = n - 1; j >= 0; j--) {
-                if (map[j][i]) {
-                    nx = j;
+        val.resize(2 * n - 2);
+        set<int, Predicate> all;
+        vi qty(n);
+        function<void(int, int)> dfs = [&](int vertex, int last) -> void {
+            qty[vertex] = 1;
+            for (auto edge : graph.edges[vertex]) {
+                if (edge->to == last) {
+                    continue;
                 }
-                next[j][i] = nx;
-            }
-        }
-        auto sweeped = makeArray(m, n, false);
-        auto trySweep = [&](int i, int j) -> bool {
-            if (next[i][j] < i + width) {
-                return false;
-            }
-            bool freeSpace = false;
-            for (int k = 0; k < width; k++) {
-                if (!sweeped[j][i + k]) {
-                    freeSpace = true;
-                    break;
-                }
-            }
-            if (!freeSpace) {
-                return false;
-            }
-            fill(sweeped[j].begin() + i, sweeped[j].begin() + (i + width), true);
-            return true;
-        };
-        int answer = 0;
-        auto sweep = [&](int i, int j) -> void {
-            answer++;
-            for (int k = j; k < m; k++) {
-                if (!trySweep(i, k)) {
-                    break;
-                }
-            }
-            for (int k = j - 1; k >= 0; k--) {
-                if (!trySweep(i, k)) {
-                    break;
-                }
+                dfs(edge->to, vertex);
+                qty[vertex] += qty[edge->to];
+                val[edge->id] = ll(qty[edge->to]) * edge->weight;
+                all.insert(edge->id);
             }
         };
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (!sweeped[j][i] && !map[i][j]) {
-                    if (i == 0 || map[i - 1][j]) {
-                        sweep(i, j);
-                    } else if (i == n - 1 || map[i + 1][j]) {
-                        sweep(i - width + 1, j);
+        dfs(0, -1);
+        auto it = all.begin();
+        ll sum = 0;
+        for (int i : all) {
+            sum += val[i];
+        }
+        set<int, Predicate> best;
+        for (auto i = 0; i < k; i++) {
+            sum -= val[*it];
+            best.insert(*it);
+            it++;
+        }
+        ll answer = sum;
+        auto remove = [&](int id) {
+            all.erase(id);
+            sum -= val[id];
+            if (best.count(id) == 1) {
+                best.erase(id);
+                sum += val[id];
+                auto it = all.begin();
+                if (!best.empty()) {
+                    it = all.lower_bound(*best.rbegin());
+                    it++;
+                }
+                best.insert(*it);
+                sum -= val[*it];
+            }
+        };
+        Predicate predicate;
+        auto add = [&](int id) {
+            all.insert(id);
+            sum += val[id];
+            if (!best.empty() && predicate(id, *best.rbegin())) {
+                sum += val[*best.rbegin()];
+                best.erase(*best.rbegin());
+                best.insert(id);
+                sum -= val[id];
+            }
+        };
+        function<void(int, int)> dfs2 = [&](int vertex, int last) -> void {
+            int eId = -1;
+            if (last != -1) {
+                for (auto edge : graph.edges[vertex]) {
+                    if (edge->to == last) {
+                        eId = edge->id;
+                        val[edge->id] = ll(edge->weight) * (n - qty[vertex]);
+                        add(edge->id);
+                        break;
                     }
                 }
             }
-        }
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < m; ++j) {
-                if (!sweeped[j][i] && !map[i][j]) {
-                    sweep(min(i, n - width), j);
+            minim(answer, sum);
+            for (auto edge : graph.edges[vertex]) {
+                if (edge->to == last) {
+                    continue;
                 }
+                remove(edge->id);
+                dfs2(edge->to, vertex);
+                add(edge->id);
             }
-        }
-        out.printLine(width);
+            if (eId != -1) {
+                remove(eId);
+            }
+        };
+        dfs2(0, -1);
         out.printLine(answer);
-    }
+	}
 };
 
 
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    LineSweep solver;
-    std::istream &in(std::cin);
-    std::ostream &out(std::cout);
-    solver.solve(in, out);
-    return 0;
+	TollCharges solver;
+	std::istream& in(std::cin);
+	std::ostream& out(std::cout);
+	int n;
+in >> n;
+for(int i = 0; i < n; ++i) {
+	solver.solve(in, out);
+}
+
+	return 0;
 }
