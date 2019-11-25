@@ -32,13 +32,13 @@ const int DY4[] = {0, 1, 0, -1};
 const int DX8[] = {1, 1, 1, 0, -1, -1, -1, 0};
 const int DY8[] = {-1, 0, 1, 1, 1, 0, -1, -1};
 
-template <typename T>
-T minim(T& was, T cand) {
+template<typename T>
+T minim(T &was, T cand) {
     return was = min(was, cand);
 }
 
-template <typename T>
-T maxim(T& was, T cand) {
+template<typename T>
+T maxim(T &was, T cand) {
     return was = max(was, cand);
 }
 
@@ -46,9 +46,9 @@ bool isValidCell(int r, int c, int n, int m) {
     return r >= 0 && c >= 0 && r < n && c < m;
 }
 
-template <typename T, typename U>
-void decreaseByOne(vector<pair<T, U> >& v) {
-    for (auto& p : v) {
+template<typename T, typename U>
+void decreaseByOne(vector<pair<T, U> > &v) {
+    for (auto &p : v) {
         p.first--;
         p.second--;
     }
@@ -56,8 +56,8 @@ void decreaseByOne(vector<pair<T, U> >& v) {
 
 void decreaseByOne() {}
 
-template <typename T, class...Vs>
-void decreaseByOne(vector<T>& arr, Vs&...vs) {
+template<typename T, class...Vs>
+void decreaseByOne(vector<T> &arr, Vs &...vs) {
     int n = arr.size();
     for (int i = 0; i < n; ++i) {
         arr[i]--;
@@ -137,16 +137,16 @@ private:
 
     void initArrays(int n) {}
 
-    template <typename T, class...Vs>
-    void initArrays(int n, vector<T>& arr, Vs&...vs) {
+    template<typename T, class...Vs>
+    void initArrays(int n, vector<T> &arr, Vs &...vs) {
         arr.resize(n);
         initArrays(n, vs...);
     }
 
     void readImpl(int i) {}
 
-    template <typename T, class...Vs>
-    void readImpl(int i, vector<T>& arr, Vs&...vs) {
+    template<typename T, class...Vs>
+    void readImpl(int i, vector<T> &arr, Vs &...vs) {
         arr[i] = readType<T>();
         readImpl(i, vs...);
     }
@@ -192,9 +192,8 @@ public:
     }
 
 
-
-    template <class...Vs>
-    void readArrays(int n, Vs&...vs) {
+    template<class...Vs>
+    void readArrays(int n, Vs &...vs) {
         initArrays(n, vs...);
         for (int i = 0; i < n; i++) {
             readImpl(i, vs...);
@@ -353,19 +352,33 @@ double Input::readDouble() {
 #define CPP_OUTPUT_H
 
 
-
 class Output {
 private:
-    ostream& out;
-    template<typename T> void printSingle(const T& value);
-    template<typename T> void printSingle(const vector<T>& value);
-    template<typename T, typename U> void printSingle(const pair<T, U>& value);
+    ostream &out;
+
+    template<typename T>
+    void printSingle(const T &value);
+
+    template<typename T>
+    void printSingle(const vector<T> &value);
+
+    template<typename T, typename U>
+    void printSingle(const pair<T, U> &value);
 
 public:
-    Output(ostream& out);
+    Output(ostream &out);
+
     void print();
-    template<typename T, typename...Targs>void print(const T& first, const Targs... args);
-    template<typename...Targs>void printLine(const Targs... args);
+
+    template<typename T, typename...Targs>
+    void print(const T &first, const Targs... args);
+
+    template<typename...Targs>
+    void printLine(const Targs... args);
+
+    void flush() {
+        out.flush();
+    }
 };
 
 Output::Output(ostream &out) : out(out) {
@@ -376,7 +389,7 @@ void Output::print() {
 }
 
 template<typename T, typename... Targs>
-void Output::print(const T& first, const Targs... args) {
+void Output::print(const T &first, const Targs... args) {
     printSingle(first);
     if (sizeof...(args) != 0) {
         out << ' ';
@@ -385,7 +398,7 @@ void Output::print(const T& first, const Targs... args) {
 }
 
 template<typename T>
-void Output::printSingle(const T& value) {
+void Output::printSingle(const T &value) {
     out << value;
 }
 
@@ -396,7 +409,7 @@ void Output::printLine(const Targs... args) {
 }
 
 template<typename T>
-void Output::printSingle(const vector<T>& array) {
+void Output::printSingle(const vector<T> &array) {
     unsigned int size = array.size();
     for (int i = 0; i < size; ++i) {
         out << array[i];
@@ -407,328 +420,191 @@ void Output::printSingle(const vector<T>& array) {
 }
 
 template<typename T, typename U>
-void Output::printSingle(const pair<T, U>& value) {
+void Output::printSingle(const pair<T, U> &value) {
     out << value.first << ' ' << value.second;
 }
 
 #endif
 
-//
-// Created by egor on 04.11.2019.
-//
-
-#ifndef JHELPER_EXAMPLE_PROJECT_GRAPH_H
-#define JHELPER_EXAMPLE_PROJECT_GRAPH_H
-
-
-
-template <typename W, typename C>
-class WeightedFlowEdge {
-private:
-    WeightedFlowEdge<W, C>* reverseEdge;
-
-public:
-    const int from;
-    const int to;
-    W weight;
-    C capacity;
-    int id;
-
-    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
-        reverseEdge = new WeightedFlowEdge(this);
-    }
-
-    WeightedFlowEdge<W, C>* transposed() { return nullptr; }
-    WeightedFlowEdge<W, C>* reverse() { return reverseEdge; }
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight), capacity(0) {
-        reverseEdge = reverse;
-    }
-};
-
-template <typename C>
-class FlowEdge {
-private:
-    FlowEdge<C>* reverseEdge;
-
-public:
-    const int from;
-    const int to;
-    C capacity;
-    int id;
-
-    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
-        reverseEdge = new FlowEdge(this);
-    }
-
-    FlowEdge<C>* transposed() { return nullptr; }
-    FlowEdge<C>* reverse() { return reverseEdge; }
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    FlowEdge(FlowEdge<C>* reverse) : from(reverse->to), to(reverse->from), capacity(0) {
-        reverseEdge = reverse;
-    }
-};
-
-template <typename W>
-class WeightedEdge {
-public:
-    const int from;
-    const int to;
-    W weight;
-    int id;
-
-    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-    }
-
-    WeightedEdge<W>* transposed() { return nullptr; }
-    WeightedEdge<W>* reverse() { return nullptr; }
-};
-
-template <typename W>
-class BidirectionalWeightedEdge {
-private:
-    BidirectionalWeightedEdge<W>* transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    W weight;
-    int id;
-
-    BidirectionalWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-        transposedEdge = new BidirectionalWeightedEdge(this);
-    }
-
-    BidirectionalWeightedEdge<W>* transposed() { return transposedEdge; }
-    BidirectionalWeightedEdge<W>* reverse() { return nullptr; }
-
-private:
-    BidirectionalWeightedEdge(BidirectionalWeightedEdge<W>* transposed) : from(transposed->to), to(transposed->from), weight(transposed->weight) {
-        transposedEdge = transposed;
-    }
-};
-
-class SimpleEdge {
-public:
-    const int from;
-    const int to;
-    int id;
-
-    SimpleEdge(int from, int to) : from(from), to(to) {
-    }
-
-    SimpleEdge* transposed() { return nullptr; }
-    SimpleEdge* reverse() { return nullptr; }
-};
-
-class BidirectionalEdge {
-private:
-    BidirectionalEdge* transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    int id;
-
-    BidirectionalEdge(int from, int to) : from(from), to(to) {
-        transposedEdge = new BidirectionalEdge(this);
-    }
-
-    BidirectionalEdge* transposed() { return transposedEdge; }
-    BidirectionalEdge* reverse() { return nullptr; }
-
-private:
-    BidirectionalEdge(BidirectionalEdge* transposed) : from(transposed->to), to(transposed->from) {
-        transposedEdge = transposed;
-    }
-};
-
-template <class Edge>
-class Graph {
-public:
-    int vertexCount;
-    int edgeCount = 0;
-    vector<vector<Edge*> > edges;
-
-    Graph(int vertexCount) : vertexCount(vertexCount) {
-        edges.resize(vertexCount);
-    }
-
-    void addEdge(Edge* edge) {
-        edge->id = edgeCount;
-        edges[edge->from].push_back(edge);
-        if (edge->reverse() != nullptr) {
-            edge->reverse()->id = edgeCount;
-            edges[edge->reverse()->from].push_back(edge->reverse());
-        }
-        if (edge->transposed() != nullptr) {
-            edges[edge->transposed()->from].push_back(edge->transposed());
-            edge->transposed()->id = edgeCount;
-            if (edge->transposed()->reverse() != nullptr) {
-                edges[edge->transposed()->reverse()->from].push_back(edge->transposed()->reverse());
-                edge->transposed()->reverse()->id = edgeCount;
-            }
-        }
-        edgeCount++;
-    }
-};
-
-typedef FlowEdge<ll> LongFlowEdge;
-typedef WeightedEdge<ll> LongWeightedEdge;
-typedef FlowEdge<int> IntFlowEdge;
-typedef WeightedEdge<int> IntWeightedEdge;
-typedef BidirectionalWeightedEdge<ll> LongBiWeightedEdge;
-typedef BidirectionalWeightedEdge<int> IntBiWeightedEdge;
-
-#endif //JHELPER_EXAMPLE_PROJECT_GRAPH_H
-
 
 //#pragma comment(linker, "/STACK:200000000")
 
-vector<ll> val;
+struct Operation {
+    string op;
+    int u;
+    int v;
 
-class Predicate {
-public:
-    bool operator()(int a, int b) const {
-        if (val[a] != val[b]) {
-            return val[a] > val[b];
-        }
-        return a < b;
-    }
+    Operation(const string &op, int u, int v) : op(op), u(u), v(v) {}
 };
 
-class TollCharges {
+class H {
 public:
-	void solve(istream& inp, ostream& outp) {
+    void solve(istream &inp, ostream &outp) {
         Input in(inp);
         Output out(outp);
 
+        int t = in.readInt();
         int n = in.readInt();
         int k = in.readInt();
-        vi x, y, a, b;
-        in.readArrays(n - 1, x, y, a, b);
-        decreaseByOne(x, y);
-        if (k == n - 1) {
-            out.printLine(0);
-            return;
-        }
-        Graph<IntWeightedEdge> graph(n);
-        for (int i = 0; i < n - 1; ++i) {
-            graph.addEdge(new IntWeightedEdge(x[i], y[i], b[i]));
-            graph.addEdge(new IntWeightedEdge(y[i], x[i], a[i]));
-        }
-        val.resize(2 * n - 2);
-        set<int, Predicate> all;
-        vi qty(n);
-        function<void(int, int)> dfs = [&](int vertex, int last) -> void {
-            qty[vertex] = 1;
-            for (auto edge : graph.edges[vertex]) {
-                if (edge->to == last) {
-                    continue;
-                }
-                dfs(edge->to, vertex);
-                qty[vertex] += qty[edge->to];
-                val[edge->id] = ll(qty[edge->to]) * edge->weight;
-                all.insert(edge->id);
-            }
-        };
-        dfs(0, -1);
-        auto it = all.begin();
-        ll sum = 0;
-        for (int i : all) {
-            sum += val[i];
-        }
-        set<int, Predicate> best;
-        for (auto i = 0; i < k; i++) {
-            sum -= val[*it];
-            best.insert(*it);
-            it++;
-        }
-        ll answer = sum;
-        auto remove = [&](int id) {
-            all.erase(id);
-            sum -= val[id];
-            if (best.count(id) == 1) {
-                best.erase(id);
-                sum += val[id];
-                auto it = all.begin();
-                if (!best.empty()) {
-                    it = all.lower_bound(*best.rbegin());
-                    it++;
-                }
-                best.insert(*it);
-                sum -= val[*it];
-            }
-        };
-        Predicate predicate;
-        auto add = [&](int id) {
-            all.insert(id);
-            sum += val[id];
-            if (!best.empty() && predicate(id, *best.rbegin())) {
-                sum += val[*best.rbegin()];
-                best.erase(*best.rbegin());
-                best.insert(id);
-                sum -= val[id];
-            }
-        };
-        function<void(int, int)> dfs2 = [&](int vertex, int last) -> void {
-            int eId = -1;
-            if (last != -1) {
-                for (auto edge : graph.edges[vertex]) {
-                    if (edge->to == last) {
-                        eId = edge->id;
-                        val[edge->id] = ll(edge->weight) * (n - qty[vertex]);
-                        add(edge->id);
-                        break;
+
+        if (t == 1) {
+            int current = -1;
+            vector<Operation> answer;
+            for (int i = 0; i < n; i++) {
+                if ((k >> i & 1) == 1) {
+                    if (current == -1) {
+                        current = i + 1;
+                    } else {
+                        answer.emplace_back("OR", current, i + 1);
+                        current = n + answer.size();
+                    }
+                } else {
+                    if (current == -1) {
+                        continue;
+                    } else {
+                        answer.emplace_back("AND", current, i + 1);
+                        current = n + answer.size();
                     }
                 }
             }
-            minim(answer, sum);
-            for (auto edge : graph.edges[vertex]) {
-                if (edge->to == last) {
+            if (answer.empty()) {
+                out.printLine(1);
+                out.printLine("NOT", 1);
+                return;
+            }
+            out.printLine(answer.size());
+            for (const auto &o : answer) {
+                out.printLine(o.op, o.u, o.v);
+            }
+            return;
+        } else {
+            vector<bool> ones(1 << n);
+            for (int i = 0; i < k; ++i) {
+                int current = 0;
+                for (int j = 0; j < n; ++j) {
+                    if (in.readType<char>() == '1') {
+                        current += 1 << j;
+                    }
+                }
+                ones[current] = true;
+            }
+            vector<Operation> answer;
+            for (int i = 0; i < n; ++i) {
+                answer.emplace_back("NOT", i + 1, -1);
+            }
+            vector<bool> has(16);
+            vector<int> type(1 << (n - 2));
+            for (int i = 0; i < (1 << n); i += 4) {
+                int current = 0;
+                for (int j = i; j < i + 4; j++) {
+                    if (ones[j]) {
+                        current += 1 << (j - i);
+                    }
+                }
+                has[current] = true;
+                type[i >> 2] = current;
+            }
+            vi id;
+            if (n > 2) {
+                function<vi(int, int)> build = [&](int from, int to) -> vi {
+                    if (from + 1 == to) {
+                        vi res;
+                        res.push_back(to + n);
+                        res.push_back(to);
+                        return res;
+                    }
+                    int mid = (from + to) / 2;
+                    vi left = build(from, mid);
+                    vi right = build(mid, to);
+                    vi res;
+                    res.reserve(1 << (to - from));
+                    for (int j = 0; j < right.size(); j++) {
+                        for (int i = 0; i < left.size(); i++) {
+                            answer.emplace_back("AND", left[i], right[j]);
+                            res.push_back(answer.size() + n);
+                        }
+                    }
+                    return res;
+                };
+                id = build(2, n);
+            }
+            vector<int> at(16);
+            for (int i = 1; i < 16; ++i) {
+                if (!has[i]) {
                     continue;
                 }
-                remove(edge->id);
-                dfs2(edge->to, vertex);
-                add(edge->id);
+                int last = -1;
+                if (i == 15) {
+                    answer.emplace_back("OR", 1, n + 1);
+                    at[i] = answer.size() + n;
+                    continue;
+                }
+                bool rev = false;
+                int ii = i;
+                if (__builtin_popcount(i) > 2) {
+                    ii = 15 - ii;
+                    rev = true;
+                }
+                for (int j = 0; j < 4; j++) {
+                    if ((ii >> j & 1) == 1) {
+                        answer.emplace_back("AND", n + 1 - n * (j & 1), n + 2 - n * ((j & 2) >> 1));
+                        if (last == -1) {
+                            last = answer.size() + n;
+                        } else {
+                            answer.emplace_back("OR", last, answer.size() + n);
+                            last = answer.size() + n;
+                        }
+                    }
+                }
+                if (rev) {
+                    answer.emplace_back("NOT", last, -1);
+                    last = answer.size() + n;
+                }
+                at[i] = last;
             }
-            if (eId != -1) {
-                remove(eId);
+            if (n > 2) {
+                vector<int> pos(16, -1);
+                for (int i = 0; i < (1 << (n - 2)); i++) {
+                    if (type[i] == 0) {
+                        continue;
+                    }
+                    if (pos[type[i]] == -1) {
+                        pos[type[i]] = id[i];
+                    } else {
+                        answer.emplace_back("OR", pos[type[i]], id[i]);
+                        pos[type[i]] = answer.size() + n;
+                    }
+                }
+                int start = answer.size();
+                for (int i = 1; i < 16; i++) {
+                    if (has[i]) {
+                        answer.emplace_back("AND", at[i], pos[i]);
+                    }
+                }
+                for (int i = answer.size() - 2; i >= start; i--) {
+                    answer.emplace_back("OR", answer.size() + n, n + i + 1);
+                }
             }
-        };
-        dfs2(0, -1);
-        out.printLine(answer);
-	}
+            out.printLine(answer.size());
+            for (const auto &o : answer) {
+                if (o.v == -1) {
+                    out.printLine(o.op, o.u);
+                } else {
+                    out.printLine(o.op, o.u, o.v);
+                }
+            }
+            return;
+        }
+    }
 };
 
 
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-	TollCharges solver;
-	std::istream& in(std::cin);
-	std::ostream& out(std::cout);
-	int n;
-in >> n;
-for(int i = 0; i < n; ++i) {
-	solver.solve(in, out);
-}
-
-	return 0;
+    H solver;
+    std::istream &in(std::cin);
+    std::ostream &out(std::cout);
+    solver.solve(in, out);
+    return 0;
 }
