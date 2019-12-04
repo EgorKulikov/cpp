@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/H.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/PenaltyCalculation.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"1\n3 2\n", "3\nXOR 1 2\nNOT 3\nAND 4 5\n", true, true},{"2\n3 2\n010\n100\n", "3\nXOR 1 2\nNOT 3\nAND 4 5\n", true, true},{"1\n5 24\n", "1\nOR 1 2\n", true, true},{"2\n3 4\n001\n101\n011\n111\n", "0\n", true, true},{"2 10 1\n0000000000\n", "", true, false},{"2\n4 2\n1010\n0101\n", "", true, false},
+		{"4\n40 RTE\n20 WA\n30 WA\n41 AC\n", "101\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -48,7 +48,7 @@ int main() {
 			std::stringstream in(test.input);
 			std::ostringstream out;
 			std::clock_t start = std::clock();
-			H solver;
+			PenaltyCalculation solver;
 			solver.solve(in, out);
 			std::clock_t finish = std::clock();
 			double currentTime = double(finish - start) / CLOCKS_PER_SEC;

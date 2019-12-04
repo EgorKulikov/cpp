@@ -1,6 +1,4 @@
-//
-// Created by egor on 09.11.2019.
-//
+#pragma once
 
 #ifndef CPP_RATIONAL_H
 #define CPP_RATIONAL_H
@@ -89,5 +87,3 @@ Rational operator /(const Rational& a, const Rational& b) {
 Rational operator -(const Rational& a) {
     return Rational(-a.num, a.den);
 }
-
-#endif //CPP_RATIONAL_H

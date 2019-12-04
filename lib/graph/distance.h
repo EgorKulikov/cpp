@@ -1,9 +1,4 @@
-//
-// Created by kulikov on 11/7/2019.
-//
-
-#ifndef JHELPER_EXAMPLE_PROJECT_DISTANCE_H
-#define JHELPER_EXAMPLE_PROJECT_DISTANCE_H
+#pragma once
 
 #include "../general.h"
 #include "graph.h"
@@ -28,5 +23,3 @@ vector<vector<W> > floydWarshall(Graph<Edge> graph) {
     }
     return dist;
 }
-
-#endif //JHELPER_EXAMPLE_PROJECT_DISTANCE_H

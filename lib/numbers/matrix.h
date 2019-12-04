@@ -1,5 +1,4 @@
-#ifndef CPP_MATRIX_H
-#define CPP_MATRIX_H
+#pragma once
 
 #include "../general.h"
 
@@ -66,5 +65,3 @@ void Matrix<T>::powerImpl(Matrix<T> &result, Matrix<T> &temp, ll exponent) const
         multiply(result, temp, temp);
     }
 }
-
-#endif //CPP_MATRIX_H

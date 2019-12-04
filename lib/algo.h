@@ -1,9 +1,4 @@
-//
-// Created by egor on 31.10.2019.
-//
-
-#ifndef JHELPER_EXAMPLE_PROJECT_ALGO_H
-#define JHELPER_EXAMPLE_PROJECT_ALGO_H
+#pragma once
 
 #include "general.h"
 
@@ -37,7 +32,6 @@ inline void addAll(vector<T>& v, const vector<T>& toAdd) {
 
 vi getQty(const vi& arr, int length) {
     vi res(length);
-    int n = arr.size();
     for (int i : arr) {
         res[i]++;
     }
@@ -47,5 +41,3 @@ vi getQty(const vi& arr, int length) {
 vi getQty(const vi& arr) {
     return getQty(arr, *max_element(all(arr)) + 1);
 }
-
-#endif //JHELPER_EXAMPLE_PROJECT_ALGO_H

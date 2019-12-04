@@ -1,9 +1,4 @@
-//
-// Created by egor on 11/16/2019.
-//
-
-#ifndef CPP_VECTOR_DSU_H
-#define CPP_VECTOR_DSU_H
+#pragma once
 
 #include "../general.h"
 #include "../algo.h"
@@ -48,5 +43,3 @@ bool VectorDSU::join(int a, int b) {
     setCount--;
     return true;
 }
-
-#endif //CPP_VECTOR_DSU_H

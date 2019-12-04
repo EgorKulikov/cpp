@@ -1,9 +1,4 @@
-//
-// Created by egor on 04.11.2019.
-//
-
-#ifndef JHELPER_EXAMPLE_PROJECT_GRAPH_H
-#define JHELPER_EXAMPLE_PROJECT_GRAPH_H
+#pragma once
 
 #include "../general.h"
 
@@ -180,5 +175,3 @@ typedef FlowEdge<int> IntFlowEdge;
 typedef WeightedEdge<int> IntWeightedEdge;
 typedef BidirectionalWeightedEdge<ll> LongBiWeightedEdge;
 typedef BidirectionalWeightedEdge<int> IntBiWeightedEdge;
-
-#endif //JHELPER_EXAMPLE_PROJECT_GRAPH_H

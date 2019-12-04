@@ -1,41 +1,31 @@
-#ifndef CPP_INPUT_H
-#define CPP_INPUT_H
-
+#pragma once
 #include "../general.h"
+#include "../numbers/doubles.h"
 
 inline bool isWhitespace(int c) {
     return isspace(c) || c == EOF;
 }
 
 class Input {
-public:
-    enum ErrorType {
-        OK,
-        END_OF_FILE,
-        UNEXPECTED_SYMBOL,
-        INVALID_CALL
-    };
-
 private:
     istream &in;
     bool exhausted = false;
-    ErrorType error = OK;
 
     inline int get() {
-        int result = in.get();
-        if (result == EOF) {
+        if (exhausted) {
+            throw "Input exhausted";
+        }
+        int c = in.get();
+        if (c == EOF) {
             exhausted = true;
         }
-        return result;
+        return c;
     }
 
     template<typename T>
     T readInteger() {
-        error = OK;
-        int c = skipWhitespace();
-        if (error != OK) {
-            return 0;
-        }
+        skipWhitespace();
+        int c = get();
         int sgn = 1;
         if (c == '-') {
             sgn = -1;
@@ -44,26 +34,13 @@ private:
         T res = 0;
         do {
             if (!isdigit(c)) {
-                error = UNEXPECTED_SYMBOL;
-                return 0;
+                throw "Number format error";
             }
             res *= 10;
             res += c - '0';
             c = get();
         } while (!isWhitespace(c));
         return res * sgn;
-    }
-
-    inline int skipWhitespace() {
-        int c;
-        do {
-            c = get();
-            if (exhausted) {
-                error = END_OF_FILE;
-                return c;
-            }
-        } while (isWhitespace(c));
-        return c;
     }
 
     void initArrays(int n) {}
@@ -85,11 +62,36 @@ private:
 public:
     Input(istream &in) : in(in) {};
 
-    int readInt();
+    inline void skipWhitespace() {
+        int c;
+        while (isWhitespace(c = in.peek()) && c != EOF) {
+            in.get();
+        }
+        if (c == EOF) {
+            exhausted = true;
+        }
+    }
 
-    ll readLong();
+    int readInt() {
+        return readInteger<int>();
+    }
 
-    string readString();
+    ll readLong() {
+        return readInteger<long>();
+    }
+
+    string readString() {
+        skipWhitespace();
+        int c = get();
+        if (c == EOF) {
+            throw "Input exhausted";
+        }
+        vector<char> res;
+        do {
+            res.push_back(c);
+        } while (!isWhitespace(c = get()));
+        return string(all(res));
+    }
 
     vector<int> readIntArray(int size) {
         return readArray<int>(size);
@@ -97,8 +99,7 @@ public:
 
     template<typename T>
     T readType() {
-        error = INVALID_CALL;
-        return nullptr;
+        throw "Operation not supported";
     }
 
     template<typename U, typename V>
@@ -109,15 +110,11 @@ public:
     }
 
     template<typename T>
-    vector<T> readArray(int size) {
+    vector<T> readArray(int n) {
         vector<T> res;
-        res.reserve(size);
-        for (int i = 0; i < size; i++) {
+        res.reserve(n);
+        for (int i = 0; i < n; i++) {
             res.push_back(readType<T>());
-            if (error != OK) {
-                res.clear();
-                return res;
-            }
         }
         return res;
     }
@@ -133,15 +130,11 @@ public:
     }
 
     template<typename U, typename V>
-    vector<pair<U, V> > readArray(int size) {
+    vector<pair<U, V> > readArray(int n) {
         vector<pair<U, V> > res;
-        res.reserve(size);
-        for (int i = 0; i < size; i++) {
+        res.reserve(n);
+        for (int i = 0; i < n; i++) {
             res.push_back(readType<U, V>());
-            if (error != OK) {
-                res.clear();
-                return res;
-            }
         }
         return res;
     }
@@ -157,17 +150,14 @@ public:
     }
 
     string readLine() {
-        error = OK;
-        int c = skipWhitespace();
-        if (error != OK) {
-            return "";
+        skipWhitespace();
+        int c = get();
+        if (c == EOF) {
+            throw "Input exhausted";
         }
         int length = 0;
         vector<char> res;
         do {
-            if (error != OK) {
-                return "";
-            }
             res.push_back(c);
             if (!isWhitespace(c)) {
                 length = res.size();
@@ -177,105 +167,76 @@ public:
         return string(res.begin(), res.begin() + length);
     }
 
-    double readDouble();
+    double readDouble() {
+        skipWhitespace();
+        int c = get();
+        int sgn = 1;
+        if (c == '-') {
+            sgn = -1;
+            c = get();
+        }
+        double res = 0;
+        do {
+            if (tolower(c) == 'e') {
+                return sgn * res * dPower(10, readInt());
+            }
+            if (!isdigit(c)) {
+                throw "Number format error";
+            }
+            res *= 10;
+            res += c - '0';
+            c = get();
+        } while (!isWhitespace(c) && c != '.');
+        if (c == '.') {
+            double add = 0;
+            int length = 0;
+            c = get();
+            do {
+                if (tolower(c) == 'e') {
+                    return sgn * (res + add * dPower(10, -length)) * dPower(10, readInt());
+                }
+                if (!isdigit(c)) {
+                    throw "Number format error";
+                }
+                add *= 10;
+                add += c - '0';
+                length++;
+                c = get();
+            } while (!isWhitespace(c));
+            res += add * dPower(10, -length);
+        }
+        return res * sgn;
+    }
 
     bool isExhausted() { return exhausted; }
 };
 
 template<>
 double Input::readType() {
-    error = OK;
-    int c = skipWhitespace();
-    if (error != OK) {
-        return 0;
-    }
-    int sgn = 1;
-    if (c == '-') {
-        sgn = -1;
-        c = get();
-    }
-    double res = 0;
-    do {
-        if (!isdigit(c)) {
-            error = UNEXPECTED_SYMBOL;
-            return 0;
-        }
-        res *= 10;
-        res += c - '0';
-        c = get();
-    } while (!isWhitespace(c) && c != '.');
-    if (c == '.') {
-        vi digits;
-        c = get();
-        do {
-            if (!isdigit(c)) {
-                error = UNEXPECTED_SYMBOL;
-                return 0;
-            }
-            digits.push_back(c - '0');
-            c = get();
-        } while (!isWhitespace(c));
-        double add = 0;
-        for (int i = int(digits.size()) - 1; i >= 0; i--) {
-            add += digits[i];
-            add /= 10;
-        }
-        res += add;
-    }
-    return res * sgn;
+    return readDouble();
 }
 
 template<>
 int Input::readType() {
-    return readInteger<int>();
+    return readInt();
 }
 
 template<>
 ll Input::readType() {
-    return readInteger<ll>();
+    return readLong();
 }
 
 template<>
 char Input::readType() {
-    error = OK;
-    int c = skipWhitespace();
-    if (error != OK) {
-        return 0;
+    skipWhitespace();
+    int c = get();
+    if (c == EOF) {
+        throw "Input exhausted";
     }
     return c;
 }
 
 template<>
 string Input::readType() {
-    error = OK;
-    int c = skipWhitespace();
-    if (error != OK) {
-        return "";
-    }
-    vector<char> res;
-    do {
-        if (error != OK) {
-            return "";
-        }
-        res.push_back(c);
-    } while (!isWhitespace(c = get()));
-    return string(res.begin(), res.end());
+    return readString();
 }
-
-inline int Input::readInt() {
-    return readType<int>();
-}
-
-inline ll Input::readLong() {
-    return readType<ll>();
-}
-
-string Input::readString() {
-    return readType<string>();
-}
-
-double Input::readDouble() {
-    return readType<double>();
-}
-
-#endif

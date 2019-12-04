@@ -1,5 +1,4 @@
-#ifndef CPP_GENERAL_H
-#define CPP_GENERAL_H
+#pragma once
 
 #include <bits/stdc++.h>
 
@@ -13,13 +12,6 @@ typedef pair<int, int> pii;
 
 const double PI = atan(1) * 4;
 
-const int DX_KNIGHT[] = {2, 1, -1, -2, -2, -1, 1, 2};
-const int DY_KNIGHT[] = {1, 2, 2, 1, -1, -2, -2, -1};
-const int DX4[] = {1, 0, -1, 0};
-const int DY4[] = {0, 1, 0, -1};
-const int DX8[] = {1, 1, 1, 0, -1, -1, -1, 0};
-const int DY8[] = {-1, 0, 1, 1, 1, 0, -1, -1};
-
 template <typename T>
 T minim(T& was, T cand) {
     return was = min(was, cand);
@@ -28,10 +20,6 @@ T minim(T& was, T cand) {
 template <typename T>
 T maxim(T& was, T cand) {
     return was = max(was, cand);
-}
-
-bool isValidCell(int r, int c, int n, int m) {
-    return r >= 0 && c >= 0 && r < n && c < m;
 }
 
 template <typename T, typename U>
@@ -52,9 +40,3 @@ void decreaseByOne(vector<T>& arr, Vs&...vs) {
     }
     decreaseByOne(vs...);
 }
-
-inline bool isSubset(int set, int subSet) {
-    return (set & subSet) == subSet;
-}
-
-#endif

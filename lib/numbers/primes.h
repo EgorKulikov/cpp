@@ -1,5 +1,4 @@
-#ifndef CPP_PRIMES_H
-#define CPP_PRIMES_H
+#pragma once
 
 #include "../general.h"
 
@@ -31,5 +30,3 @@ vi primes(int n) {
     }
     return res;
 }
-
-#endif //CPP_PRIMES_H

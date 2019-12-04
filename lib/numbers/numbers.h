@@ -1,6 +1,4 @@
-//
-// Created by egor on 01.11.2019.
-//
+#pragma once
 
 #ifndef JHELPER_EXAMPLE_PROJECT_NUMBERS_H
 #define JHELPER_EXAMPLE_PROJECT_NUMBERS_H
@@ -113,5 +111,3 @@ public:
         return revFactorial[n];
     }
 };
-
-#endif //JHELPER_EXAMPLE_PROJECT_NUMBERS_H

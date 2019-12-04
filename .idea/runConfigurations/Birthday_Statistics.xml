@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Birthday Statistics" type="name.admitriev.jhelper.configuration.TaskConfigurationType" factoryName="Task" className="BirthdayStatistics" cppPath="tasks/BirthdayStatistics.cpp" inputType="STANDARD" outputType="STANDARD" testType="SINGLE">
+    <tests>
+      <test input="10&#10;1000 1/2/1967&#10;1012 13/10/1940&#10;1103 5/1/1965&#10;2012 16/7/1980&#10;1125 18/9/1979&#10;1235 10/10/1976&#10;1400 16/11/1973&#10;1013 5/1/1965&#10;2109 28/7/1958&#10;2155 10/12/1970&#10;" output="1 2&#10;2 1&#10;3 0&#10;4 0&#10;5 0&#10;6 0&#10;7 2&#10;8 0&#10;9 1&#10;10 2&#10;11 1&#10;12 1&#10;" active="true" />
+    </tests>
+    <method v="2" />
+  </configuration>
+</component>

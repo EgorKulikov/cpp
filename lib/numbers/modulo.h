@@ -1,9 +1,4 @@
-//
-// Created by egor on 31.10.2019.
-//
-
-#ifndef JHELPER_EXAMPLE_PROJECT_MODULO_H
-#define JHELPER_EXAMPLE_PROJECT_MODULO_H
+#pragma once
 
 #include "../general.h"
 
@@ -14,10 +9,8 @@ const int MODF = 998244353;
 int mod = MOD7;
 
 class ModuloInt {
-private:
-    ll n;
-
 public:
+    ll n;
     ModuloInt() : n(0) {}
     ModuloInt(ll n) {
         n %= mod;
@@ -78,5 +71,3 @@ ModuloInt ModuloInt::operator-() {
     }
     return ModuloInt(mod - n);
 }
-
-#endif //JHELPER_EXAMPLE_PROJECT_MODULO_H

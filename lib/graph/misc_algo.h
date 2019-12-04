@@ -1,6 +1,4 @@
-//
-// Created by egor on 11/15/2019.
-//
+#pragma once
 
 #ifndef CPP_MISC_ALGO_H
 #define CPP_MISC_ALGO_H
@@ -40,5 +38,3 @@ vi topologicalSort(const Graph<Edge>& graph) {
     }
     return result;
 }
-
-#endif //CPP_MISC_ALGO_H

@@ -1,9 +1,4 @@
-//
-// Created by egor on 31.10.2019.
-//
-
-#ifndef JHELPER_EXAMPLE_PROJECT_DSU_H
-#define JHELPER_EXAMPLE_PROJECT_DSU_H
+#pragma once
 
 #include "../general.h"
 #include "../algo.h"
@@ -48,5 +43,3 @@ bool DSU::join(int a, int b) {
     setCount--;
     return true;
 }
-
-#endif //JHELPER_EXAMPLE_PROJECT_DSU_H

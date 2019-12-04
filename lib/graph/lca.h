@@ -1,5 +1,4 @@
-#ifndef CPP_LCA_H
-#define CPP_LCA_H
+#pragma once
 
 #include "../general.h"
 #include "../collections/interval_tree.h"
@@ -72,5 +71,3 @@ public:
         return level[first] + level[second] - 2 * level[getLCA(first, second)];
     }
 };
-
-#endif //CPP_LCA_H

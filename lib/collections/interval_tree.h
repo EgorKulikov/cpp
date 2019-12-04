@@ -1,11 +1,4 @@
-//
-// Created by kulikov on 11/7/2019.
-//
-
-#include <functional>
-
-#ifndef JHELPER_EXAMPLE_PROJECT_INTERVAL_TREE_H
-#define JHELPER_EXAMPLE_PROJECT_INTERVAL_TREE_H
+#pragma once
 
 #include "../general.h"
 
@@ -133,6 +126,3 @@ public:
         return query(0, 0, size, from, to);
     }
 };
-
-
-#endif //JHELPER_EXAMPLE_PROJECT_INTERVAL_TREE_H

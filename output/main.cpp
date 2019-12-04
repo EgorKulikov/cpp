@@ -4,14 +4,8 @@
  * @author Egor Kulikov
  */
 
-#include <iostream>
-#include <fstream>
 
-#ifndef CPP_INPUT_H
-#define CPP_INPUT_H
 
-#ifndef CPP_GENERAL_H
-#define CPP_GENERAL_H
 
 #include <bits/stdc++.h>
 
@@ -25,13 +19,6 @@ typedef pair<int, int> pii;
 
 const double PI = atan(1) * 4;
 
-const int DX_KNIGHT[] = {2, 1, -1, -2, -2, -1, 1, 2};
-const int DY_KNIGHT[] = {1, 2, 2, 1, -1, -2, -2, -1};
-const int DX4[] = {1, 0, -1, 0};
-const int DY4[] = {0, 1, 0, -1};
-const int DX8[] = {1, 1, 1, 0, -1, -1, -1, 0};
-const int DY8[] = {-1, 0, 1, 1, 1, 0, -1, -1};
-
 template<typename T>
 T minim(T &was, T cand) {
     return was = min(was, cand);
@@ -40,10 +27,6 @@ T minim(T &was, T cand) {
 template<typename T>
 T maxim(T &was, T cand) {
     return was = max(was, cand);
-}
-
-bool isValidCell(int r, int c, int n, int m) {
-    return r >= 0 && c >= 0 && r < n && c < m;
 }
 
 template<typename T, typename U>
@@ -65,11 +48,22 @@ void decreaseByOne(vector<T> &arr, Vs &...vs) {
     decreaseByOne(vs...);
 }
 
-inline bool isSubset(int set, int subSet) {
-    return (set & subSet) == subSet;
-}
 
-#endif
+template<typename D>
+D dPower(D base, ll exponent) {
+    if (exponent < 0) {
+        return dPower(1 / base, -exponent);
+    }
+    if (exponent == 0) {
+        return 1;
+    }
+    if ((exponent & 1) == 1) {
+        return dPower(base, exponent - 1) * base;
+    } else {
+        D res = dPower(base, exponent >> 1);
+        return res * res;
+    }
+}
 
 
 inline bool isWhitespace(int c) {
@@ -77,34 +71,25 @@ inline bool isWhitespace(int c) {
 }
 
 class Input {
-public:
-    enum ErrorType {
-        OK,
-        END_OF_FILE,
-        UNEXPECTED_SYMBOL,
-        INVALID_CALL
-    };
-
 private:
     istream &in;
     bool exhausted = false;
-    ErrorType error = OK;
 
     inline int get() {
-        int result = in.get();
-        if (result == EOF) {
+        if (exhausted) {
+            throw "Input exhausted";
+        }
+        int c = in.get();
+        if (c == EOF) {
             exhausted = true;
         }
-        return result;
+        return c;
     }
 
     template<typename T>
     T readInteger() {
-        error = OK;
-        int c = skipWhitespace();
-        if (error != OK) {
-            return 0;
-        }
+        skipWhitespace();
+        int c = get();
         int sgn = 1;
         if (c == '-') {
             sgn = -1;
@@ -113,26 +98,13 @@ private:
         T res = 0;
         do {
             if (!isdigit(c)) {
-                error = UNEXPECTED_SYMBOL;
-                return 0;
+                throw "Number format error";
             }
             res *= 10;
             res += c - '0';
             c = get();
         } while (!isWhitespace(c));
         return res * sgn;
-    }
-
-    inline int skipWhitespace() {
-        int c;
-        do {
-            c = get();
-            if (exhausted) {
-                error = END_OF_FILE;
-                return c;
-            }
-        } while (isWhitespace(c));
-        return c;
     }
 
     void initArrays(int n) {}
@@ -154,11 +126,36 @@ private:
 public:
     Input(istream &in) : in(in) {};
 
-    int readInt();
+    inline void skipWhitespace() {
+        int c;
+        while (isWhitespace(c = in.peek()) && c != EOF) {
+            in.get();
+        }
+        if (c == EOF) {
+            exhausted = true;
+        }
+    }
 
-    ll readLong();
+    int readInt() {
+        return readInteger<int>();
+    }
 
-    string readString();
+    ll readLong() {
+        return readInteger<long>();
+    }
+
+    string readString() {
+        skipWhitespace();
+        int c = get();
+        if (c == EOF) {
+            throw "Input exhausted";
+        }
+        vector<char> res;
+        do {
+            res.push_back(c);
+        } while (!isWhitespace(c = get()));
+        return string(all(res));
+    }
 
     vector<int> readIntArray(int size) {
         return readArray<int>(size);
@@ -166,8 +163,7 @@ public:
 
     template<typename T>
     T readType() {
-        error = INVALID_CALL;
-        return nullptr;
+        throw "Operation not supported";
     }
 
     template<typename U, typename V>
@@ -178,15 +174,11 @@ public:
     }
 
     template<typename T>
-    vector<T> readArray(int size) {
+    vector<T> readArray(int n) {
         vector<T> res;
-        res.reserve(size);
-        for (int i = 0; i < size; i++) {
+        res.reserve(n);
+        for (int i = 0; i < n; i++) {
             res.push_back(readType<T>());
-            if (error != OK) {
-                res.clear();
-                return res;
-            }
         }
         return res;
     }
@@ -201,15 +193,11 @@ public:
     }
 
     template<typename U, typename V>
-    vector<pair<U, V> > readArray(int size) {
+    vector<pair<U, V> > readArray(int n) {
         vector<pair<U, V> > res;
-        res.reserve(size);
-        for (int i = 0; i < size; i++) {
+        res.reserve(n);
+        for (int i = 0; i < n; i++) {
             res.push_back(readType<U, V>());
-            if (error != OK) {
-                res.clear();
-                return res;
-            }
         }
         return res;
     }
@@ -225,17 +213,14 @@ public:
     }
 
     string readLine() {
-        error = OK;
-        int c = skipWhitespace();
-        if (error != OK) {
-            return "";
+        skipWhitespace();
+        int c = get();
+        if (c == EOF) {
+            throw "Input exhausted";
         }
         int length = 0;
         vector<char> res;
         do {
-            if (error != OK) {
-                return "";
-            }
             res.push_back(c);
             if (!isWhitespace(c)) {
                 length = res.size();
@@ -245,111 +230,79 @@ public:
         return string(res.begin(), res.begin() + length);
     }
 
-    double readDouble();
+    double readDouble() {
+        skipWhitespace();
+        int c = get();
+        int sgn = 1;
+        if (c == '-') {
+            sgn = -1;
+            c = get();
+        }
+        double res = 0;
+        do {
+            if (tolower(c) == 'e') {
+                return sgn * res * dPower(10, readInt());
+            }
+            if (!isdigit(c)) {
+                throw "Number format error";
+            }
+            res *= 10;
+            res += c - '0';
+            c = get();
+        } while (!isWhitespace(c) && c != '.');
+        if (c == '.') {
+            double add = 0;
+            int length = 0;
+            c = get();
+            do {
+                if (tolower(c) == 'e') {
+                    return sgn * (res + add * dPower(10, -length)) * dPower(10, readInt());
+                }
+                if (!isdigit(c)) {
+                    throw "Number format error";
+                }
+                add *= 10;
+                add += c - '0';
+                length++;
+                c = get();
+            } while (!isWhitespace(c));
+            res += add * dPower(10, -length);
+        }
+        return res * sgn;
+    }
 
     bool isExhausted() { return exhausted; }
 };
 
 template<>
 double Input::readType() {
-    error = OK;
-    int c = skipWhitespace();
-    if (error != OK) {
-        return 0;
-    }
-    int sgn = 1;
-    if (c == '-') {
-        sgn = -1;
-        c = get();
-    }
-    double res = 0;
-    do {
-        if (!isdigit(c)) {
-            error = UNEXPECTED_SYMBOL;
-            return 0;
-        }
-        res *= 10;
-        res += c - '0';
-        c = get();
-    } while (!isWhitespace(c) && c != '.');
-    if (c == '.') {
-        vi digits;
-        c = get();
-        do {
-            if (!isdigit(c)) {
-                error = UNEXPECTED_SYMBOL;
-                return 0;
-            }
-            digits.push_back(c - '0');
-            c = get();
-        } while (!isWhitespace(c));
-        double add = 0;
-        for (int i = int(digits.size()) - 1; i >= 0; i--) {
-            add += digits[i];
-            add /= 10;
-        }
-        res += add;
-    }
-    return res * sgn;
+    return readDouble();
 }
 
 template<>
 int Input::readType() {
-    return readInteger<int>();
+    return readInt();
 }
 
 template<>
 ll Input::readType() {
-    return readInteger<ll>();
+    return readLong();
 }
 
 template<>
 char Input::readType() {
-    error = OK;
-    int c = skipWhitespace();
-    if (error != OK) {
-        return 0;
+    skipWhitespace();
+    int c = get();
+    if (c == EOF) {
+        throw "Input exhausted";
     }
     return c;
 }
 
 template<>
 string Input::readType() {
-    error = OK;
-    int c = skipWhitespace();
-    if (error != OK) {
-        return "";
-    }
-    vector<char> res;
-    do {
-        if (error != OK) {
-            return "";
-        }
-        res.push_back(c);
-    } while (!isWhitespace(c = get()));
-    return string(res.begin(), res.end());
+    return readString();
 }
-
-inline int Input::readInt() {
-    return readType<int>();
-}
-
-inline ll Input::readLong() {
-    return readType<ll>();
-}
-
-string Input::readString() {
-    return readType<string>();
-}
-
-double Input::readDouble() {
-    return readType<double>();
-}
-
-#endif
-
-#ifndef CPP_OUTPUT_H
-#define CPP_OUTPUT_H
 
 
 class Output {
@@ -357,244 +310,103 @@ private:
     ostream &out;
 
     template<typename T>
-    void printSingle(const T &value);
+    void printSingle(const T &value) {
+        out << value;
+    }
 
     template<typename T>
-    void printSingle(const vector<T> &value);
+    void printSingle(const vector<T> &array) {
+        size_t n = array.size();
+        for (int i = 0; i < n; ++i) {
+            out << array[i];
+            if (i + 1 != n) {
+                out << ' ';
+            }
+        }
+    }
 
     template<typename T, typename U>
-    void printSingle(const pair<T, U> &value);
+    void printSingle(const pair<T, U> &value) {
+        out << value.first << ' ' << value.second;
+    }
 
 public:
-    Output(ostream &out);
+    Output(ostream &out) : out(out) {
+        out << fixed << setprecision(12);
+    }
 
-    void print();
+    void print() {}
 
     template<typename T, typename...Targs>
-    void print(const T &first, const Targs... args);
+    void print(const T &first, const Targs... args) {
+        printSingle(first);
+        if (sizeof...(args) != 0) {
+            out << ' ';
+            print(args...);
+        }
+    }
 
     template<typename...Targs>
-    void printLine(const Targs... args);
+    void printLine(const Targs... args) {
+        print(args...);
+        out << '\n';
+    }
 
     void flush() {
         out.flush();
     }
 };
 
-Output::Output(ostream &out) : out(out) {
-    out << setprecision(12);
-}
 
-void Output::print() {
-}
+class NumberIterator : iterator<forward_iterator_tag, int> {
+public:
+    int v;
 
-template<typename T, typename... Targs>
-void Output::print(const T &first, const Targs... args) {
-    printSingle(first);
-    if (sizeof...(args) != 0) {
-        out << ' ';
-        print(args...);
+    NumberIterator(int v) : v(v) {}
+
+    operator int &() { return v; }
+
+    int operator*() { return v; }
+};
+
+class Range : pii {
+public:
+    Range(int begin, int end) : pii(begin, end) {}
+
+    Range(int n) : pii(0, n) {}
+
+    NumberIterator begin() {
+        return first;
     }
-}
 
-template<typename T>
-void Output::printSingle(const T &value) {
-    out << value;
-}
-
-template<typename... Targs>
-void Output::printLine(const Targs... args) {
-    print(args...);
-    out << '\n';
-}
-
-template<typename T>
-void Output::printSingle(const vector<T> &array) {
-    unsigned int size = array.size();
-    for (int i = 0; i < size; ++i) {
-        out << array[i];
-        if (i + 1 != size) {
-            out << ' ';
-        }
+    NumberIterator end() {
+        return second;
     }
-}
-
-template<typename T, typename U>
-void Output::printSingle(const pair<T, U> &value) {
-    out << value.first << ' ' << value.second;
-}
-
-#endif
+};
 
 
 //#pragma comment(linker, "/STACK:200000000")
 
-struct Operation {
-    string op;
-    int u;
-    int v;
-
-    Operation(const string &op, int u, int v) : op(op), u(u), v(v) {}
-};
-
-class H {
+class PenaltyCalculation {
 public:
     void solve(istream &inp, ostream &outp) {
         Input in(inp);
         Output out(outp);
 
-        int t = in.readInt();
         int n = in.readInt();
-        int k = in.readInt();
+        auto submissions = in.readArray<int, string>(n);
 
-        if (t == 1) {
-            int current = -1;
-            vector<Operation> answer;
-            for (int i = 0; i < n; i++) {
-                if ((k >> i & 1) == 1) {
-                    if (current == -1) {
-                        current = i + 1;
-                    } else {
-                        answer.emplace_back("OR", current, i + 1);
-                        current = n + answer.size();
-                    }
-                } else {
-                    if (current == -1) {
-                        continue;
-                    } else {
-                        answer.emplace_back("AND", current, i + 1);
-                        current = n + answer.size();
-                    }
-                }
-            }
-            if (answer.empty()) {
-                out.printLine(1);
-                out.printLine("NOT", 1);
+        sort(all(submissions));
+        int answer = 0;
+        for (const auto &p : submissions) {
+            if (p.second == "AC") {
+                answer += p.first;
+                out.printLine(answer);
                 return;
             }
-            out.printLine(answer.size());
-            for (const auto &o : answer) {
-                out.printLine(o.op, o.u, o.v);
-            }
-            return;
-        } else {
-            vector<bool> ones(1 << n);
-            for (int i = 0; i < k; ++i) {
-                int current = 0;
-                for (int j = 0; j < n; ++j) {
-                    if (in.readType<char>() == '1') {
-                        current += 1 << j;
-                    }
-                }
-                ones[current] = true;
-            }
-            vector<Operation> answer;
-            for (int i = 0; i < n; ++i) {
-                answer.emplace_back("NOT", i + 1, -1);
-            }
-            vector<bool> has(16);
-            vector<int> type(1 << (n - 2));
-            for (int i = 0; i < (1 << n); i += 4) {
-                int current = 0;
-                for (int j = i; j < i + 4; j++) {
-                    if (ones[j]) {
-                        current += 1 << (j - i);
-                    }
-                }
-                has[current] = true;
-                type[i >> 2] = current;
-            }
-            vi id;
-            if (n > 2) {
-                function<vi(int, int)> build = [&](int from, int to) -> vi {
-                    if (from + 1 == to) {
-                        vi res;
-                        res.push_back(to + n);
-                        res.push_back(to);
-                        return res;
-                    }
-                    int mid = (from + to) / 2;
-                    vi left = build(from, mid);
-                    vi right = build(mid, to);
-                    vi res;
-                    res.reserve(1 << (to - from));
-                    for (int j = 0; j < right.size(); j++) {
-                        for (int i = 0; i < left.size(); i++) {
-                            answer.emplace_back("AND", left[i], right[j]);
-                            res.push_back(answer.size() + n);
-                        }
-                    }
-                    return res;
-                };
-                id = build(2, n);
-            }
-            vector<int> at(16);
-            for (int i = 1; i < 16; ++i) {
-                if (!has[i]) {
-                    continue;
-                }
-                int last = -1;
-                if (i == 15) {
-                    answer.emplace_back("OR", 1, n + 1);
-                    at[i] = answer.size() + n;
-                    continue;
-                }
-                bool rev = false;
-                int ii = i;
-                if (__builtin_popcount(i) > 2) {
-                    ii = 15 - ii;
-                    rev = true;
-                }
-                for (int j = 0; j < 4; j++) {
-                    if ((ii >> j & 1) == 1) {
-                        answer.emplace_back("AND", n + 1 - n * (j & 1), n + 2 - n * ((j & 2) >> 1));
-                        if (last == -1) {
-                            last = answer.size() + n;
-                        } else {
-                            answer.emplace_back("OR", last, answer.size() + n);
-                            last = answer.size() + n;
-                        }
-                    }
-                }
-                if (rev) {
-                    answer.emplace_back("NOT", last, -1);
-                    last = answer.size() + n;
-                }
-                at[i] = last;
-            }
-            if (n > 2) {
-                vector<int> pos(16, -1);
-                for (int i = 0; i < (1 << (n - 2)); i++) {
-                    if (type[i] == 0) {
-                        continue;
-                    }
-                    if (pos[type[i]] == -1) {
-                        pos[type[i]] = id[i];
-                    } else {
-                        answer.emplace_back("OR", pos[type[i]], id[i]);
-                        pos[type[i]] = answer.size() + n;
-                    }
-                }
-                int start = answer.size();
-                for (int i = 1; i < 16; i++) {
-                    if (has[i]) {
-                        answer.emplace_back("AND", at[i], pos[i]);
-                    }
-                }
-                for (int i = answer.size() - 2; i >= start; i--) {
-                    answer.emplace_back("OR", answer.size() + n, n + i + 1);
-                }
-            }
-            out.printLine(answer.size());
-            for (const auto &o : answer) {
-                if (o.v == -1) {
-                    out.printLine(o.op, o.u);
-                } else {
-                    out.printLine(o.op, o.u, o.v);
-                }
-            }
-            return;
+            answer += 20;
         }
+        out.printLine(0);
     }
 };
 
@@ -602,7 +414,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    H solver;
+    PenaltyCalculation solver;
     std::istream &in(std::cin);
     std::ostream &out(std::cout);
     solver.solve(in, out);

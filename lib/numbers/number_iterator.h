@@ -1,5 +1,4 @@
-#ifndef CPP_NUMBER_ITERATOR_H
-#define CPP_NUMBER_ITERATOR_H
+#pragma once
 
 #include "../general.h"
 
@@ -37,5 +36,3 @@ void iterate(ll from, ll to, function<void(ll, int)> process, int base = 10) {
         }
     }
 }
-
-#endif //CPP_NUMBER_ITERATOR_H

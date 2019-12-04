@@ -1,9 +1,4 @@
-//
-// Created by kulikov on 11/7/2019.
-//
-
-#ifndef JHELPER_EXAMPLE_PROJECT_FLOW_H
-#define JHELPER_EXAMPLE_PROJECT_FLOW_H
+#pragma once
 
 #include "graph.h"
 
@@ -89,5 +84,3 @@ template <class Edge, typename C>
 C dinic(Graph<Edge>& graph, int source, int destination) {
     return MaxFlow<Edge, C>(graph, source, destination).dinic();
 }
-
-#endif //JHELPER_EXAMPLE_PROJECT_FLOW_H

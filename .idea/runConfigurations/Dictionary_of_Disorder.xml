@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Dictionary of Disorder" type="name.admitriev.jhelper.configuration.TaskConfigurationType" factoryName="Task" className="DictionaryOfDisorder" cppPath="tasks/DictionaryOfDisorder.cpp" inputType="STANDARD" outputType="STANDARD" testType="SINGLE">
+    <tests>
+      <test input="6&#10;petals&#10;plates&#10;pleats&#10;dog&#10;cat&#10;parrot&#10;" output="0&#10;1&#10;2&#10;0&#10;0&#10;0&#10;" active="true" />
+    </tests>
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,9 +1,4 @@
-//
-// Created by egor on 09.11.2019.
-//
-
-#ifndef CPP_SUFFIX_AUTOMATON_H
-#define CPP_SUFFIX_AUTOMATON_H
+#pragma once
 
 #include "../general.h"
 
@@ -60,6 +55,3 @@ SuffixAutomaton* buildAutomaton(const string& s, char first = 'a', char last = '
     }
     return head;
 }
-
-
-#endif //CPP_SUFFIX_AUTOMATON_H

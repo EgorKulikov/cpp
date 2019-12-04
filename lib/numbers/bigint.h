@@ -1,5 +1,4 @@
-#ifndef CPP_BIGINT_H
-#define CPP_BIGINT_H
+#pragma once
 
 #include "../general.h"
 
@@ -161,7 +160,6 @@ public:
                 cur %= j;
             }
         }
+        return out;
     }
 };
-
-#endif //CPP_BIGINT_H

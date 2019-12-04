@@ -1,9 +1,4 @@
-//
-// Created by egor on 11/15/2019.
-//
-
-#ifndef CPP_ID_H
-#define CPP_ID_H
+#pragma once
 
 #include "../general.h"
 
@@ -37,5 +32,3 @@ public:
         return result;
     }
 };
-
-#endif //CPP_ID_H

@@ -1,5 +1,4 @@
-#ifndef CPP_GEOMETRY_H
-#define CPP_GEOMETRY_H
+#pragma once
 
 #include "general.h"
 
@@ -131,5 +130,3 @@ vector<Point<T> > touchingPoints(const Circle<T>& c, const Point<T>& p) {
     Circle<T> power(p, sqrt((dist - c.r) * (dist + c.r)));
     return intersect(c, power);
 }
-
-#endif //CPP_GEOMETRY_H
