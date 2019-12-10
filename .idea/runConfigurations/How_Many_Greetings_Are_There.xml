@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="How Many Greetings Are There" type="name.admitriev.jhelper.configuration.TaskConfigurationType" factoryName="Task" className="HowManyGreetingsAreThere" cppPath="tasks/HowManyGreetingsAreThere.cpp" inputType="STANDARD" inputFile="input.txt" outputType="STANDARD" outputFile="output.txt" testType="MULTI_NUMBER">
-    <tests>
-      <test input="1&#10;5&#10;" output="21" active="true" />
-    </tests>
-    <method v="2" />
-  </configuration>
-</component>

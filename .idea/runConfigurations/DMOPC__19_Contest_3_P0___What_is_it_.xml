@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="DMOPC '19 Contest 3 P0 - What is it?" type="name.admitriev.jhelper.configuration.TaskConfigurationType" factoryName="Task" className="DMOPC19Contest3P0WhatIsIt" cppPath="tasks/DMOPC19Contest3P0WhatIsIt.cpp" inputType="STANDARD" inputFile="input.txt" outputType="STANDARD" outputFile="output.txt" testType="MULTI_NUMBER">
-    <tests>
-      <test input="4&#10;1 2 3 4 5 6 7 8 9 10&#10;2 4 8 16 32 64 128 256 512 1024&#10;1 1 0 0 1 1 0 0 1 1&#10;1 1 1 1 1 1 1 1 1 1&#10;" output="arithmetic&#10;geometric&#10;neither&#10;both&#10;" active="true" />
-    </tests>
-    <method v="2" />
-  </configuration>
-</component>

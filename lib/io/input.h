@@ -23,7 +23,7 @@ private:
     }
 
     template<typename T>
-    T readInteger() {
+    inline T readInteger() {
         skipWhitespace();
         int c = get();
         int sgn = 1;
@@ -72,12 +72,12 @@ public:
         }
     }
 
-    int readInt() {
+    inline int readInt() {
         return readInteger<int>();
     }
 
     ll readLong() {
-        return readInteger<long>();
+        return readInteger<ll>();
     }
 
     string readString() {
@@ -150,7 +150,7 @@ public:
     }
 
     string readLine() {
-        skipWhitespace();
+//        skipWhitespace();
         int c = get();
         if (c == EOF) {
             throw "Input exhausted";

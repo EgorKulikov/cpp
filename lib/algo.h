@@ -25,9 +25,9 @@ inline vector<vector<vector<T> > > makeArray(int a, int b, int c, T init) {
     return vector<vector<vector<T> > >(a, makeArray<T>(b, c, init));
 }
 
-template <typename T>
-inline void addAll(vector<T>& v, const vector<T>& toAdd) {
-    v.insert(v.end(), toAdd.begin(), toAdd.end());
+template <typename T, typename Iterator>
+inline void addAll(vector<T>& v, Iterator begin, Iterator end) {
+    v.insert(v.end(), begin, end);
 }
 
 vi getQty(const vi& arr, int length) {

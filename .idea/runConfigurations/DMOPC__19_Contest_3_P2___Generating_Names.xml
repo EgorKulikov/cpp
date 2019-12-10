@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="DMOPC '19 Contest 3 P2 - Generating Names" type="name.admitriev.jhelper.configuration.TaskConfigurationType" factoryName="Task" className="DMOPC19Contest3P2GeneratingNames" cppPath="tasks/DMOPC19Contest3P2GeneratingNames.cpp" inputType="STANDARD" outputType="STANDARD" testType="SINGLE">
-    <tests>
-      <test input="2 1&#10;b*&#10;" output="51&#10;" active="true" />
-      <test input="2 2&#10;**&#10;" output="676&#10;" active="true" />
-    </tests>
-    <method v="2" />
-  </configuration>
-</component>

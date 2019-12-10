@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef CPP_MISC_ALGO_H
-#define CPP_MISC_ALGO_H
-
 #include "../general.h"
 #include "graph.h"
 

@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef JHELPER_EXAMPLE_PROJECT_NUMBERS_H
-#define JHELPER_EXAMPLE_PROJECT_NUMBERS_H
-
 #include "../general.h"
 #include "modulo.h"
 

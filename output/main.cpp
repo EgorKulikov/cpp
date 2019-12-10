@@ -87,7 +87,7 @@ private:
     }
 
     template<typename T>
-    T readInteger() {
+    inline T readInteger() {
         skipWhitespace();
         int c = get();
         int sgn = 1;
@@ -136,12 +136,12 @@ public:
         }
     }
 
-    int readInt() {
+    inline int readInt() {
         return readInteger<int>();
     }
 
     ll readLong() {
-        return readInteger<long>();
+        return readInteger<ll>();
     }
 
     string readString() {
@@ -213,7 +213,7 @@ public:
     }
 
     string readLine() {
-        skipWhitespace();
+//        skipWhitespace();
         int c = get();
         if (c == EOF) {
             throw "Input exhausted";
@@ -385,28 +385,316 @@ public:
 };
 
 
+const int MOD7 = 1000000007;
+const int MOD9 = 1000000009;
+const int MODF = 998244353;
+
+int mod = MOD7;
+
+class ModuloInt {
+public:
+    ll n;
+
+    ModuloInt() : n(0) {}
+
+    ModuloInt(ll n) {
+        n %= mod;
+        if (n < 0) {
+            n += mod;
+        }
+        this->n = n;
+    }
+
+    ModuloInt(const ModuloInt &n) = default;
+
+    ModuloInt &operator+=(const ModuloInt &other);
+
+    ModuloInt &operator-=(const ModuloInt &other);
+
+    ModuloInt &operator*=(const ModuloInt &other);
+
+    ModuloInt operator-();
+
+    friend ostream &operator<<(ostream &out, const ModuloInt &val);
+};
+
+ModuloInt &ModuloInt::operator+=(const ModuloInt &other) {
+    n += other.n;
+    if (n >= mod) {
+        n -= mod;
+    }
+    return *this;
+}
+
+ModuloInt &ModuloInt::operator-=(const ModuloInt &other) {
+    n -= other.n;
+    if (n < 0) {
+        n += mod;
+    }
+    return *this;
+}
+
+ModuloInt &ModuloInt::operator*=(const ModuloInt &other) {
+    n *= other.n;
+    n %= mod;
+    return *this;
+}
+
+ModuloInt operator+(const ModuloInt &a, const ModuloInt &b) {
+    return ModuloInt(a) += b;
+}
+
+ModuloInt operator-(const ModuloInt &a, const ModuloInt &b) {
+    return ModuloInt(a) -= b;
+}
+
+ModuloInt operator*(const ModuloInt &a, const ModuloInt &b) {
+    return ModuloInt(a) *= b;
+}
+
+ostream &operator<<(ostream &out, const ModuloInt &val) {
+    return out << val.n;
+}
+
+ModuloInt ModuloInt::operator-() {
+    if (n == 0) {
+        return 0;
+    }
+    return ModuloInt(mod - n);
+}
+
+
+template<typename T>
+T gcd(T a, T b) {
+    a = abs(a);
+    b = abs(b);
+    while (b != 0) {
+        a = a % b;
+        swap(a, b);
+    }
+    return a;
+}
+
+template<typename T>
+T lcm(T a, T b) {
+    return a / gcd(a, b) * b;
+}
+
+template<typename T>
+T power(const T &a, ll b) {
+    if (b == 0) {
+        return 1;
+    }
+    if ((b & 1) == 0) {
+        T res = power(a, b >> 1);
+        return res * res;
+    } else {
+        return power(a, b - 1) * a;
+    }
+}
+
+template<typename T>
+vector<T> generateFactorial(int length) {
+    vector<T> result(length);
+    if (length > 0) {
+        result[0] = 1;
+    }
+    for (int i = 1; i < length; i++) {
+        result[i] = result[i - 1] * i;
+    }
+    return result;
+}
+
+template<typename T>
+vector<T> generateReverse(int length) {
+    vector<T> result(length);
+    if (length > 1) {
+        result[1] = 1;
+    }
+    for (int i = 2; i < length; i++) {
+        result[i] = -(mod / i) * result[mod % i];
+    }
+    return result;
+}
+
+template<typename T>
+vector<T> generatePowers(T base, int length) {
+    vector<T> result(length);
+    if (length > 0) {
+        result[0] = 1;
+    }
+    for (int i = 1; i < length; i++) {
+        result[i] = result[i - 1] * base;
+    }
+    return result;
+}
+
+template<typename T>
+vector<T> generateReverseFactorial(int length) {
+    auto result = generateReverse<T>(length);
+    if (length > 0) {
+        result[0] = 1;
+    }
+    for (int i = 1; i < length; i++) {
+        result[i] *= result[i - 1];
+    }
+    return result;
+}
+
+template<typename T>
+class Combinations {
+private:
+    vector<T> fact;
+    vector<T> revFactorial;
+
+public:
+    Combinations(int length) {
+        fact = generateFactorial<T>(length);
+        revFactorial = generateReverseFactorial<T>(length);
+    }
+
+public:
+    T c(int n, int k) {
+        if (k < 0 || k > n) {
+            return 0;
+        }
+        return fact[n] * revFactorial[k] * revFactorial[n - k];
+    }
+
+    T factorial(int n) {
+        return fact[n];
+    }
+
+    T reverseFactorial(int n) {
+        return revFactorial[n];
+    }
+};
+
+
+template<typename T>
+inline void unique(vector<T> &v) {
+    v.resize(unique(all(v)) - v.begin());
+}
+
+vi createOrder(int n) {
+    vi order(n);
+    for (int i = 0; i < n; i++) {
+        order[i] = i;
+    }
+    return order;
+}
+
+template<typename T>
+inline vector<vector<T> > makeArray(int a, int b, T init) {
+    return vector<vector<T> >(a, vector<T>(b, init));
+}
+
+template<typename T>
+inline vector<vector<vector<T> > > makeArray(int a, int b, int c, T init) {
+    return vector<vector<vector<T> > >(a, makeArray<T>(b, c, init));
+}
+
+template<typename T, typename Iterator>
+inline void addAll(vector<T> &v, Iterator begin, Iterator end) {
+    v.insert(v.end(), begin, end);
+}
+
+vi getQty(const vi &arr, int length) {
+    vi res(length);
+    for (int i : arr) {
+        res[i]++;
+    }
+    return res;
+}
+
+vi getQty(const vi &arr) {
+    return getQty(arr, *max_element(all(arr)) + 1);
+}
+
+
 //#pragma comment(linker, "/STACK:200000000")
 
-class PenaltyCalculation {
+class day10 {
 public:
     void solve(istream &inp, ostream &outp) {
         Input in(inp);
         Output out(outp);
 
-        int n = in.readInt();
-        auto submissions = in.readArray<int, string>(n);
-
-        sort(all(submissions));
-        int answer = 0;
-        for (const auto &p : submissions) {
-            if (p.second == "AC") {
-                answer += p.first;
-                out.printLine(answer);
-                return;
-            }
-            answer += 20;
+        vector<string> data;
+        while (!in.isExhausted()) {
+            data.push_back(in.readString());
+            in.skipWhitespace();
         }
-        out.printLine(0);
+        int n = data.size();
+        int m = data[0].size();
+        int answer = 0;
+        int r, c;
+        for (int i : Range(n)) {
+            for (int j : Range(m)) {
+                if (data[i][j] != '#') {
+                    continue;
+                }
+                set<pii> dirs;
+                for (int k : Range(n)) {
+                    for (int l : Range(m)) {
+                        if (k == i && j == l || data[k][l] != '#') {
+                            continue;
+                        }
+                        int dr = k - i;
+                        int dc = l - j;
+                        int g = gcd(dr, dc);
+                        dr /= g;
+                        dc /= g;
+                        dirs.emplace(dr, dc);
+                    }
+                }
+                if (dirs.size() > answer) {
+                    answer = dirs.size();
+                    r = i;
+                    c = j;
+                }
+            }
+        }
+        struct asteroid {
+            int dr, dc;
+            double ang;
+            int layer;
+
+            asteroid(int dr, int dc) : dr(dr), dc(dc) {
+                ang = -atan2(dc, dr);
+            }
+        };
+        map<pii, vector<asteroid> > mp;
+        for (int i : Range(n)) {
+            for (int j : Range(m)) {
+                if (i == r && j == c || data[i][j] != '#') {
+                    continue;
+                }
+                int dr = i - r;
+                int dc = j - c;
+                int g = gcd(dr, dc);
+                dr /= g;
+                dc /= g;
+                mp[make_pair(dr, dc)].push_back(asteroid(i - r, j - c));
+            }
+        }
+        vector<asteroid> all;
+        for (auto &p : mp) {
+            sort(all(p.second), [](const asteroid &a, const asteroid &b) -> bool {
+                return hypot(a.dr, a.dc) < hypot(b.dr, b.dc);
+            });
+            for (int i : Range(p.second.size())) {
+                p.second[i].layer = i;
+            }
+            addAll(all, all(p.second));
+        }
+        sort(all(all), [](const asteroid &a, const asteroid &b) -> bool {
+            if (a.layer != b.layer) {
+                return a.layer < b.layer;
+            }
+            return a.ang < b.ang;
+        });
+        out.printLine(100 * (c + all[199].dc) + r + all[199].dr);
     }
 };
 
@@ -414,7 +702,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    PenaltyCalculation solver;
+    day10 solver;
     std::istream &in(std::cin);
     std::ostream &out(std::cout);
     solver.solve(in, out);

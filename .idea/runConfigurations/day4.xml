@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="day4" type="name.admitriev.jhelper.configuration.TaskConfigurationType" factoryName="Task" className="day4" cppPath="tasks/day4.cpp" inputType="STANDARD" inputFile="input.txt" outputType="STANDARD" outputFile="output.txt" testType="SINGLE">
-    <tests>
-      <test input="" active="true" />
-    </tests>
-    <method v="2" />
-  </configuration>
-</component>

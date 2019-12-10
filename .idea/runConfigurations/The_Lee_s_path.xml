@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="The Lee's path" type="name.admitriev.jhelper.configuration.TaskConfigurationType" factoryName="Task" className="TheLeesPath" cppPath="tasks/TheLeesPath.cpp" inputType="STANDARD" outputType="STANDARD" testType="SINGLE">
-    <tests>
-      <test input="7 6&#10;1 0 0 0 0 0&#10;2 0 0 0 0 0&#10;3 0 0 0 0 0&#10;4 0 0 0 0 0&#10;5 6 7 8 9 10&#10;0 0 0 0 0 11&#10;0 0 0 0 0 12&#10;" output="4D5R2D E" active="true" />
-      <test input="7 6&#10;1 0 0 0 0 0&#10;2 0 0 0 0 0&#10;3 0 0 0 0 0&#10;4 0 0 0 0 0&#10;5 6 7 8 9 0&#10;0 0 0 0 0 0&#10;0 0 0 0 0 0" output="4D4R NE" active="true" />
-    </tests>
-    <method v="2" />
-  </configuration>
-</component>
