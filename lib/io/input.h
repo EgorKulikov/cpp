@@ -208,6 +208,15 @@ public:
         return res * sgn;
     }
 
+    char readChar() {
+        skipWhitespace();
+        int c = get();
+        if (c == EOF) {
+            throw "Input exhausted";
+        }
+        return c;
+    }
+
     bool isExhausted() { return exhausted; }
 };
 
@@ -228,12 +237,7 @@ ll Input::readType() {
 
 template<>
 char Input::readType() {
-    skipWhitespace();
-    int c = get();
-    if (c == EOF) {
-        throw "Input exhausted";
-    }
-    return c;
+    return readChar();
 }
 
 template<>

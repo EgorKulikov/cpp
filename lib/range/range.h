@@ -15,9 +15,9 @@ public:
 
 class Range : pii {
 public:
-    Range(int begin, int end) : pii(begin, end) {}
+    Range(int begin, int end) : pii(begin, max(begin, end)) {}
 
-    Range(int n) : pii(0, n) {}
+    Range(int n) : pii(0, max(0, n)) {}
 
     NumberIterator begin() {
         return first;

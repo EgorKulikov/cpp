@@ -7,11 +7,14 @@ void iterate(ll from, ll to, function<void(ll, int)> process, int base = 10) {
     ll max = numeric_limits<ll>::max();
     power.push_back(1);
     while (max / power.back() >= base) {
-        power.push_back(power.back() * 10);
+        power.push_back(power.back() * base);
     }
     to++;
     for (int i = 0; ; i++) {
-        if (i != power.size() - 1 && from / power[i + 1] != to / power[i + 1]) {
+        if (i != power.size() - 1 && from / power[i + 1] != to && from / power[i] % base == 0) {
+            continue;
+        }
+        if (i != power.size() - 1 && from / power[i + 1] != to / power[i + 1] && from / power[i] % base != 0) {
             ll prefix = from / power[i + 1] * base;
             for (int j = (int) (from / power[i] % base); j < base; j++) {
                 process(prefix + j, i);

@@ -14,9 +14,9 @@ public:
 
 class RevRange : pii {
 public:
-    RevRange(int begin, int end) : pii(begin - 1, end - 1) {}
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
 
-    RevRange(int n) : pii(n - 1, -1) {}
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
 
     ReverseNumberIterator begin() {
         return first;

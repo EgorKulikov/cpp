@@ -23,3 +23,26 @@ vector<vector<W> > floydWarshall(Graph<Edge> graph) {
     }
     return dist;
 }
+
+template <class Edge>
+vi edgeDistances(Graph<Edge>& graph, int source) {
+    vi dist(graph.vertexCount);
+    fill(all(dist), -1);
+    dist[source] = 0;
+    queue<int> q;
+    q.push(source);
+    while (!q.empty()) {
+        int current = q.front();
+        q.pop();
+        for (auto edge : graph.edges[current]) {
+            int next = edge->to;
+            if (dist[next] == -1) {
+                dist[next] = dist[current] + 1;
+                q.push(next);
+            }
+        }
+    }
+    return dist;
+}
+
+
