@@ -19,7 +19,8 @@ public:
         }
         this->n = n;
     }
-    ModuloInt(const ModuloInt& n) = default;
+//    ModuloInt(const ModuloInt&) = default;
+//    ModuloInt(ModuloInt&&) = default;
     ModuloInt& operator +=(const ModuloInt& other);
     ModuloInt& operator -=(const ModuloInt& other);
     ModuloInt& operator *=(const ModuloInt& other);
@@ -70,4 +71,12 @@ ModuloInt ModuloInt::operator-() {
         return 0;
     }
     return ModuloInt(mod - n);
+}
+
+bool operator==(const ModuloInt& a, const ModuloInt& b) {
+    return a.n == b.n;
+}
+
+bool operator!=(const ModuloInt& a, const ModuloInt& b) {
+    return a.n != b.n;
 }

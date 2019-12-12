@@ -19,19 +19,19 @@ typedef pair<int, int> pii;
 
 const double PI = atan(1) * 4;
 
-template<typename T>
-T minim(T &was, T cand) {
+template <typename T>
+T minim(T& was, T cand) {
     return was = min(was, cand);
 }
 
-template<typename T>
-T maxim(T &was, T cand) {
+template <typename T>
+T maxim(T& was, T cand) {
     return was = max(was, cand);
 }
 
-template<typename T, typename U>
-void decreaseByOne(vector<pair<T, U> > &v) {
-    for (auto &p : v) {
+template <typename T, typename U>
+void decreaseByOne(vector<pair<T, U> >& v) {
+    for (auto& p : v) {
         p.first--;
         p.second--;
     }
@@ -39,8 +39,8 @@ void decreaseByOne(vector<pair<T, U> > &v) {
 
 void decreaseByOne() {}
 
-template<typename T, class...Vs>
-void decreaseByOne(vector<T> &arr, Vs &...vs) {
+template <typename T, class...Vs>
+void decreaseByOne(vector<T>& arr, Vs&...vs) {
     int n = arr.size();
     for (int i = 0; i < n; ++i) {
         arr[i]--;
@@ -49,7 +49,10 @@ void decreaseByOne(vector<T> &arr, Vs &...vs) {
 }
 
 
-template<typename D>
+
+
+
+template <typename D>
 D dPower(D base, ll exponent) {
     if (exponent < 0) {
         return dPower(1 / base, -exponent);
@@ -109,16 +112,16 @@ private:
 
     void initArrays(int n) {}
 
-    template<typename T, class...Vs>
-    void initArrays(int n, vector<T> &arr, Vs &...vs) {
+    template <typename T, class...Vs>
+    void initArrays(int n, vector<T>& arr, Vs&...vs) {
         arr.resize(n);
         initArrays(n, vs...);
     }
 
     void readImpl(int i) {}
 
-    template<typename T, class...Vs>
-    void readImpl(int i, vector<T> &arr, Vs &...vs) {
+    template <typename T, class...Vs>
+    void readImpl(int i, vector<T>& arr, Vs&...vs) {
         arr[i] = readType<T>();
         readImpl(i, vs...);
     }
@@ -184,8 +187,9 @@ public:
     }
 
 
-    template<class...Vs>
-    void readArrays(int n, Vs &...vs) {
+
+    template <class...Vs>
+    void readArrays(int n, Vs&...vs) {
         initArrays(n, vs...);
         for (int i = 0; i < n; i++) {
             readImpl(i, vs...);
@@ -271,6 +275,15 @@ public:
         return res * sgn;
     }
 
+    char readChar() {
+        skipWhitespace();
+        int c = get();
+        if (c == EOF) {
+            throw "Input exhausted";
+        }
+        return c;
+    }
+
     bool isExhausted() { return exhausted; }
 };
 
@@ -291,12 +304,7 @@ ll Input::readType() {
 
 template<>
 char Input::readType() {
-    skipWhitespace();
-    int c = get();
-    if (c == EOF) {
-        throw "Input exhausted";
-    }
-    return c;
+    return readChar();
 }
 
 template<>
@@ -305,17 +313,18 @@ string Input::readType() {
 }
 
 
+
+
+
 class Output {
 private:
-    ostream &out;
+    ostream& out;
 
-    template<typename T>
-    void printSingle(const T &value) {
+    template<typename T> void printSingle(const T& value) {
         out << value;
     }
 
-    template<typename T>
-    void printSingle(const vector<T> &array) {
+    template<typename T> void printSingle(const vector<T>& array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -324,21 +333,19 @@ private:
             }
         }
     }
-
-    template<typename T, typename U>
-    void printSingle(const pair<T, U> &value) {
+    template<typename T, typename U> void printSingle(const pair<T, U>& value) {
         out << value.first << ' ' << value.second;
     }
 
 public:
-    Output(ostream &out) : out(out) {
+    Output(ostream& out) : out(out) {
         out << fixed << setprecision(12);
     }
 
     void print() {}
 
     template<typename T, typename...Targs>
-    void print(const T &first, const Targs... args) {
+    void print(const T& first, const Targs... args) {
         printSingle(first);
         if (sizeof...(args) != 0) {
             out << ' ';
@@ -358,6 +365,9 @@ public:
 };
 
 
+
+
+
 class NumberIterator : iterator<forward_iterator_tag, int> {
 public:
     int v;
@@ -371,9 +381,9 @@ public:
 
 class Range : pii {
 public:
-    Range(int begin, int end) : pii(begin, end) {}
+    Range(int begin, int end) : pii(begin, max(begin, end)) {}
 
-    Range(int n) : pii(0, n) {}
+    Range(int n) : pii(0, max(0, n)) {}
 
     NumberIterator begin() {
         return first;
@@ -385,6 +395,9 @@ public:
 };
 
 
+
+
+
 const int MOD7 = 1000000007;
 const int MOD9 = 1000000009;
 const int MODF = 998244353;
@@ -394,9 +407,7 @@ int mod = MOD7;
 class ModuloInt {
 public:
     ll n;
-
     ModuloInt() : n(0) {}
-
     ModuloInt(ll n) {
         n %= mod;
         if (n < 0) {
@@ -404,21 +415,16 @@ public:
         }
         this->n = n;
     }
-
-    ModuloInt(const ModuloInt &n) = default;
-
-    ModuloInt &operator+=(const ModuloInt &other);
-
-    ModuloInt &operator-=(const ModuloInt &other);
-
-    ModuloInt &operator*=(const ModuloInt &other);
-
-    ModuloInt operator-();
-
-    friend ostream &operator<<(ostream &out, const ModuloInt &val);
+//    ModuloInt(const ModuloInt&) = default;
+//    ModuloInt(ModuloInt&&) = default;
+    ModuloInt& operator +=(const ModuloInt& other);
+    ModuloInt& operator -=(const ModuloInt& other);
+    ModuloInt& operator *=(const ModuloInt& other);
+    ModuloInt operator -();
+    friend ostream&operator <<(ostream& out, const ModuloInt& val);
 };
 
-ModuloInt &ModuloInt::operator+=(const ModuloInt &other) {
+ModuloInt &ModuloInt::operator+=(const ModuloInt& other) {
     n += other.n;
     if (n >= mod) {
         n -= mod;
@@ -426,7 +432,7 @@ ModuloInt &ModuloInt::operator+=(const ModuloInt &other) {
     return *this;
 }
 
-ModuloInt &ModuloInt::operator-=(const ModuloInt &other) {
+ModuloInt &ModuloInt::operator-=(const ModuloInt& other) {
     n -= other.n;
     if (n < 0) {
         n += mod;
@@ -434,25 +440,25 @@ ModuloInt &ModuloInt::operator-=(const ModuloInt &other) {
     return *this;
 }
 
-ModuloInt &ModuloInt::operator*=(const ModuloInt &other) {
+ModuloInt &ModuloInt::operator*=(const ModuloInt& other) {
     n *= other.n;
     n %= mod;
     return *this;
 }
 
-ModuloInt operator+(const ModuloInt &a, const ModuloInt &b) {
+ModuloInt operator +(const ModuloInt& a, const ModuloInt& b) {
     return ModuloInt(a) += b;
 }
 
-ModuloInt operator-(const ModuloInt &a, const ModuloInt &b) {
+ModuloInt operator -(const ModuloInt& a, const ModuloInt& b) {
     return ModuloInt(a) -= b;
 }
 
-ModuloInt operator*(const ModuloInt &a, const ModuloInt &b) {
+ModuloInt operator *(const ModuloInt& a, const ModuloInt& b) {
     return ModuloInt(a) *= b;
 }
 
-ostream &operator<<(ostream &out, const ModuloInt &val) {
+ostream& operator <<(ostream& out, const ModuloInt& val) {
     return out << val.n;
 }
 
@@ -463,8 +469,23 @@ ModuloInt ModuloInt::operator-() {
     return ModuloInt(mod - n);
 }
 
+bool operator==(const ModuloInt& a, const ModuloInt& b) {
+    return a.n == b.n;
+}
 
-template<typename T>
+bool operator!=(const ModuloInt& a, const ModuloInt& b) {
+    return a.n != b.n;
+}
+
+
+
+
+
+
+
+
+
+template <typename T>
 T gcd(T a, T b) {
     a = abs(a);
     b = abs(b);
@@ -475,13 +496,13 @@ T gcd(T a, T b) {
     return a;
 }
 
-template<typename T>
+template <typename T>
 T lcm(T a, T b) {
     return a / gcd(a, b) * b;
 }
 
-template<typename T>
-T power(const T &a, ll b) {
+template <typename T>
+T power(const T& a, ll b) {
     if (b == 0) {
         return 1;
     }
@@ -493,7 +514,7 @@ T power(const T &a, ll b) {
     }
 }
 
-template<typename T>
+template <typename T>
 vector<T> generateFactorial(int length) {
     vector<T> result(length);
     if (length > 0) {
@@ -505,7 +526,7 @@ vector<T> generateFactorial(int length) {
     return result;
 }
 
-template<typename T>
+template <typename T>
 vector<T> generateReverse(int length) {
     vector<T> result(length);
     if (length > 1) {
@@ -517,7 +538,7 @@ vector<T> generateReverse(int length) {
     return result;
 }
 
-template<typename T>
+template <typename T>
 vector<T> generatePowers(T base, int length) {
     vector<T> result(length);
     if (length > 0) {
@@ -529,7 +550,7 @@ vector<T> generatePowers(T base, int length) {
     return result;
 }
 
-template<typename T>
+template <typename T>
 vector<T> generateReverseFactorial(int length) {
     auto result = generateReverse<T>(length);
     if (length > 0) {
@@ -541,7 +562,7 @@ vector<T> generateReverseFactorial(int length) {
     return result;
 }
 
-template<typename T>
+template <typename T>
 class Combinations {
 private:
     vector<T> fact;
@@ -571,140 +592,203 @@ public:
 };
 
 
-template<typename T>
-inline void unique(vector<T> &v) {
-    v.resize(unique(all(v)) - v.begin());
+namespace prime_fft {
+    bool init = false;
+    ModuloInt root;
+    ModuloInt reverseRoot;
+    int rootPower;
+    vector<ModuloInt> aa;
+    vector<ModuloInt> bb;
 }
 
-vi createOrder(int n) {
-    vi order(n);
-    for (int i = 0; i < n; i++) {
-        order[i] = i;
+void initPrimeFFT() {
+    if (prime_fft::init) {
+        return;
     }
-    return order;
-}
-
-template<typename T>
-inline vector<vector<T> > makeArray(int a, int b, T init) {
-    return vector<vector<T> >(a, vector<T>(b, init));
-}
-
-template<typename T>
-inline vector<vector<vector<T> > > makeArray(int a, int b, int c, T init) {
-    return vector<vector<vector<T> > >(a, makeArray<T>(b, c, init));
-}
-
-template<typename T, typename Iterator>
-inline void addAll(vector<T> &v, Iterator begin, Iterator end) {
-    v.insert(v.end(), begin, end);
-}
-
-vi getQty(const vi &arr, int length) {
-    vi res(length);
-    for (int i : arr) {
-        res[i]++;
+    prime_fft::init = true;
+    prime_fft::rootPower = 1;
+    int pw = 0;
+    while ((mod - 1) % (2 * prime_fft::rootPower) == 0) {
+        prime_fft::rootPower *= 2;
+        pw++;
     }
-    return res;
+    for (int i = 2; ; i++) {
+        mod--;
+        int exp = power(ModuloInt(2), pw - 1).n;
+        int next = (exp * 2) % mod;
+        mod++;
+        if (power(ModuloInt(i), exp).n != 1 && power(ModuloInt(i), next).n == 1) {
+            prime_fft::root = i;
+            prime_fft::reverseRoot = power(prime_fft::root, mod - 2);
+            break;
+        }
+    }
 }
 
-vi getQty(const vi &arr) {
-    return getQty(arr, *max_element(all(arr)) + 1);
+namespace prime_fft {
+    void primeFFT(vector<ModuloInt>& array, bool invert, int size) {
+        for (int i = 1, j = 0; i < size; ++i) {
+            int bit = size >> 1;
+            for (; j >= bit; bit >>= 1) {
+                j -= bit;
+            }
+            j += bit;
+            if (i < j) {
+                swap(array[i], array[j]);
+            }
+        }
+
+        for (int len = 2; len <= size; len <<= 1) {
+            ModuloInt wlen = invert ? reverseRoot : root;
+            for (int i = len; i < rootPower; i <<= 1) {
+                wlen *= wlen;
+            }
+            int half = len >> 1;
+            for (int i = 0; i < size; i += len) {
+                ModuloInt w = 1;
+                for (int j = 0; j < half; ++j) {
+                    ModuloInt u = array[i + j], v = array[i + j + half] * w;
+                    array[i + j] = u + v;
+                    array[i + j + half] = u - v;
+                    w *= wlen;
+                }
+            }
+        }
+        if (invert) {
+            ModuloInt reverseSize = power(ModuloInt(size), mod - 2);
+            for (int i = 0; i < size; ++i) {
+                array[i] *= reverseSize;
+            }
+        }
+    }
+
 }
+
+vector<ModuloInt> multiply(const vector<ModuloInt>& first, const vector<ModuloInt>& second) {
+    int resLen = first.size() + second.size() - 1;
+    if (resLen <= 100) {
+        vector<ModuloInt> result(resLen);
+        for (int i = 0; i < first.size(); i++) {
+            for (int j = 0; j < second.size(); j++) {
+                result[i + j] += first[i] * second[j];
+            }
+        }
+        return result;
+    }
+    int resultSize = 1;
+    while (resultSize < resLen) {
+        resultSize *= 2;
+    }
+    vector<ModuloInt>& aa = prime_fft::aa;
+    vector<ModuloInt>& bb = prime_fft::bb;
+    if (aa.size() < resultSize) {
+        aa.resize(resultSize);
+        bb.resize(resultSize);
+    }
+    fill(aa.begin() + first.size(), aa.begin() + resultSize, ModuloInt(0));
+    fill(bb.begin() + second.size(), bb.begin() + resultSize, ModuloInt(0));
+    for (int i = 0; i < first.size(); i++) {
+        aa[i] = first[i];
+    }
+    for (int i = 0; i < second.size(); i++) {
+        bb[i] = second[i];
+    }
+    prime_fft::primeFFT(aa, false, resultSize);
+//    if (first == second) {
+//        copy(all(aa), bb.begin());
+//    } else {
+    prime_fft::primeFFT(bb, false, resultSize);
+//    }
+    for (int i = 0; i < resultSize; i++) {
+        aa[i] *= bb[i];
+    }
+    prime_fft::primeFFT(aa, true, resultSize);
+    vector<ModuloInt> result(resLen);
+    for (int i = 0; i < result.size(); i++) {
+        result[i] = aa[i];
+    }
+    return result;
+}
+
 
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class day10 {
+class BinomialFever {
 public:
-    void solve(istream &inp, ostream &outp) {
+	void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
-        vector<string> data;
-        while (!in.isExhausted()) {
-            data.push_back(in.readString());
-            in.skipWhitespace();
-        }
-        int n = data.size();
-        int m = data[0].size();
-        int answer = 0;
-        int r, c;
-        for (int i : Range(n)) {
-            for (int j : Range(m)) {
-                if (data[i][j] != '#') {
-                    continue;
-                }
-                set<pii> dirs;
-                for (int k : Range(n)) {
-                    for (int l : Range(m)) {
-                        if (k == i && j == l || data[k][l] != '#') {
-                            continue;
-                        }
-                        int dr = k - i;
-                        int dc = l - j;
-                        int g = gcd(dr, dc);
-                        dr /= g;
-                        dc /= g;
-                        dirs.emplace(dr, dc);
-                    }
-                }
-                if (dirs.size() > answer) {
-                    answer = dirs.size();
-                    r = i;
-                    c = j;
-                }
-            }
-        }
-        struct asteroid {
-            int dr, dc;
-            double ang;
-            int layer;
+        mod = MODF;
+        initPrimeFFT();
 
-            asteroid(int dr, int dc) : dr(dr), dc(dc) {
-                ang = -atan2(dc, dr);
+        int n = in.readInt();
+        ModuloInt p = in.readInt();
+        int r = in.readInt();
+        function<vector<ModuloInt>(int, int)> build = [&](int from, int to) -> vector<ModuloInt> {
+            if (from + 1 == to) {
+                return {ModuloInt(-from), ModuloInt(1)};
+            }
+            int mid = (from + to) / 2;
+            auto left = build(from, mid);
+            auto right = build(mid, to);
+            if (from == 0 && to == r) {
+#ifdef LOCAL
+                cerr << "start build" << endl;
+#endif
+            }
+            return multiply(left, right);
+        };
+        auto poly = build(0, r);
+#ifdef LOCAL
+        cerr << "end build" << endl;
+#endif
+        ModuloInt answer = 0;
+        function<ModuloInt(ModuloInt, ModuloInt&, int)> sump = [&](ModuloInt base, ModuloInt& power, int exp) -> ModuloInt {
+            if (exp == 0) {
+                power = 1;
+                return 0;
+            }
+            if ((exp & 1) == 0) {
+                auto val = sump(base, power, exp >> 1);
+                auto res = val * (1 + power);
+                power *= power;
+                return res;
+            } else {
+                auto val = sump(base, power, exp - 1);
+                power *= base;
+                return val * base + 1;
             }
         };
-        map<pii, vector<asteroid> > mp;
-        for (int i : Range(n)) {
-            for (int j : Range(m)) {
-                if (i == r && j == c || data[i][j] != '#') {
-                    continue;
-                }
-                int dr = i - r;
-                int dc = j - c;
-                int g = gcd(dr, dc);
-                dr /= g;
-                dc /= g;
-                mp[make_pair(dr, dc)].push_back(asteroid(i - r, j - c));
-            }
+        ModuloInt pw = 1;
+        ModuloInt temp = 0;
+        for (int i : Range(poly.size())) {
+            answer += sump(pw, temp, n + 1) * poly[i];
+            pw *= p;
         }
-        vector<asteroid> all;
-        for (auto &p : mp) {
-            sort(all(p.second), [](const asteroid &a, const asteroid &b) -> bool {
-                return hypot(a.dr, a.dc) < hypot(b.dr, b.dc);
-            });
-            for (int i : Range(p.second.size())) {
-                p.second[i].layer = i;
-            }
-            addAll(all, all(p.second));
+        ModuloInt fact = 1;
+        for (int i = 2; i <= r; i++) {
+            fact *= i;
         }
-        sort(all(all), [](const asteroid &a, const asteroid &b) -> bool {
-            if (a.layer != b.layer) {
-                return a.layer < b.layer;
-            }
-            return a.ang < b.ang;
-        });
-        out.printLine(100 * (c + all[199].dc) + r + all[199].dr);
-    }
+        fact = power(fact, mod - 2);
+        answer *= fact;
+        out.printLine(answer);
+	}
 };
 
 
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    day10 solver;
-    std::istream &in(std::cin);
-    std::ostream &out(std::cout);
-    solver.solve(in, out);
-    return 0;
+	BinomialFever solver;
+	std::istream& in(std::cin);
+	std::ostream& out(std::cout);
+	int n;
+in >> n;
+for(int i = 0; i < n; ++i) {
+	solver.solve(in, out);
+}
+
+	return 0;
 }
