@@ -8,75 +8,84 @@ const int MODF = 998244353;
 
 int mod = MOD7;
 
-class ModuloInt {
+template <typename T>
+T gcd(T a, T b, T& x, T& y) {
+    if (a == 0) {
+        x = 0;
+        y = 1;
+        return b;
+    }
+    int d = gcd(b % a, a, y, x);
+    x -= (b / a) * y;
+    return d;
+}
+
+class modint {
 public:
-    ll n;
-    ModuloInt() : n(0) {}
-    ModuloInt(ll n) {
+    int n;
+    modint() : n(0) {}
+    modint(ll n) {
+        if (n >= 0 && n < mod) {
+            this->n = n;
+            return;
+        }
         n %= mod;
         if (n < 0) {
             n += mod;
         }
         this->n = n;
     }
-//    ModuloInt(const ModuloInt&) = default;
-//    ModuloInt(ModuloInt&&) = default;
-    ModuloInt& operator +=(const ModuloInt& other);
-    ModuloInt& operator -=(const ModuloInt& other);
-    ModuloInt& operator *=(const ModuloInt& other);
-    ModuloInt operator -();
-    friend ostream&operator <<(ostream& out, const ModuloInt& val);
+    modint& operator +=(const modint& other) {
+        n += other.n;
+        if (n >= mod) {
+            n -= mod;
+        }
+        return *this;
+    }
+    modint& operator -=(const modint& other) {
+        n -= other.n;
+        if (n < 0) {
+            n += mod;
+        }
+        return *this;
+    }
+    modint& operator *=(const modint& other) {
+        n = ll(n) * other.n % mod;
+        return *this;
+    }
+    modint operator -() {
+        if (n == 0) {
+            return 0;
+        }
+        return modint(mod - n);
+    }
+    modint inverse() {
+        ll x, y;
+        gcd(ll(n), ll(mod), x, y);
+        return x;
+    }
 };
 
-ModuloInt &ModuloInt::operator+=(const ModuloInt& other) {
-    n += other.n;
-    if (n >= mod) {
-        n -= mod;
-    }
-    return *this;
+modint operator +(const modint& a, const modint& b) {
+    return modint(a) += b;
 }
 
-ModuloInt &ModuloInt::operator-=(const ModuloInt& other) {
-    n -= other.n;
-    if (n < 0) {
-        n += mod;
-    }
-    return *this;
+modint operator -(const modint& a, const modint& b) {
+    return modint(a) -= b;
 }
 
-ModuloInt &ModuloInt::operator*=(const ModuloInt& other) {
-    n *= other.n;
-    n %= mod;
-    return *this;
+modint operator *(const modint& a, const modint& b) {
+    return modint(a) *= b;
 }
 
-ModuloInt operator +(const ModuloInt& a, const ModuloInt& b) {
-    return ModuloInt(a) += b;
-}
-
-ModuloInt operator -(const ModuloInt& a, const ModuloInt& b) {
-    return ModuloInt(a) -= b;
-}
-
-ModuloInt operator *(const ModuloInt& a, const ModuloInt& b) {
-    return ModuloInt(a) *= b;
-}
-
-ostream& operator <<(ostream& out, const ModuloInt& val) {
+ostream& operator <<(ostream& out, const modint& val) {
     return out << val.n;
 }
 
-ModuloInt ModuloInt::operator-() {
-    if (n == 0) {
-        return 0;
-    }
-    return ModuloInt(mod - n);
-}
-
-bool operator==(const ModuloInt& a, const ModuloInt& b) {
+bool operator==(const modint& a, const modint& b) {
     return a.n == b.n;
 }
 
-bool operator!=(const ModuloInt& a, const ModuloInt& b) {
+bool operator!=(const modint& a, const modint& b) {
     return a.n != b.n;
 }

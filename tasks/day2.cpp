@@ -1,6 +1,7 @@
 #include "../lib/io/input.h"
 #include "../lib/io/output.h"
 #include "../lib/range/range.h"
+#include "../lib/misc.h"
 
 //#pragma comment(linker, "/STACK:200000000")
 
@@ -101,12 +102,44 @@ public:
         }
 
         auto p = program(mem);
-        auto res = p.run({ll(2)});
-        if (res.first != FINISHED) {
-            cerr << res.first << endl;
+        map<pii, int> hull;
+        hull[make_pair(0, 0)] = 1;
+        int x = 0;
+        int y = 0;
+        int dir = 1;
+        while (true) {
+            pii key = make_pair(x, y);
+            auto res = p.run({ll(hull[key])});
+            if (res.first == CRASHED || res.second.size() != 2) {
+                cerr << res.second.size() << endl;
+                return;
+            }
+            hull[key] = res.second[0];
+            dir = (dir + 1 + 2 * res.second[1]) & 3;
+            x += DX4[dir];
+            y += DY4[dir];
+            if (res.first == FINISHED) {
+                break;
+            }
         }
-        for (ll r : res.second) {
-            out.printLine(r);
+        int mix = numeric_limits<int>::max();
+        int max = numeric_limits<int>::min();
+        int miy = numeric_limits<int>::max();
+        int may = numeric_limits<int>::min();
+        for (const auto& p : hull) {
+            minim(mix, p.first.first);
+            maxim(max, p.first.first);
+            minim(miy, p.first.second);
+            maxim(may, p.first.second);
+        }
+        vector<string> answer(may - miy + 1, string(max - mix + 1, ' '));
+        for (const auto& p : hull) {
+            if (p.second == 1) {
+                answer[may - p.first.second][p.first.first - mix] = 'X';
+            }
+        }
+        for (const auto& row : answer) {
+            out.printLine(row);
         }
 	}
 };

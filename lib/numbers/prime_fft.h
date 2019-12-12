@@ -5,11 +5,11 @@
 
 namespace prime_fft {
     bool init = false;
-    ModuloInt root;
-    ModuloInt reverseRoot;
+    modint root;
+    modint reverseRoot;
     int rootPower;
-    vector<ModuloInt> aa;
-    vector<ModuloInt> bb;
+    vector<modint> aa;
+    vector<modint> bb;
 }
 
 void initPrimeFFT() {
@@ -25,21 +25,21 @@ void initPrimeFFT() {
     }
     for (int i = 2; ; i++) {
         mod--;
-        int exp = power(ModuloInt(2), pw - 1).n;
+        int exp = power(modint(2), pw - 1).n;
         int next = (exp * 2) % mod;
         mod++;
-        if (power(ModuloInt(i), exp).n != 1 && power(ModuloInt(i), next).n == 1) {
+        if (power(modint(i), exp).n != 1 && power(modint(i), next).n == 1) {
             prime_fft::root = i;
-            prime_fft::reverseRoot = power(prime_fft::root, mod - 2);
+            prime_fft::reverseRoot = prime_fft::root.inverse();
             break;
         }
     }
 }
 
 namespace prime_fft {
-    void primeFFT(vector<ModuloInt>& array, bool invert, int size) {
-        for (int i = 1, j = 0; i < size; ++i) {
-            int bit = size >> 1;
+    void primeFFT(vector<modint>& array, bool invert, int n) {
+        for (int i = 1, j = 0; i < n; ++i) {
+            int bit = n >> 1;
             for (; j >= bit; bit >>= 1) {
                 j -= bit;
             }
@@ -49,16 +49,16 @@ namespace prime_fft {
             }
         }
 
-        for (int len = 2; len <= size; len <<= 1) {
-            ModuloInt wlen = invert ? reverseRoot : root;
+        for (int len = 2; len <= n; len <<= 1) {
+            modint wlen = invert ? reverseRoot : root;
             for (int i = len; i < rootPower; i <<= 1) {
                 wlen *= wlen;
             }
             int half = len >> 1;
-            for (int i = 0; i < size; i += len) {
-                ModuloInt w = 1;
+            for (int i = 0; i < n; i += len) {
+                modint w = 1;
                 for (int j = 0; j < half; ++j) {
-                    ModuloInt u = array[i + j], v = array[i + j + half] * w;
+                    modint u = array[i + j], v = array[i + j + half] * w;
                     array[i + j] = u + v;
                     array[i + j + half] = u - v;
                     w *= wlen;
@@ -66,8 +66,8 @@ namespace prime_fft {
             }
         }
         if (invert) {
-            ModuloInt reverseSize = power(ModuloInt(size), mod - 2);
-            for (int i = 0; i < size; ++i) {
+            modint reverseSize = modint(n).inverse();
+            for (int i = 0; i < n; ++i) {
                 array[i] *= reverseSize;
             }
         }
@@ -75,49 +75,52 @@ namespace prime_fft {
 
 }
 
-vector<ModuloInt> multiply(const vector<ModuloInt>& first, const vector<ModuloInt>& second) {
-    int resLen = first.size() + second.size() - 1;
+template <typename It>
+void multiply(const It fBegin, const It fEnd, const It sBegin, const It sEnd, It res) {
+    unsigned long fLen = fEnd - fBegin;
+    unsigned long sLen = sEnd - sBegin;
+    int resLen = fLen + sLen - 1;
     if (resLen <= 100) {
-        vector<ModuloInt> result(resLen);
-        for (int i = 0; i < first.size(); i++) {
-            for (int j = 0; j < second.size(); j++) {
-                result[i + j] += first[i] * second[j];
+        fill(res, res + resLen, 0);
+        for (int i = 0; i < fLen; i++) {
+            for (int j = 0; j < sLen; j++) {
+                res[i + j] += fBegin[i] * sBegin[j];
             }
         }
-        return result;
+        return;
     }
     int resultSize = 1;
     while (resultSize < resLen) {
         resultSize *= 2;
     }
-    vector<ModuloInt>& aa = prime_fft::aa;
-    vector<ModuloInt>& bb = prime_fft::bb;
+    vector<modint>& aa = prime_fft::aa;
+    vector<modint>& bb = prime_fft::bb;
     if (aa.size() < resultSize) {
         aa.resize(resultSize);
         bb.resize(resultSize);
     }
-    fill(aa.begin() + first.size(), aa.begin() + resultSize, ModuloInt(0));
-    fill(bb.begin() + second.size(), bb.begin() + resultSize, ModuloInt(0));
-    for (int i = 0; i < first.size(); i++) {
-        aa[i] = first[i];
-    }
-    for (int i = 0; i < second.size(); i++) {
-        bb[i] = second[i];
-    }
+    fill(aa.begin() + fLen, aa.begin() + resultSize, modint(0));
+    fill(bb.begin() + sLen, bb.begin() + resultSize, modint(0));
+    copy(fBegin, fEnd, aa.begin());
+    copy(sBegin, sEnd, bb.begin());
     prime_fft::primeFFT(aa, false, resultSize);
-//    if (first == second) {
-//        copy(all(aa), bb.begin());
-//    } else {
-    prime_fft::primeFFT(bb, false, resultSize);
-//    }
+    if (equal(fBegin, fEnd, sBegin, sEnd)) {
+        copy(all(aa), bb.begin());
+    } else {
+        prime_fft::primeFFT(bb, false, resultSize);
+    }
     for (int i = 0; i < resultSize; i++) {
         aa[i] *= bb[i];
     }
     prime_fft::primeFFT(aa, true, resultSize);
-    vector<ModuloInt> result(resLen);
-    for (int i = 0; i < result.size(); i++) {
-        result[i] = aa[i];
+    for (int i = 0; i < resLen; i++) {
+        res[i] = aa[i];
     }
-    return result;
 }
 
+vector<modint> multiply(vector<modint>& first, vector<modint>& second) {
+    auto len = first.size() + second.size() - 1;
+    vector<modint> res(len);
+    multiply(all(first), all(second), res.begin());
+    return res;
+}

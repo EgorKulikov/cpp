@@ -1,4 +1,4 @@
-#include "C:/Users/kulikov/proj/cpp/tasks/BinomialFever.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/BinomialFever.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"2\n1 10 2\n10 2 5\n", "45\n644687652\n", true, true},{"1\n1000000000\n35634735\n100000\n", "", true, false},
+		{"2\n1 10 2\n10 2 5\n", "45\n644687652\n", true, true},{"1\n1000000000\n35634735\n100000\n", "926771855", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;

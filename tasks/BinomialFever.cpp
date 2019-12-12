@@ -3,6 +3,7 @@
 #include "../lib/range/range.h"
 #include "../lib/numbers/modulo.h"
 #include "../lib/numbers/prime_fft.h"
+#include "../lib/algo.h"
 
 //#pragma comment(linker, "/STACK:200000000")
 
@@ -14,30 +15,36 @@ public:
 
         mod = MODF;
         initPrimeFFT();
+        prime_fft::aa.resize(2000000);
+        prime_fft::bb.resize(2000000);
 
         int n = in.readInt();
-        ModuloInt p = in.readInt();
+        modint p = in.readInt();
         int r = in.readInt();
-        function<vector<ModuloInt>(int, int)> build = [&](int from, int to) -> vector<ModuloInt> {
+        auto work = makeArray(2, 2 * r, modint(0));
+        function<void(int, int, int)> build = [&](int from, int to, int side) {
             if (from + 1 == to) {
-                return {ModuloInt(-from), ModuloInt(1)};
+                work[side][2 * from] = -from;
+                work[side][2 * from + 1] = 1;
+                return;
             }
             int mid = (from + to) / 2;
-            auto left = build(from, mid);
-            auto right = build(mid, to);
-            if (from == 0 && to == r) {
-#ifdef LOCAL
-                cerr << "start build" << endl;
-#endif
-            }
-            return multiply(left, right);
+            build(from, mid, 1 - side);
+            build(mid, to, 1 - side);
+            multiply(work[1 - side].begin() + (2 * from), work[1 - side].begin() + (from + mid + 1),
+                    work[1 - side].begin() + (2 * mid), work[1 - side].begin() + (mid + to + 1),
+                    work[side].begin() + (2 * from));
         };
-        auto poly = build(0, r);
 #ifdef LOCAL
-        cerr << "end build" << endl;
+        ll time = clock();
 #endif
-        ModuloInt answer = 0;
-        function<ModuloInt(ModuloInt, ModuloInt&, int)> sump = [&](ModuloInt base, ModuloInt& power, int exp) -> ModuloInt {
+        build(0, r, 0);
+#ifdef LOCAL
+        cerr << "built " << clock() - time << endl;
+#endif
+        vector<modint>& poly = work[0];
+        modint answer = 0;
+        function<modint(modint, modint&, int)> sump = [&](modint base, modint& power, int exp) -> modint {
             if (exp == 0) {
                 power = 1;
                 return 0;
@@ -53,13 +60,13 @@ public:
                 return val * base + 1;
             }
         };
-        ModuloInt pw = 1;
-        ModuloInt temp = 0;
-        for (int i : Range(poly.size())) {
+        modint pw = 1;
+        modint temp = 0;
+        for (int i : Range(r + 1)) {
             answer += sump(pw, temp, n + 1) * poly[i];
             pw *= p;
         }
-        ModuloInt fact = 1;
+        modint fact = 1;
         for (int i = 2; i <= r; i++) {
             fact *= i;
         }

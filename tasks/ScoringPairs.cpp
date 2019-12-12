@@ -17,8 +17,8 @@ public:
 
         ll l = in.readLong();
         ll r = in.readLong();
-        ModuloInt answer = 0;
-//        Combinations<ModuloInt> c(40);
+        modint answer = 0;
+//        Combinations<modint> c(40);
         auto c = makeArray(21, 21, 0);
         for (int i : Range(21)) {
             c[i][0] = 1;
@@ -30,10 +30,10 @@ public:
         vi bq(10);
         vi aa(10);
         vi ba(10);
-        auto resA = makeArray(21, 21, ModuloInt(0));
-        auto resB = makeArray(21, 21, ModuloInt(0));
-        auto qA = makeArray(21, 21, ModuloInt(0));
-        auto qB = makeArray(21, 21, ModuloInt(0));
+        auto resA = makeArray(21, 21, modint(0));
+        auto resB = makeArray(21, 21, modint(0));
+        auto qA = makeArray(21, 21, modint(0));
+        auto qB = makeArray(21, 21, modint(0));
         iterate(l, r, [&](ll aPrefix, int aDigs) {
             fill(all(aq), 0);
             ll ap = aPrefix;
@@ -59,7 +59,7 @@ public:
                 for (int i : Range(aDigs + 1)) {
                     for (int j : Range(bDigs + 1)) {
                         resA[i][j] = 0;
-                        qA[i][j] = ModuloInt(c[aDigs][i]) * c[bDigs][j];
+                        qA[i][j] = modint(c[aDigs][i]) * c[bDigs][j];
                     }
                 }
                 for (int i : Range(1, 10)) {
@@ -72,7 +72,7 @@ public:
                                 int raAfter = j + aa[i];
                                 int rb = k + ba[i] + bq[i];
                                 int delta = -(min(raBefore, rb) - min(raAfter, rb) - max(raBefore, rb) + max(raAfter, rb));
-//                                const ModuloInt &cc = c.c(l, j);
+//                                const modint &cc = c.c(l, j);
                                 resB[j][k] += c[l][j] * (delta * i * qA[l][k] + resA[l][k]);
                                 qB[j][k] += c[l][j] * qA[l][k];
                             }
@@ -87,7 +87,7 @@ public:
                                 int raAfter = j + ba[i];
                                 int rb = k + aa[i];
                                 int delta = -(min(raBefore, rb) - min(raAfter, rb) - max(raBefore, rb) + max(raAfter, rb));
-//                                const ModuloInt &cc = c.c(l, j);
+//                                const modint &cc = c.c(l, j);
                                 resA[k][j] += c[l][j] * (delta * i * qB[k][l] + resB[k][l]);
                                 qA[k][j] += c[l][j] * qB[k][l];
                             }
