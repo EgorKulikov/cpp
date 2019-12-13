@@ -21,19 +21,20 @@ public:
         int n = in.readInt();
         modint p = in.readInt();
         int r = in.readInt();
-        auto work = makeArray(2, 2 * r, modint(0));
+        auto work = new modint[4 * r];
+//        auto work = makeArray(2, 2 * r, modint(0));
         function<void(int, int, int)> build = [&](int from, int to, int side) {
             if (from + 1 == to) {
-                work[side][2 * from] = -from;
-                work[side][2 * from + 1] = 1;
+                work[side * 2 * r + 2 * from] = -from;
+                work[side * 2 * r + 2 * from + 1] = 1;
                 return;
             }
             int mid = (from + to) / 2;
             build(from, mid, 1 - side);
             build(mid, to, 1 - side);
-            multiply(work[1 - side].begin() + (2 * from), work[1 - side].begin() + (from + mid + 1),
-                    work[1 - side].begin() + (2 * mid), work[1 - side].begin() + (mid + to + 1),
-                    work[side].begin() + (2 * from));
+            multiply(work + (1 - side) * 2 * r + (2 * from), work + (1 - side) * 2 * r + (from + mid + 1),
+                    work + (1 - side) * 2 * r + (2 * mid), work + (1 - side) * 2 * r + (mid + to + 1),
+                    work + 2 * side * r + (2 * from));
         };
 #ifdef LOCAL
         ll time = clock();
@@ -42,7 +43,7 @@ public:
 #ifdef LOCAL
         cerr << "built " << clock() - time << endl;
 #endif
-        vector<modint>& poly = work[0];
+        auto poly = work;
         modint answer = 0;
         function<modint(modint, modint&, int)> sump = [&](modint base, modint& power, int exp) -> modint {
             if (exp == 0) {

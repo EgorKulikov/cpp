@@ -1,6 +1,7 @@
 #pragma once
 #include "../general.h"
 #include "../numbers/doubles.h"
+#include "../collections/arr.h"
 
 inline bool isWhitespace(int c) {
     return isspace(c) || c == EOF;
@@ -46,15 +47,15 @@ private:
     void initArrays(int n) {}
 
     template <typename T, class...Vs>
-    void initArrays(int n, vector<T>& arr, Vs&...vs) {
-        arr.resize(n);
+    void initArrays(int n, arr<T>& array, Vs&...vs) {
+        array = arr<T>(n);
         initArrays(n, vs...);
     }
 
     void readImpl(int i) {}
 
     template <typename T, class...Vs>
-    void readImpl(int i, vector<T>& arr, Vs&...vs) {
+    void readImpl(int i, arr<T>& arr, Vs&...vs) {
         arr[i] = readType<T>();
         readImpl(i, vs...);
     }
@@ -93,7 +94,7 @@ public:
         return string(all(res));
     }
 
-    vector<int> readIntArray(int size) {
+    arri readIntArray(int size) {
         return readArray<int>(size);
     }
 
@@ -110,11 +111,10 @@ public:
     }
 
     template<typename T>
-    vector<T> readArray(int n) {
-        vector<T> res;
-        res.reserve(n);
+    arr<T> readArray(int n) {
+        arr<T> res(n);
         for (int i = 0; i < n; i++) {
-            res.push_back(readType<T>());
+            res[i] = readType<T>();
         }
         return res;
     }
@@ -130,11 +130,10 @@ public:
     }
 
     template<typename U, typename V>
-    vector<pair<U, V> > readArray(int n) {
-        vector<pair<U, V> > res;
-        res.reserve(n);
+    arr<pair<U, V> > readArray(int n) {
+        arr<pair<U, V> > res(n);
         for (int i = 0; i < n; i++) {
-            res.push_back(readType<U, V>());
+            res[i] = readType<U, V>();
         }
         return res;
     }

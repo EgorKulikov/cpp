@@ -1,26 +1,23 @@
 #pragma once
 
 #include "graph.h"
+#include "../collections/arr.h"
 
 template <class Edge, typename C>
-class MaxFlow {
-private:
-    Graph<Edge>* graph;
-    int source;
-    int destination;
+C dinic(Graph<Edge>& graph, int source, int destination) {
+    arri dist(graph.vertexCount);
+    arri nextEdge(graph.vertexCount);
+    C inf = numeric_limits<C>::max();
+    C totalFlow = 0;
     queue<int> q;
-    vi dist;
-    vi nextEdge;
-    C inf;
-
-    void edgeDistances() {
+    auto edgeDistances = [&]() {
         fill(all(dist), -1);
         dist[source] = 0;
         q.push(source);
         while (!q.empty()) {
             int current = q.front();
             q.pop();
-            for (auto edge : graph->edges[current]) {
+            for (auto edge : graph.edges[current]) {
                 if (edge->capacity != 0) {
                     int next = edge->to;
                     if (dist[next] == -1) {
@@ -30,9 +27,8 @@ private:
                 }
             }
         }
-    }
-
-    C dinicImpl(int source, C flow) {
+    };
+    function<C(int, C)> dinicImpl = [&] (int source, C flow) {
         if (source == destination) {
             return flow;
         }
@@ -40,8 +36,8 @@ private:
             return 0;
         }
         C totalPushed = 0;
-        while (nextEdge[source] < graph->edges[source].size()) {
-            auto edge = graph->edges[source][nextEdge[source]];
+        while (nextEdge[source] < graph.edges[source].size()) {
+            auto edge = graph.edges[source][nextEdge[source]];
             if (edge->capacity != 0 && dist[edge->to] == dist[source] + 1) {
                 C pushed = dinicImpl(edge->to, min(flow, edge->capacity));
                 if (pushed != 0) {
@@ -56,31 +52,15 @@ private:
             nextEdge[source]++;
         }
         return totalPushed;
-    }
+    };
 
-public:
-    MaxFlow(Graph<Edge>& graph, int source, int destination) : graph(&graph), source(source), destination(destination) {
-        dist = vi(graph.vertexCount);
-        nextEdge = vi(graph.vertexCount);
-        inf = numeric_limits<C>().max();
-    }
-
-    C dinic() {
-        C totalFlow = 0;
-        while (true) {
-            edgeDistances();
-            if (dist[destination] == -1) {
-                break;
-            }
-            fill(nextEdge.begin(), nextEdge.end(), 0);
-            totalFlow += dinicImpl(source, inf);
+    while (true) {
+        edgeDistances();
+        if (dist[destination] == -1) {
+            break;
         }
-        return totalFlow;
+        fill(nextEdge.begin(), nextEdge.end(), 0);
+        totalFlow += dinicImpl(source, inf);
     }
-
-};
-
-template <class Edge, typename C>
-C dinic(Graph<Edge>& graph, int source, int destination) {
-    return MaxFlow<Edge, C>(graph, source, destination).dinic();
+    return totalFlow;
 }

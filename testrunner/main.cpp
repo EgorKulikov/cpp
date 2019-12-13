@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/BinomialFever.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/Treedepth.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"2\n1 10 2\n10 2 5\n", "45\n644687652\n", true, true},{"1\n1000000000\n35634735\n100000\n", "926771855", true, true},
+		{"3 0 192603497\n", "1 2 3\n", true, true},{"3 1 144408983", "3 4 4\n", true, true},{"1 0 192603497", "1\n", true, true},{"8 14 144408983", "", true, false},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -48,13 +48,12 @@ int main() {
 			std::stringstream in(test.input);
 			std::ostringstream out;
 			std::clock_t start = std::clock();
-			BinomialFever solver;
-			int n;
-in >> n;
-for(int i = 0; i < n; ++i) {
-	solver.solve(in, out);
-}
-
+			try {
+			    Treedepth solver;
+			    solver.solve(in, out);
+            } catch (const char* e) {
+                std::cerr << e << std::endl;
+            }
 			std::clock_t finish = std::clock();
 			double currentTime = double(finish - start) / CLOCKS_PER_SEC;
 			maxTime = std::max(currentTime, maxTime);

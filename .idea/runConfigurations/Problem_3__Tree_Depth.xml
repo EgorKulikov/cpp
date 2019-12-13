@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Problem 3. Tree Depth" type="name.admitriev.jhelper.configuration.TaskConfigurationType" factoryName="Task" className="Treedepth" cppPath="tasks/Treedepth.cpp" inputType="CUSTOM" inputFile="treedepth.in" outputType="CUSTOM" outputFile="treedepth.out" testType="SINGLE">
+    <tests>
+      <test input="3 0 192603497&#10;" output="1 2 3&#10;" active="true" />
+      <test input="3 1 144408983" output="3 4 4&#10;" active="true" />
+      <test input="1 0 192603497" output="1&#10;" active="true" />
+      <test input="8 14 144408983" active="true" />
+    </tests>
+    <method v="2" />
+  </configuration>
+</component>

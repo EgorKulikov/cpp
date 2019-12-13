@@ -19,37 +19,21 @@ typedef pair<int, int> pii;
 
 const double PI = atan(1) * 4;
 
-template<typename T>
-T minim(T &was, T cand) {
+template <typename T>
+T minim(T& was, T cand) {
     return was = min(was, cand);
 }
 
-template<typename T>
-T maxim(T &was, T cand) {
+template <typename T>
+T maxim(T& was, T cand) {
     return was = max(was, cand);
 }
 
-template<typename T, typename U>
-void decreaseByOne(vector<pair<T, U> > &v) {
-    for (auto &p : v) {
-        p.first--;
-        p.second--;
-    }
-}
-
-void decreaseByOne() {}
-
-template<typename T, class...Vs>
-void decreaseByOne(vector<T> &arr, Vs &...vs) {
-    int n = arr.size();
-    for (int i = 0; i < n; ++i) {
-        arr[i]--;
-    }
-    decreaseByOne(vs...);
-}
 
 
-template<typename D>
+
+
+template <typename D>
 D dPower(D base, ll exponent) {
     if (exponent < 0) {
         return dPower(1 / base, -exponent);
@@ -62,6 +46,87 @@ D dPower(D base, ll exponent) {
     } else {
         D res = dPower(base, exponent >> 1);
         return res * res;
+    }
+}
+
+
+
+
+
+template <typename T>
+class arr {
+    T* b;
+    T* e;
+    int n;
+public:
+    arr() : b(nullptr), e(nullptr), n(0) {}
+
+    arr(int n) : n(n) {
+        b = new T[n];
+        e = b + n;
+    }
+
+    arr(int n, T init) : n(n) {
+        b = new T[n];
+        e = b + n;
+        fill(b, e, init);
+    }
+
+    size_t size() const {
+        return n;
+    }
+
+    T* begin() {
+        return b;
+    }
+
+    T* end() {
+        return e;
+    }
+
+    arr<T> clone() {
+        arr<T> res(n);
+        copy(b, e, res.begin());
+        return res;
+    }
+
+    T& operator[](int at) {
+#ifdef LOCAL
+        if (at < 0 || at >= n) {
+            throw "Out of bounds";
+        }
+#endif
+        return b[at];
+    }
+
+    const T& operator[](int at) const {
+#ifdef LOCAL
+        if (at < 0 || at >= n) {
+            throw "Out of bounds";
+        }
+#endif
+        return b[at];
+    }
+};
+
+typedef arr<int> arri;
+
+void decreaseByOne() {}
+
+template <typename T, class...Vs>
+void decreaseByOne(arr<T>& array, Vs&...vs) {
+    int n = array.size();
+    for (int i = 0; i < n; ++i) {
+        array[i]--;
+    }
+    decreaseByOne(vs...);
+}
+
+template <typename T, typename U>
+void decreaseByOne(arr<pair<T, U> >& v) {
+    for (auto& p : v) {
+        p.first--;
+        p.second--;
     }
 }
 
@@ -109,16 +174,16 @@ private:
 
     void initArrays(int n) {}
 
-    template<typename T, class...Vs>
-    void initArrays(int n, vector<T> &arr, Vs &...vs) {
-        arr.resize(n);
+    template <typename T, class...Vs>
+    void initArrays(int n, arr<T>& array, Vs&...vs) {
+        array = arr<T>(n);
         initArrays(n, vs...);
     }
 
     void readImpl(int i) {}
 
-    template<typename T, class...Vs>
-    void readImpl(int i, vector<T> &arr, Vs &...vs) {
+    template <typename T, class...Vs>
+    void readImpl(int i, arr<T>& arr, Vs&...vs) {
         arr[i] = readType<T>();
         readImpl(i, vs...);
     }
@@ -157,7 +222,7 @@ public:
         return string(all(res));
     }
 
-    vector<int> readIntArray(int size) {
+    arri readIntArray(int size) {
         return readArray<int>(size);
     }
 
@@ -174,18 +239,18 @@ public:
     }
 
     template<typename T>
-    vector<T> readArray(int n) {
-        vector<T> res;
-        res.reserve(n);
+    arr<T> readArray(int n) {
+        arr<T> res(n);
         for (int i = 0; i < n; i++) {
-            res.push_back(readType<T>());
+            res[i] = readType<T>();
         }
         return res;
     }
 
 
-    template<class...Vs>
-    void readArrays(int n, Vs &...vs) {
+
+    template <class...Vs>
+    void readArrays(int n, Vs&...vs) {
         initArrays(n, vs...);
         for (int i = 0; i < n; i++) {
             readImpl(i, vs...);
@@ -193,11 +258,10 @@ public:
     }
 
     template<typename U, typename V>
-    vector<pair<U, V> > readArray(int n) {
-        vector<pair<U, V> > res;
-        res.reserve(n);
+    arr<pair<U, V> > readArray(int n) {
+        arr<pair<U, V> > res(n);
         for (int i = 0; i < n; i++) {
-            res.push_back(readType<U, V>());
+            res[i] = readType<U, V>();
         }
         return res;
     }
@@ -309,17 +373,19 @@ string Input::readType() {
 }
 
 
+
+
+
+
 class Output {
 private:
-    ostream &out;
+    ostream& out;
 
-    template<typename T>
-    void printSingle(const T &value) {
+    template<typename T> void printSingle(const T& value) {
         out << value;
     }
 
-    template<typename T>
-    void printSingle(const vector<T> &array) {
+    template<typename T> void printSingle(const vector<T>& array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -328,21 +394,28 @@ private:
             }
         }
     }
-
-    template<typename T, typename U>
-    void printSingle(const pair<T, U> &value) {
+    template<typename T> void printSingle(const arr<T>& array) {
+        size_t n = array.size();
+        for (int i = 0; i < n; ++i) {
+            out << array[i];
+            if (i + 1 != n) {
+                out << ' ';
+            }
+        }
+    }
+    template<typename T, typename U> void printSingle(const pair<T, U>& value) {
         out << value.first << ' ' << value.second;
     }
 
 public:
-    Output(ostream &out) : out(out) {
+    Output(ostream& out) : out(out) {
         out << fixed << setprecision(12);
     }
 
     void print() {}
 
     template<typename T, typename...Targs>
-    void print(const T &first, const Targs... args) {
+    void print(const T& first, const Targs... args) {
         printSingle(first);
         if (sizeof...(args) != 0) {
             out << ' ';
@@ -360,6 +433,9 @@ public:
         out.flush();
     }
 };
+
+
+
 
 
 class NumberIterator : iterator<forward_iterator_tag, int> {
@@ -389,14 +465,17 @@ public:
 };
 
 
+
+
+
 const int MOD7 = 1000000007;
 const int MOD9 = 1000000009;
 const int MODF = 998244353;
 
 int mod = MOD7;
 
-template<typename T>
-T gcd(T a, T b, T &x, T &y) {
+template <typename T>
+T gcd(T a, T b, T& x, T& y) {
     if (a == 0) {
         x = 0;
         y = 1;
@@ -410,9 +489,7 @@ T gcd(T a, T b, T &x, T &y) {
 class modint {
 public:
     int n;
-
     modint() : n(0) {}
-
     modint(ll n) {
         if (n >= 0 && n < mod) {
             this->n = n;
@@ -424,35 +501,30 @@ public:
         }
         this->n = n;
     }
-
-    modint &operator+=(const modint &other) {
+    modint& operator +=(const modint& other) {
         n += other.n;
         if (n >= mod) {
             n -= mod;
         }
         return *this;
     }
-
-    modint &operator-=(const modint &other) {
+    modint& operator -=(const modint& other) {
         n -= other.n;
         if (n < 0) {
             n += mod;
         }
         return *this;
     }
-
-    modint &operator*=(const modint &other) {
+    modint& operator *=(const modint& other) {
         n = ll(n) * other.n % mod;
         return *this;
     }
-
-    modint operator-() {
+    modint operator -() {
         if (n == 0) {
             return 0;
         }
         return modint(mod - n);
     }
-
     modint inverse() {
         ll x, y;
         gcd(ll(n), ll(mod), x, y);
@@ -460,263 +532,36 @@ public:
     }
 };
 
-modint operator+(const modint &a, const modint &b) {
+modint operator +(const modint& a, const modint& b) {
     return modint(a) += b;
 }
 
-modint operator-(const modint &a, const modint &b) {
+modint operator -(const modint& a, const modint& b) {
     return modint(a) -= b;
 }
 
-modint operator*(const modint &a, const modint &b) {
+modint operator *(const modint& a, const modint& b) {
     return modint(a) *= b;
 }
 
-ostream &operator<<(ostream &out, const modint &val) {
+ostream& operator <<(ostream& out, const modint& val) {
     return out << val.n;
 }
 
-bool operator==(const modint &a, const modint &b) {
+bool operator==(const modint& a, const modint& b) {
     return a.n == b.n;
 }
 
-bool operator!=(const modint &a, const modint &b) {
+bool operator!=(const modint& a, const modint& b) {
     return a.n != b.n;
 }
 
 
-template<typename T>
-T gcd(T a, T b) {
-    a = abs(a);
-    b = abs(b);
-    while (b != 0) {
-        a = a % b;
-        swap(a, b);
-    }
-    return a;
-}
-
-template<typename T>
-T lcm(T a, T b) {
-    return a / gcd(a, b) * b;
-}
-
-template<typename T>
-T power(const T &a, ll b) {
-    if (b == 0) {
-        return 1;
-    }
-    if ((b & 1) == 0) {
-        T res = power(a, b >> 1);
-        return res * res;
-    } else {
-        return power(a, b - 1) * a;
-    }
-}
-
-template<typename T>
-vector<T> generateFactorial(int length) {
-    vector<T> result(length);
-    if (length > 0) {
-        result[0] = 1;
-    }
-    for (int i = 1; i < length; i++) {
-        result[i] = result[i - 1] * i;
-    }
-    return result;
-}
-
-template<typename T>
-vector<T> generateReverse(int length) {
-    vector<T> result(length);
-    if (length > 1) {
-        result[1] = 1;
-    }
-    for (int i = 2; i < length; i++) {
-        result[i] = -(mod / i) * result[mod % i];
-    }
-    return result;
-}
-
-template<typename T>
-vector<T> generatePowers(T base, int length) {
-    vector<T> result(length);
-    if (length > 0) {
-        result[0] = 1;
-    }
-    for (int i = 1; i < length; i++) {
-        result[i] = result[i - 1] * base;
-    }
-    return result;
-}
-
-template<typename T>
-vector<T> generateReverseFactorial(int length) {
-    auto result = generateReverse<T>(length);
-    if (length > 0) {
-        result[0] = 1;
-    }
-    for (int i = 1; i < length; i++) {
-        result[i] *= result[i - 1];
-    }
-    return result;
-}
-
-template<typename T>
-class Combinations {
-private:
-    vector<T> fact;
-    vector<T> revFactorial;
-
-public:
-    Combinations(int length) {
-        fact = generateFactorial<T>(length);
-        revFactorial = generateReverseFactorial<T>(length);
-    }
-
-public:
-    T c(int n, int k) {
-        if (k < 0 || k > n) {
-            return 0;
-        }
-        return fact[n] * revFactorial[k] * revFactorial[n - k];
-    }
-
-    T factorial(int n) {
-        return fact[n];
-    }
-
-    T reverseFactorial(int n) {
-        return revFactorial[n];
-    }
-};
 
 
-namespace prime_fft {
-    bool init = false;
-    modint root;
-    modint reverseRoot;
-    int rootPower;
-    vector<modint> aa;
-    vector<modint> bb;
-}
 
-void initPrimeFFT() {
-    if (prime_fft::init) {
-        return;
-    }
-    prime_fft::init = true;
-    prime_fft::rootPower = 1;
-    int pw = 0;
-    while ((mod - 1) % (2 * prime_fft::rootPower) == 0) {
-        prime_fft::rootPower *= 2;
-        pw++;
-    }
-    for (int i = 2;; i++) {
-        mod--;
-        int exp = power(modint(2), pw - 1).n;
-        int next = (exp * 2) % mod;
-        mod++;
-        if (power(modint(i), exp).n != 1 && power(modint(i), next).n == 1) {
-            prime_fft::root = i;
-            prime_fft::reverseRoot = prime_fft::root.inverse();
-            break;
-        }
-    }
-}
-
-namespace prime_fft {
-    void primeFFT(vector<modint> &array, bool invert, int n) {
-        for (int i = 1, j = 0; i < n; ++i) {
-            int bit = n >> 1;
-            for (; j >= bit; bit >>= 1) {
-                j -= bit;
-            }
-            j += bit;
-            if (i < j) {
-                swap(array[i], array[j]);
-            }
-        }
-
-        for (int len = 2; len <= n; len <<= 1) {
-            modint wlen = invert ? reverseRoot : root;
-            for (int i = len; i < rootPower; i <<= 1) {
-                wlen *= wlen;
-            }
-            int half = len >> 1;
-            for (int i = 0; i < n; i += len) {
-                modint w = 1;
-                for (int j = 0; j < half; ++j) {
-                    modint u = array[i + j], v = array[i + j + half] * w;
-                    array[i + j] = u + v;
-                    array[i + j + half] = u - v;
-                    w *= wlen;
-                }
-            }
-        }
-        if (invert) {
-            modint reverseSize = modint(n).inverse();
-            for (int i = 0; i < n; ++i) {
-                array[i] *= reverseSize;
-            }
-        }
-    }
-
-}
-
-template<typename It>
-void multiply(const It fBegin, const It fEnd, const It sBegin, const It sEnd, It res) {
-    unsigned long fLen = fEnd - fBegin;
-    unsigned long sLen = sEnd - sBegin;
-    int resLen = fLen + sLen - 1;
-    if (resLen <= 100) {
-        fill(res, res + resLen, 0);
-        for (int i = 0; i < fLen; i++) {
-            for (int j = 0; j < sLen; j++) {
-                res[i + j] += fBegin[i] * sBegin[j];
-            }
-        }
-        return;
-    }
-    int resultSize = 1;
-    while (resultSize < resLen) {
-        resultSize *= 2;
-    }
-    vector<modint> &aa = prime_fft::aa;
-    vector<modint> &bb = prime_fft::bb;
-    if (aa.size() < resultSize) {
-        aa.resize(resultSize);
-        bb.resize(resultSize);
-    }
-    fill(aa.begin() + fLen, aa.begin() + resultSize, modint(0));
-    fill(bb.begin() + sLen, bb.begin() + resultSize, modint(0));
-    copy(fBegin, fEnd, aa.begin());
-    copy(sBegin, sEnd, bb.begin());
-    prime_fft::primeFFT(aa, false, resultSize);
-    if (equal(fBegin, fEnd, sBegin, sEnd)) {
-        copy(all(aa), bb.begin());
-    } else {
-        prime_fft::primeFFT(bb, false, resultSize);
-    }
-    for (int i = 0; i < resultSize; i++) {
-        aa[i] *= bb[i];
-    }
-    prime_fft::primeFFT(aa, true, resultSize);
-    for (int i = 0; i < resLen; i++) {
-        res[i] = aa[i];
-    }
-}
-
-vector<modint> multiply(vector<modint> &first, vector<modint> &second) {
-    auto len = first.size() + second.size() - 1;
-    vector<modint> res(len);
-    multiply(all(first), all(second), res.begin());
-    return res;
-}
-
-
-template<typename T>
-inline void unique(vector<T> &v) {
+template <typename T>
+inline void unique(vector<T>& v) {
     v.resize(unique(all(v)) - v.begin());
 }
 
@@ -728,22 +573,22 @@ vi createOrder(int n) {
     return order;
 }
 
-template<typename T>
+template <typename T>
 inline vector<vector<T> > makeArray(int a, int b, T init) {
     return vector<vector<T> >(a, vector<T>(b, init));
 }
 
-template<typename T>
+template <typename T>
 inline vector<vector<vector<T> > > makeArray(int a, int b, int c, T init) {
     return vector<vector<vector<T> > >(a, makeArray<T>(b, c, init));
 }
 
-template<typename T, typename Iterator>
-inline void addAll(vector<T> &v, Iterator begin, Iterator end) {
+template <typename T, typename Iterator>
+inline void addAll(vector<T>& v, Iterator begin, Iterator end) {
     v.insert(v.end(), begin, end);
 }
 
-vi getQty(const vi &arr, int length) {
+vi getQty(const vi& arr, int length) {
     vi res(length);
     for (int i : arr) {
         res[i]++;
@@ -751,31 +596,31 @@ vi getQty(const vi &arr, int length) {
     return res;
 }
 
-vi getQty(const vi &arr) {
+vi getQty(const vi& arr) {
     return getQty(arr, *max_element(all(arr)) + 1);
 }
 
-template<typename T>
-void collect(vector<T> &all) {}
+template <typename T>
+void collect(vector<T>& all) {}
 
-template<typename T, class ...Vs>
-void collect(vector<T> &all, vector<T> &a, Vs &...vs) {
+template <typename T, class ...Vs>
+void collect(vector<T>& all, vector<T>& a, Vs&...vs) {
     addAll(all, all(a));
     collect(all, vs...);
 }
 
-void replace(const vi &all) {}
+void replace(const vi& all) {}
 
-template<class ...Vs>
-void replace(const vi &all, vi &a, Vs &...vs) {
-    for (int &i : a) {
+template <class ...Vs>
+void replace(const vi& all, vi& a, Vs&...vs) {
+    for (int& i : a) {
         i = lower_bound(all(all), i) - all.begin();
     }
     replace(all, vs...);
 }
 
-template<class ...Vs>
-vi compress(Vs &...vs) {
+template <class ...Vs>
+vi compress(Vs&...vs) {
     vi vals;
     collect(vals, vs...);
     sort(all(vals));
@@ -786,87 +631,90 @@ vi compress(Vs &...vs) {
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class BinomialFever {
+class Treedepth {
 public:
-    void solve(istream &inp, ostream &outp) {
+	void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
-        mod = MODF;
-        initPrimeFFT();
-        prime_fft::aa.resize(2000000);
-        prime_fft::bb.resize(2000000);
-
         int n = in.readInt();
-        modint p = in.readInt();
-        int r = in.readInt();
-        auto work = makeArray(2, 2 * r, modint(0));
-        function<void(int, int, int)> build = [&](int from, int to, int side) {
-            if (from + 1 == to) {
-                work[side][2 * from] = -from;
-                work[side][2 * from + 1] = 1;
-                return;
+        int k = in.readInt();
+        int m = in.readInt();
+
+        mod = m;
+        auto q = makeArray(n, n, arr<modint>());
+        for (int i : Range(n)) {
+            for (int j : Range(n - i)) {
+                if (i == 0 && j == 0) {
+                    q[i][j] = arr<modint>(1, 1);
+                } else {
+                    q[i][j] = arr<modint>(i * j + 1, 0);
+                    if (i > 0) {
+                        for (int k : Range(q[i - 1][j].size())) {
+                            q[i][j][k] += q[i - 1][j][k];
+                        }
+                    }
+                    if (j > 0) {
+                        for (int k : Range(q[i][j - 1].size())) {
+                            q[i][j][k + i] += q[i][j - 1][k];
+                        }
+                    }
+                }
             }
-            int mid = (from + to) / 2;
-            build(from, mid, 1 - side);
-            build(mid, to, 1 - side);
-            multiply(work[1 - side].begin() + (2 * from), work[1 - side].begin() + (from + mid + 1),
-                     work[1 - side].begin() + (2 * mid), work[1 - side].begin() + (mid + to + 1),
-                     work[side].begin() + (2 * from));
-        };
-#ifdef LOCAL
-        ll time = clock();
-#endif
-        build(0, r, 0);
-#ifdef LOCAL
-        cerr << "built " << clock() - time << endl;
-#endif
-        vector<modint> &poly = work[0];
-        modint answer = 0;
-        function<modint(modint, modint &, int)> sump = [&](modint base, modint &power, int exp) -> modint {
-            if (exp == 0) {
-                power = 1;
-                return 0;
-            }
-            if ((exp & 1) == 0) {
-                auto val = sump(base, power, exp >> 1);
-                auto res = val * (1 + power);
-                power *= power;
-                return res;
-            } else {
-                auto val = sump(base, power, exp - 1);
-                power *= base;
-                return val * base + 1;
-            }
-        };
-        modint pw = 1;
-        modint temp = 0;
-        for (int i : Range(r + 1)) {
-            answer += sump(pw, temp, n + 1) * poly[i];
-            pw *= p;
         }
-        modint fact = 1;
-        for (int i = 2; i <= r; i++) {
-            fact *= i;
+        vector<vector<arr<modint> > > res(n + 1);
+        vector<vector<modint> > qq(n + 1);
+        res[0] = vector<arr<modint> >(1);
+        qq[0] = vector<modint>(1, 1);
+        auto temp = makeArray(k + 1, n, modint(0));
+        vector<modint> qtemp(k + 1);
+        vector<modint> localq(k + 1);
+        for (int i = 1; i <= n; i++) {
+            res[i] = vector<arr<modint> >(min(k + 1, i * (i - 1) / 2 + 1));
+            qq[i] = vector<modint>(res[i].size());
+            for (auto& row : res[i]) {
+                row = arr<modint>(i, 0);
+            }
+            for (int j : Range(i)) {
+                for (int l : Range(res[i].size())) {
+                    fill(temp[l].begin(), temp[l].begin() + i, 0);
+                }
+                fill(qtemp.begin(), qtemp.begin() + res[i].size(), 0);
+                fill(localq.begin(), localq.begin() + res[i].size(), 0);
+                for (int l : Range(res[j].size())) {
+                    for (int m : Range(min(int(res[i - j - 1].size()), k - l + 1 - j))) {
+                        qtemp[l + m + j] += qq[j][l] * qq[i - j - 1][m];
+                        for (int n : Range(j)) {
+                            temp[l + m + j][n] += res[j][l][n] * qq[i - j - 1][m];
+                        }
+                        for (int n : Range(i - j - 1)) {
+                            temp[l + m + j][j + 1 + n] += res[i - j - 1][m][n] * qq[j][l];
+                        }
+                    }
+                }
+                for (int l : Range(j, res[i].size())) {
+                    for (int m : Range(min(int(q[j][i - j - 1].size()), min(k, int(res[i].size()) - 1) - l + 1))) {
+                        modint ways = qtemp[l] * q[j][i - j - 1][m];
+                        qq[i][l + m] += ways;
+                        localq[l + m] += ways;
+                        for (int n : Range(i)) {
+                            res[i][l + m][n] += temp[l][n] * q[j][i - j - 1][m] + ways;
+                        }
+                    }
+                }
+            }
         }
-        fact = power(fact, mod - 2);
-        answer *= fact;
-        out.printLine(answer);
-    }
+        out.printLine(res[n][k]);
+	}
 };
 
 
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    BinomialFever solver;
-    std::istream &in(std::cin);
-    std::ostream &out(std::cout);
-    int n;
-    in >> n;
-    for (int i = 0; i < n; ++i) {
-        solver.solve(in, out);
-    }
-
-    return 0;
+	Treedepth solver;
+	std::ifstream in("treedepth.in");
+	std::ofstream out("treedepth.out");
+	solver.solve(in, out);
+	return 0;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../general.h"
+#include "../collections/arr.h"
 
 class Output {
 private:
@@ -11,6 +12,15 @@ private:
     }
 
     template<typename T> void printSingle(const vector<T>& array) {
+        size_t n = array.size();
+        for (int i = 0; i < n; ++i) {
+            out << array[i];
+            if (i + 1 != n) {
+                out << ' ';
+            }
+        }
+    }
+    template<typename T> void printSingle(const arr<T>& array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
