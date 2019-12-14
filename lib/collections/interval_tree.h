@@ -1,17 +1,17 @@
 #pragma once
 
 #include "../general.h"
+#include "arr.h"
 
 template<typename Value, typename Delta, Value defaultValue = 0, Delta defaultDelta = 0>
 class IntervalTree {
-private:
     const int size;
     function<Value(Value, Value)> joinValue;
     function<Delta(Delta, Delta)> joinDelta;
     function<Value(Value, Delta, int, int)> accumulate;
     function<Value(int)> initValue;
-    vector<Value> value;
-    vector<Delta> delta;
+    arr<Value> value;
+    arr<Delta> delta;
 
     void init(int root, int left, int right) {
         if (left + 1 == right) {
@@ -69,8 +69,8 @@ public:
                  function<Value(int)> initValue = [](int at) -> Value { return defaultValue; }) :
             size(size), joinValue(joinValue), joinDelta(joinDelta), accumulate(accumulate), initValue(initValue) {
         int vertexSize = size * 4;
-        value = vector<Value>(vertexSize);
-        delta = vector<Delta>(vertexSize, defaultDelta);
+        value = arr<Value>(vertexSize);
+        delta = arr<Delta>(vertexSize, defaultDelta);
         init(0, 0, size);
     }
 
@@ -88,7 +88,7 @@ class ReadOnlyIntervalTree {
 private:
     const int size;
     function<Value(Value, Value)> joinValue;
-    vector<Value> value;
+    arr<Value> value;
 
     void init(int root, int left, int right, const vector<Value>& array) {
         if (left + 1 == right) {
@@ -101,7 +101,7 @@ private:
         }
     }
 
-    Value query(int root, int left, int right, int from, int to) {
+    Value query(int root, int left, int right, int from, int to) const {
         if (left >= from && right <= to) {
             return value[root];
         }
@@ -115,14 +115,14 @@ private:
     }
 
 public:
-    ReadOnlyIntervalTree(const vector<Value>& array, function<Value(Value, Value)> joinValue) :
+    ReadOnlyIntervalTree(const arr<Value>& array, function<Value(Value, Value)> joinValue) :
             size(array.size()), joinValue(joinValue) {
         int vertexSize = size * 4;
-        value = vector<Value>(vertexSize);
+        value = arr<Value>(vertexSize);
         init(0, 0, size, array);
     }
 
-    Value query(int from, int to) {
+    Value query(int from, int to) const {
         return query(0, 0, size, from, to);
     }
 };

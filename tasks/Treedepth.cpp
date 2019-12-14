@@ -17,21 +17,21 @@ public:
         int m = in.readInt();
 
         mod = m;
-        auto q = makeArray(n, n, arr<modint>());
+        auto q = arr2d<arr<modint> >(n, n, arr<modint>());
         for (int i : Range(n)) {
             for (int j : Range(n - i)) {
                 if (i == 0 && j == 0) {
-                    q[i][j] = arr<modint>(1, 1);
+                    q(i, j) = arr<modint>(1, 1);
                 } else {
-                    q[i][j] = arr<modint>(i * j + 1, 0);
+                    q(i, j) = arr<modint>(i * j + 1, 0);
                     if (i > 0) {
-                        for (int k : Range(q[i - 1][j].size())) {
-                            q[i][j][k] += q[i - 1][j][k];
+                        for (int k : Range(q(i - 1, j).size())) {
+                            q(i, j)[k] += q[i - 1][j][k];
                         }
                     }
                     if (j > 0) {
                         for (int k : Range(q[i][j - 1].size())) {
-                            q[i][j][k + i] += q[i][j - 1][k];
+                            q(i, j)[k + i] += q[i][j - 1][k];
                         }
                     }
                 }
@@ -41,7 +41,7 @@ public:
         vector<vector<modint> > qq(n + 1);
         res[0] = vector<arr<modint> >(1);
         qq[0] = vector<modint>(1, 1);
-        auto temp = makeArray(k + 1, n, modint(0));
+        auto temp = arr2d<modint>(k + 1, n, modint(0));
         vector<modint> qtemp(k + 1);
         vector<modint> localq(k + 1);
         for (int i = 1; i <= n; i++) {

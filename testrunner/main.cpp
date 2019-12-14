@@ -1,4 +1,4 @@
-#include "C:/Users/kulikov/proj/cpp/tasks/Treedepth.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/Pieaters.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"3 0 192603497\n", "1 2 3\n", true, true},{"3 1 144408983", "3 4 4\n", true, true},{"1 0 192603497", "1\n", true, true},{"8 14 144408983", "", true, false},
+		{"2 2\n100 1 2\n100 1 1\n", "200\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -49,7 +49,7 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    Treedepth solver;
+			    Pieaters solver;
 			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;

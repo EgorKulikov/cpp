@@ -2,6 +2,7 @@
 
 #include "../general.h"
 #include "../collections/arr.h"
+#include "../collections/mdarr.h"
 
 class Output {
 private:
@@ -26,6 +27,21 @@ private:
             out << array[i];
             if (i + 1 != n) {
                 out << ' ';
+            }
+        }
+    }
+    template<typename T> void printSingle(const arr2d<T>& array) {
+        size_t n = array.dim1();
+        size_t m = array.dim2();
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                out << array(i, j);
+                if (j + 1 != m) {
+                    out << ' ';
+                }
+            }
+            if (i + 1 != n) {
+                out << '\n';
             }
         }
     }

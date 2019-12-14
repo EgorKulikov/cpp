@@ -19,21 +19,18 @@ typedef pair<int, int> pii;
 
 const double PI = atan(1) * 4;
 
-template <typename T>
-T minim(T& was, T cand) {
+template<typename T>
+T minim(T &was, T cand) {
     return was = min(was, cand);
 }
 
-template <typename T>
-T maxim(T& was, T cand) {
+template<typename T>
+T maxim(T &was, T cand) {
     return was = max(was, cand);
 }
 
 
-
-
-
-template <typename D>
+template<typename D>
 D dPower(D base, ll exponent) {
     if (exponent < 0) {
         return dPower(1 / base, -exponent);
@@ -50,13 +47,10 @@ D dPower(D base, ll exponent) {
 }
 
 
-
-
-
-template <typename T>
+template<typename T>
 class arr {
-    T* b;
-    T* e;
+    T *b;
+    T *e;
     int n;
 public:
     arr() : b(nullptr), e(nullptr), n(0) {}
@@ -66,31 +60,35 @@ public:
         e = b + n;
     }
 
-    arr(int n, T init) : n(n) {
+    arr(int n, const T &init) : n(n) {
         b = new T[n];
         e = b + n;
         fill(b, e, init);
     }
 
+    arr(T *b, int n) : b(b), e(b + n), n(n) {}
+
+    arr(T *b, T *e) : b(b), e(e), n(e - b) {}
+
     size_t size() const {
         return n;
     }
 
-    T* begin() {
+    T *begin() {
         return b;
     }
 
-    T* end() {
+    T *end() {
         return e;
     }
 
-    arr<T> clone() {
+    arr<T> clone() const {
         arr<T> res(n);
         copy(b, e, res.begin());
         return res;
     }
 
-    T& operator[](int at) {
+    T &operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= n) {
             throw "Out of bounds";
@@ -99,7 +97,7 @@ public:
         return b[at];
     }
 
-    const T& operator[](int at) const {
+    const T &operator[](int at) const {
 #ifdef LOCAL
         if (at < 0 || at >= n) {
             throw "Out of bounds";
@@ -113,8 +111,8 @@ typedef arr<int> arri;
 
 void decreaseByOne() {}
 
-template <typename T, class...Vs>
-void decreaseByOne(arr<T>& array, Vs&...vs) {
+template<typename T, class...Vs>
+void decreaseByOne(arr<T> &array, Vs &...vs) {
     int n = array.size();
     for (int i = 0; i < n; ++i) {
         array[i]--;
@@ -122,9 +120,9 @@ void decreaseByOne(arr<T>& array, Vs&...vs) {
     decreaseByOne(vs...);
 }
 
-template <typename T, typename U>
-void decreaseByOne(arr<pair<T, U> >& v) {
-    for (auto& p : v) {
+template<typename T, typename U>
+void decreaseByOne(arr<pair<T, U> > &v) {
+    for (auto &p : v) {
         p.first--;
         p.second--;
     }
@@ -174,16 +172,16 @@ private:
 
     void initArrays(int n) {}
 
-    template <typename T, class...Vs>
-    void initArrays(int n, arr<T>& array, Vs&...vs) {
+    template<typename T, class...Vs>
+    void initArrays(int n, arr<T> &array, Vs &...vs) {
         array = arr<T>(n);
         initArrays(n, vs...);
     }
 
     void readImpl(int i) {}
 
-    template <typename T, class...Vs>
-    void readImpl(int i, arr<T>& arr, Vs&...vs) {
+    template<typename T, class...Vs>
+    void readImpl(int i, arr<T> &arr, Vs &...vs) {
         arr[i] = readType<T>();
         readImpl(i, vs...);
     }
@@ -248,9 +246,8 @@ public:
     }
 
 
-
-    template <class...Vs>
-    void readArrays(int n, Vs&...vs) {
+    template<class...Vs>
+    void readArrays(int n, Vs &...vs) {
         initArrays(n, vs...);
         for (int i = 0; i < n; i++) {
             readImpl(i, vs...);
@@ -373,19 +370,169 @@ string Input::readType() {
 }
 
 
+template<typename T>
+class arr2d {
+    T *b;
+    T *e;
+    int d1;
+    int d2;
+    int sz;
 
+public:
+    arr2d() : b(nullptr), e(nullptr), d1(0), d2(0), sz(0) {}
 
+    arr2d(int d1, int d2) : d1(d1), d2(d2), sz(d1 * d2) {
+        b = new T[sz];
+        e = b + sz;
+    }
+
+    arr2d(int d1, int d2, const T &init) : d1(d1), d2(d2), sz(d1 * d2) {
+        b = new T[sz];
+        e = b + sz;
+        fill(b, e, init);
+    }
+
+    arr2d(T *b, int d1, int d2) : b(b), e(b + d1 * d2), d1(d1), d2(d2), sz(d1 * d2) {}
+
+    size_t size() const {
+        return sz;
+    }
+
+    size_t dim1() const {
+        return d1;
+    }
+
+    size_t dim2() const {
+        return d1;
+    }
+
+    T *begin() {
+        return b;
+    }
+
+    T *end() {
+        return e;
+    }
+
+    T &operator()(int i1, int i2) {
+#ifdef LOCAL
+        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2) {
+            throw "Out of bounds";
+        }
+#endif
+        return b[i1 * d2 + i2];
+    }
+
+    const T &operator()(int i1, int i2) const {
+#ifdef LOCAL
+        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2) {
+            throw "Out of bounds";
+        }
+#endif
+        return b[i1 * d2 + i2];
+    }
+
+    arr<T> operator[](int at) {
+#ifdef LOCAL
+        if (at < 0 || at >= d1) {
+            throw "Out of bounds";
+        }
+#endif
+        return arr<T>(b + at * d2, d2);
+    }
+};
+
+template<typename T>
+class arr3d {
+    T *b;
+    T *e;
+    int d1;
+    int d2;
+    int d3;
+    int shift;
+    int sz;
+
+public:
+    arr3d() : b(nullptr), e(nullptr), d1(0), d2(0), d3(0), shift(0), sz(0) {}
+
+    arr3d(int d1, int d2, int d3) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
+        b = new T[sz];
+        e = b + sz;
+    }
+
+    arr3d(int d1, int d2, int d3, const T &init) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
+        b = new T[sz];
+        e = b + sz;
+        fill(b, e, init);
+    }
+
+    arr3d(T *b, int d1, int d2, int d3) : b(b), e(b + d1 * d2 * d3), d1(d1), d2(d2), d3(d3), shift(d2 * d3),
+                                          sz(d1 * d2 * d3) {}
+
+    size_t size() const {
+        return sz;
+    }
+
+    size_t dim1() const {
+        return d1;
+    }
+
+    size_t dim2() const {
+        return d1;
+    }
+
+    size_t dim3() const {
+        return d3;
+    }
+
+    T *begin() {
+        return b;
+    }
+
+    T *end() {
+        return e;
+    }
+
+    T &operator()(int i1, int i2, int i3) {
+#ifdef LOCAL
+        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
+            throw "Out of bounds";
+        }
+#endif
+        return b[i1 * shift + i2 * d3 + i3];
+    }
+
+    const T &operator()(int i1, int i2, int i3) const {
+#ifdef LOCAL
+        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
+            throw "Out of bounds";
+        }
+#endif
+        return b[i1 * shift + i2 * d3 + i3];
+    }
+
+    arr2d<T> operator[](int at) {
+#ifdef LOCAL
+        if (at < 0 || at >= d1) {
+            throw "Out of bounds";
+        }
+#endif
+        return arr2d<T>(b + at * shift, d2, d3);
+    }
+};
 
 
 class Output {
 private:
-    ostream& out;
+    ostream &out;
 
-    template<typename T> void printSingle(const T& value) {
+    template<typename T>
+    void printSingle(const T &value) {
         out << value;
     }
 
-    template<typename T> void printSingle(const vector<T>& array) {
+    template<typename T>
+    void printSingle(const vector<T> &array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -394,7 +541,9 @@ private:
             }
         }
     }
-    template<typename T> void printSingle(const arr<T>& array) {
+
+    template<typename T>
+    void printSingle(const arr<T> &array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -403,19 +552,38 @@ private:
             }
         }
     }
-    template<typename T, typename U> void printSingle(const pair<T, U>& value) {
+
+    template<typename T>
+    void printSingle(const arr2d<T> &array) {
+        size_t n = array.dim1();
+        size_t m = array.dim2();
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                out << array(i, j);
+                if (j + 1 != m) {
+                    out << ' ';
+                }
+            }
+            if (i + 1 != n) {
+                out << '\n';
+            }
+        }
+    }
+
+    template<typename T, typename U>
+    void printSingle(const pair<T, U> &value) {
         out << value.first << ' ' << value.second;
     }
 
 public:
-    Output(ostream& out) : out(out) {
+    Output(ostream &out) : out(out) {
         out << fixed << setprecision(12);
     }
 
     void print() {}
 
     template<typename T, typename...Targs>
-    void print(const T& first, const Targs... args) {
+    void print(const T &first, const Targs... args) {
         printSingle(first);
         if (sizeof...(args) != 0) {
             out << ' ';
@@ -433,9 +601,6 @@ public:
         out.flush();
     }
 };
-
-
-
 
 
 class NumberIterator : iterator<forward_iterator_tag, int> {
@@ -465,162 +630,59 @@ public:
 };
 
 
-
-
-
-const int MOD7 = 1000000007;
-const int MOD9 = 1000000009;
-const int MODF = 998244353;
-
-int mod = MOD7;
-
-template <typename T>
-T gcd(T a, T b, T& x, T& y) {
-    if (a == 0) {
-        x = 0;
-        y = 1;
-        return b;
-    }
-    int d = gcd(b % a, a, y, x);
-    x -= (b / a) * y;
-    return d;
-}
-
-class modint {
-public:
-    int n;
-    modint() : n(0) {}
-    modint(ll n) {
-        if (n >= 0 && n < mod) {
-            this->n = n;
-            return;
-        }
-        n %= mod;
-        if (n < 0) {
-            n += mod;
-        }
-        this->n = n;
-    }
-    modint& operator +=(const modint& other) {
-        n += other.n;
-        if (n >= mod) {
-            n -= mod;
-        }
-        return *this;
-    }
-    modint& operator -=(const modint& other) {
-        n -= other.n;
-        if (n < 0) {
-            n += mod;
-        }
-        return *this;
-    }
-    modint& operator *=(const modint& other) {
-        n = ll(n) * other.n % mod;
-        return *this;
-    }
-    modint operator -() {
-        if (n == 0) {
-            return 0;
-        }
-        return modint(mod - n);
-    }
-    modint inverse() {
-        ll x, y;
-        gcd(ll(n), ll(mod), x, y);
-        return x;
-    }
-};
-
-modint operator +(const modint& a, const modint& b) {
-    return modint(a) += b;
-}
-
-modint operator -(const modint& a, const modint& b) {
-    return modint(a) -= b;
-}
-
-modint operator *(const modint& a, const modint& b) {
-    return modint(a) *= b;
-}
-
-ostream& operator <<(ostream& out, const modint& val) {
-    return out << val.n;
-}
-
-bool operator==(const modint& a, const modint& b) {
-    return a.n == b.n;
-}
-
-bool operator!=(const modint& a, const modint& b) {
-    return a.n != b.n;
-}
-
-
-
-
-
-template <typename T>
-inline void unique(vector<T>& v) {
+template<typename T>
+inline void unique(vector<T> &v) {
     v.resize(unique(all(v)) - v.begin());
 }
 
-vi createOrder(int n) {
-    vi order(n);
+arri createOrder(int n) {
+    arri order(n);
     for (int i = 0; i < n; i++) {
         order[i] = i;
     }
     return order;
 }
 
-template <typename T>
-inline vector<vector<T> > makeArray(int a, int b, T init) {
-    return vector<vector<T> >(a, vector<T>(b, init));
-}
-
-template <typename T>
-inline vector<vector<vector<T> > > makeArray(int a, int b, int c, T init) {
-    return vector<vector<vector<T> > >(a, makeArray<T>(b, c, init));
-}
-
-template <typename T, typename Iterator>
-inline void addAll(vector<T>& v, Iterator begin, Iterator end) {
+template<typename T, typename Iterator>
+inline void addAll(vector<T> &v, Iterator begin, Iterator end) {
     v.insert(v.end(), begin, end);
 }
 
-vi getQty(const vi& arr, int length) {
-    vi res(length);
+template<typename Collection>
+arri getQty(const Collection &arr, int length) {
+    arri res(length);
     for (int i : arr) {
         res[i]++;
     }
     return res;
 }
 
-vi getQty(const vi& arr) {
+template<typename Collection>
+arri getQty(const Collection &arr) {
     return getQty(arr, *max_element(all(arr)) + 1);
 }
 
-template <typename T>
-void collect(vector<T>& all) {}
+template<typename T>
+void collect(vector<T> &all) {}
 
-template <typename T, class ...Vs>
-void collect(vector<T>& all, vector<T>& a, Vs&...vs) {
+template<typename T, class ...Vs>
+void collect(vector<T> &all, vector<T> &a, Vs &...vs) {
     addAll(all, all(a));
     collect(all, vs...);
 }
 
-void replace(const vi& all) {}
+void replace(const vi &all) {}
 
-template <class ...Vs>
-void replace(const vi& all, vi& a, Vs&...vs) {
-    for (int& i : a) {
+template<class ...Vs>
+void replace(const vi &all, vi &a, Vs &...vs) {
+    for (int &i : a) {
         i = lower_bound(all(all), i) - all.begin();
     }
     replace(all, vs...);
 }
 
-template <class ...Vs>
-vi compress(Vs&...vs) {
+template<class ...Vs>
+vi compress(Vs &...vs) {
     vi vals;
     collect(vals, vs...);
     sort(all(vals));
@@ -629,92 +691,84 @@ vi compress(Vs&...vs) {
     return vals;
 }
 
+
+class ReverseNumberIterator : public NumberIterator {
+public:
+    ReverseNumberIterator(int v) : NumberIterator(v) {}
+
+    ReverseNumberIterator &operator++() {
+        --v;
+        return *this;
+    }
+};
+
+class RevRange : pii {
+public:
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
+
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
+
+    ReverseNumberIterator begin() {
+        return first;
+    }
+
+    ReverseNumberIterator end() {
+        return second;
+    }
+};
+
+
 //#pragma comment(linker, "/STACK:200000000")
 
-class Treedepth {
+class Pieaters {
 public:
-	void solve(istream& inp, ostream& outp) {
+    void solve(istream &inp, ostream &outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        int k = in.readInt();
         int m = in.readInt();
-
-        mod = m;
-        auto q = makeArray(n, n, arr<modint>());
-        for (int i : Range(n)) {
-            for (int j : Range(n - i)) {
-                if (i == 0 && j == 0) {
-                    q[i][j] = arr<modint>(1, 1);
-                } else {
-                    q[i][j] = arr<modint>(i * j + 1, 0);
-                    if (i > 0) {
-                        for (int k : Range(q[i - 1][j].size())) {
-                            q[i][j][k] += q[i - 1][j][k];
-                        }
-                    }
-                    if (j > 0) {
-                        for (int k : Range(q[i][j - 1].size())) {
-                            q[i][j][k + i] += q[i][j - 1][k];
-                        }
-                    }
+        arri w, l, r;
+        in.readArrays(m, w, l, r);
+        decreaseByOne(l, r);
+        auto b = arr2d<int>(n, n, 0);
+        for (int i : Range(m)) {
+            b(l[i], r[i]) = w[i];
+        }
+        auto bb = arr3d<int>(n, n, n);
+        for (int i : RevRange(n)) {
+            for (int j : Range(i, n)) {
+                for (int k : Range(i, j + 1)) {
+                    bb(i, j, k) = max(b(i, j), max(i < n - 1 ? bb(i + 1, j, k) : 0, j > 0 ? bb(i, j - 1, k) : 0));
                 }
             }
         }
-        vector<vector<arr<modint> > > res(n + 1);
-        vector<vector<modint> > qq(n + 1);
-        res[0] = vector<arr<modint> >(1);
-        qq[0] = vector<modint>(1, 1);
-        auto temp = makeArray(k + 1, n, modint(0));
-        vector<modint> qtemp(k + 1);
-        vector<modint> localq(k + 1);
-        for (int i = 1; i <= n; i++) {
-            res[i] = vector<arr<modint> >(min(k + 1, i * (i - 1) / 2 + 1));
-            qq[i] = vector<modint>(res[i].size());
-            for (auto& row : res[i]) {
-                row = arr<modint>(i, 0);
+        auto ans = arr2d<int>(n, n, -1);
+        function<int(int, int)> go = [&](int f, int t) -> int {
+            if (f > t) {
+                return 0;
             }
-            for (int j : Range(i)) {
-                for (int l : Range(res[i].size())) {
-                    fill(temp[l].begin(), temp[l].begin() + i, 0);
-                }
-                fill(qtemp.begin(), qtemp.begin() + res[i].size(), 0);
-                fill(localq.begin(), localq.begin() + res[i].size(), 0);
-                for (int l : Range(res[j].size())) {
-                    for (int m : Range(min(int(res[i - j - 1].size()), k - l + 1 - j))) {
-                        qtemp[l + m + j] += qq[j][l] * qq[i - j - 1][m];
-                        for (int n : Range(j)) {
-                            temp[l + m + j][n] += res[j][l][n] * qq[i - j - 1][m];
-                        }
-                        for (int n : Range(i - j - 1)) {
-                            temp[l + m + j][j + 1 + n] += res[i - j - 1][m][n] * qq[j][l];
-                        }
-                    }
-                }
-                for (int l : Range(j, res[i].size())) {
-                    for (int m : Range(min(int(q[j][i - j - 1].size()), min(k, int(res[i].size()) - 1) - l + 1))) {
-                        modint ways = qtemp[l] * q[j][i - j - 1][m];
-                        qq[i][l + m] += ways;
-                        localq[l + m] += ways;
-                        for (int n : Range(i)) {
-                            res[i][l + m][n] += temp[l][n] * q[j][i - j - 1][m] + ways;
-                        }
-                    }
-                }
+            int &res = ans(f, t);
+            if (res != -1) {
+                return res;
             }
-        }
-        out.printLine(res[n][k]);
-	}
+            res = b(f, t);
+            for (int i : Range(f, t + 1)) {
+                maxim(res, bb(f, t, i) + go(f, i - 1) + go(i + 1, t));
+            }
+            return res;
+        };
+        out.printLine(go(0, n - 1));
+    }
 };
 
 
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-	Treedepth solver;
-	std::ifstream in("treedepth.in");
-	std::ofstream out("treedepth.out");
-	solver.solve(in, out);
-	return 0;
+    Pieaters solver;
+    std::istream &in(std::cin);
+    std::ostream &out(std::cout);
+    solver.solve(in, out);
+    return 0;
 }

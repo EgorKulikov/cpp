@@ -15,11 +15,14 @@ public:
         e = b + n;
     }
 
-    arr(int n, T init) : n(n) {
+    arr(int n, const T& init) : n(n) {
         b = new T[n];
         e = b + n;
         fill(b, e, init);
     }
+
+    arr(T* b, int n) : b(b), e(b + n), n(n) {}
+    arr(T* b, T* e) : b(b), e(e), n(e - b) {}
 
     size_t size() const {
         return n;
@@ -33,7 +36,7 @@ public:
         return e;
     }
 
-    arr<T> clone() {
+    arr<T> clone() const {
         arr<T> res(n);
         copy(b, e, res.begin());
         return res;

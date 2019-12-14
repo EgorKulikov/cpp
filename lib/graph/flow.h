@@ -4,7 +4,7 @@
 #include "../collections/arr.h"
 
 template <class Edge, typename C>
-C dinic(Graph<Edge>& graph, int source, int destination) {
+C maxFlow(Graph<Edge>& graph, int source, int destination) {
     arri dist(graph.vertexCount);
     arri nextEdge(graph.vertexCount);
     C inf = numeric_limits<C>::max();

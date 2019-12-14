@@ -1,12 +1,12 @@
 #pragma once
 
 #include "../general.h"
+#include "arr.h"
 
 class FenwickTree {
-private:
-    vector<ll> value;
+    arr<ll> value;
 
-    ll get(int to) {
+    ll get(int to) const {
         minim(to, int(value.size()) - 1);
         ll result = 0;
         while (to >= 0) {
@@ -18,7 +18,7 @@ private:
 
 public:
     FenwickTree(int size) {
-        value.resize(size);
+        value = arr<ll>(size);
     }
 
     void add(int at, ll val) {
@@ -28,7 +28,7 @@ public:
         }
     }
 
-    ll get(int from, int to) {
+    ll get(int from, int to) const {
         if (from >= to) {
             return 0;
         }

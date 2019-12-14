@@ -33,8 +33,8 @@ T power(const T& a, ll b) {
 }
 
 template <typename T>
-vector<T> generateFactorial(int length) {
-    vector<T> result(length);
+arr<T> generateFactorial(int length) {
+    arr<T> result(length);
     if (length > 0) {
         result[0] = 1;
     }
@@ -44,9 +44,8 @@ vector<T> generateFactorial(int length) {
     return result;
 }
 
-template <typename T>
-vector<T> generateReverse(int length) {
-    vector<T> result(length);
+arr<modint> generateInverse(int length) {
+    arr<modint> result(length);
     if (length > 1) {
         result[1] = 1;
     }
@@ -57,8 +56,8 @@ vector<T> generateReverse(int length) {
 }
 
 template <typename T>
-vector<T> generatePowers(T base, int length) {
-    vector<T> result(length);
+arr<T> generatePowers(T base, int length) {
+    arr<T> result(length);
     if (length > 0) {
         result[0] = 1;
     }
@@ -68,9 +67,8 @@ vector<T> generatePowers(T base, int length) {
     return result;
 }
 
-template <typename T>
-vector<T> generateReverseFactorial(int length) {
-    auto result = generateReverse<T>(length);
+arr<modint> generateInverseFactorial(int length) {
+    auto result = generateInverse(length);
     if (length > 0) {
         result[0] = 1;
     }
@@ -80,31 +78,30 @@ vector<T> generateReverseFactorial(int length) {
     return result;
 }
 
-template <typename T>
 class Combinations {
 private:
-    vector<T> fact;
-    vector<T> revFactorial;
+    arr<modint> fact;
+    arr<modint> invFactorial;
 
 public:
     Combinations(int length) {
-        fact = generateFactorial<T>(length);
-        revFactorial = generateReverseFactorial<T>(length);
+        fact = generateFactorial<modint>(length);
+        invFactorial = generateInverseFactorial(length);
     }
 
 public:
-    T c(int n, int k) {
+    modint c(int n, int k) const {
         if (k < 0 || k > n) {
             return 0;
         }
-        return fact[n] * revFactorial[k] * revFactorial[n - k];
+        return fact[n] * invFactorial[k] * invFactorial[n - k];
     }
 
-    T factorial(int n) {
+    modint factorial(int n) const {
         return fact[n];
     }
 
-    T reverseFactorial(int n) {
-        return revFactorial[n];
+    modint inverseFactorial(int n) const {
+        return invFactorial[n];
     }
 };

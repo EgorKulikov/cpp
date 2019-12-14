@@ -2,28 +2,29 @@
 
 #include "../general.h"
 #include "graph.h"
+#include "../collections/arr.h"
+#include "../collections/queue.h"
 
 template <class Edge>
 vi topologicalSort(const Graph<Edge>& graph) {
     vi result;
     int n = graph.vertexCount;
     result.reserve(n);
-    vi degree(n);
+    arri degree(n, 0);
     for (int i = 0; i < n; ++i) {
         for (auto edge : graph.edges[i]) {
             degree[edge->to]++;
         }
     }
-    queue<int> q;
+    que<int> q;
     for (int i = 0; i < n; ++i) {
         if (degree[i] == 0) {
             q.push(i);
         }
     }
     while (!q.empty()) {
-        int cur = q.front();
+        int cur = q.pop();
         result.push_back(cur);
-        q.pop();
         for (auto edge : graph.edges[cur]) {
             if (--degree[edge->to] == 0) {
                 q.push(edge->to);

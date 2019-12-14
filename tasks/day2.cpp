@@ -102,26 +102,50 @@ public:
         }
 
         auto p = program(mem);
-        map<pii, int> hull;
-        hull[make_pair(0, 0)] = 1;
-        int x = 0;
-        int y = 0;
-        int dir = 1;
+        vector<ll> inputs;
+        ll score = 0;
         while (true) {
-            pii key = make_pair(x, y);
-            auto res = p.run({ll(hull[key])});
-            if (res.first == CRASHED || res.second.size() != 2) {
-                cerr << res.second.size() << endl;
-                return;
+            map<pii, int> hull;
+            auto res = p.run(inputs);
+            if (res.first == CRASHED) {
+                cerr << "******" << endl;
             }
-            hull[key] = res.second[0];
-            dir = (dir + 1 + 2 * res.second[1]) & 3;
-            x += DX4[dir];
-            y += DY4[dir];
+            auto vec = res.second;
+            for (int i = 0; i < vec.size(); i += 3) {
+                if (vec[i] == -1 && vec[i + 1] == 0) {
+                    score = vec[i + 2];
+                    continue;
+                }
+                hull[make_pair(vec[i], vec[i + 1])] = vec[i + 2];
+            }
+            cerr << score << endl;
+            int paddlePos;
+            int ballPos;
+            int numBlocks = 0;
+
+            for (const auto& p : hull) {
+                if (p.second == 1) {
+                    numBlocks++;
+                } else if (p.second == 3) {
+                    paddlePos = p.first.first;
+                } else if (p.second == 4) {
+                    ballPos = p.first.first;
+                }
+            }
+            inputs.clear();
+            if (ballPos < paddlePos) {
+                inputs.push_back(-1);
+            } else if (ballPos > paddlePos) {
+                inputs.push_back(1);
+            } else {
+                inputs.push_back(0);
+            }
             if (res.first == FINISHED) {
                 break;
             }
         }
+        out.printLine(score);
+/*        auto res = p.run({});
         int mix = numeric_limits<int>::max();
         int max = numeric_limits<int>::min();
         int miy = numeric_limits<int>::max();
@@ -132,14 +156,23 @@ public:
             minim(miy, p.first.second);
             maxim(may, p.first.second);
         }
+        int r = 0;
         vector<string> answer(may - miy + 1, string(max - mix + 1, ' '));
         for (const auto& p : hull) {
             if (p.second == 1) {
-                answer[may - p.first.second][p.first.first - mix] = 'X';
+                answer[p.first.second - miy][p.first.first - mix] = 'X';
+            } else if (p.second == 2) {
+                answer[p.first.second - miy][p.first.first - mix] = '*';
+                r++;
+            } else if (p.second == 3) {
+                answer[p.first.second - miy][p.first.first - mix] = '-';
+            } else if (p.second == 4) {
+                answer[p.first.second - miy][p.first.first - mix] = 'o';
             }
         }
         for (const auto& row : answer) {
             out.printLine(row);
         }
+        out.printLine(r);*/
 	}
 };

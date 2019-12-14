@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../general.h"
+#include "arr.h"
 
 template <typename T>
 class Id {
@@ -24,8 +25,8 @@ public:
         return next;
     }
 
-    vector<T> byId() {
-        vector<T> result(next);
+    arr<T> byId() const {
+        arr<T> result(next);
         for (const auto& entry : map) {
             result[entry.second] = entry.first;
         }
