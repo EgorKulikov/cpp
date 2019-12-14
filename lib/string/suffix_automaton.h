@@ -1,14 +1,15 @@
 #pragma once
 
 #include "../general.h"
+#include "../collections/arr.h"
 
 struct SuffixAutomaton {
     int length;
     SuffixAutomaton* link;
-    vector<SuffixAutomaton*> edges;
+    arr<SuffixAutomaton*> edges;
 
     SuffixAutomaton(SuffixAutomaton* link, int length, int alphabetSize) : link(link), length(length) {
-        edges = vector<SuffixAutomaton*>(alphabetSize, nullptr);
+        edges = arr<SuffixAutomaton*>(alphabetSize, nullptr);
     }
     
     SuffixAutomaton* addLetter(SuffixAutomaton* head, int c, int alphabetSize) {

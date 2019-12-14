@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/Pieaters.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/Snowcow.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"2 2\n100 1 2\n100 1 1\n", "200\n", true, true},
+		{"5 18\n1 2\n1 3\n3 4\n3 5\n1 4 1\n2 1\n2 2\n2 3\n2 4\n2 5\n1 5 1\n2 1\n2 2\n2 3\n2 4\n2 5\n1 1 1\n2 1\n2 2\n2 3\n2 4\n2 5\n", "1\n0\n1\n1\n0\n2\n0\n2\n1\n1\n5\n1\n3\n1\n1\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -49,7 +49,7 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    Pieaters solver;
+			    Snowcow solver;
 			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;

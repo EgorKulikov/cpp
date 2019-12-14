@@ -13,7 +13,7 @@ arr2d<W> floydWarshall(Graph<Edge> graph) {
     arr2d<W> dist(n, n, inf);
     for (int i = 0; i < n; i++) {
         dist(i, i) = 0;
-        for (auto edge : graph.edges[i]) {
+        for (auto edge : graph[i]) {
             minim(dist(i, edge->to), edge->weight);
         }
     }
@@ -35,7 +35,7 @@ arri edgeDistances(Graph<Edge>& graph, int source) {
     q.push(source);
     while (!q.empty()) {
         int current = q.pop();
-        for (auto edge : graph.edges[current]) {
+        for (auto edge : graph[current]) {
             int next = edge->to;
             if (dist[next] == -1) {
                 dist[next] = dist[current] + 1;

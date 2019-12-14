@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef CPP_RATIONAL_H
-#define CPP_RATIONAL_H
-
 #include "../general.h"
 #include "numbers.h"
 

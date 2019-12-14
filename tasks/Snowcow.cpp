@@ -28,11 +28,12 @@ public:
             }
         }
         decreaseByOne(a, b);
-        Graph<BidirectionalEdge> graph(n);
+        typedef BiEdge edge;
+        Graph<edge> graph(n);
         for (int i : Range(n - 1)) {
-            graph.addEdge(new BidirectionalEdge(a[i], b[i]));
+            graph.addEdge(new edge(a[i], b[i]));
         }
-        DFSOrder<BidirectionalEdge> order(graph);
+        DFSOrder<edge> order(graph);
         unordered_map<int, set<int> > changes;
         auto sum = [](ll a, ll b) -> ll { return a + b; };
         IntervalTree<ll, ll> tree(n, sum, sum, [](ll val, ll delta, int from, int to) -> ll {

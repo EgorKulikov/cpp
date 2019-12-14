@@ -17,7 +17,7 @@ C maxFlow(Graph<Edge>& graph, int source, int destination) {
         while (!q.empty()) {
             int current = q.front();
             q.pop();
-            for (auto edge : graph.edges[current]) {
+            for (auto edge : graph[current]) {
                 if (edge->capacity != 0) {
                     int next = edge->to;
                     if (dist[next] == -1) {
@@ -36,8 +36,8 @@ C maxFlow(Graph<Edge>& graph, int source, int destination) {
             return 0;
         }
         C totalPushed = 0;
-        while (nextEdge[source] < graph.edges[source].size()) {
-            auto edge = graph.edges[source][nextEdge[source]];
+        while (nextEdge[source] < graph[source].size()) {
+            auto edge = graph[source][nextEdge[source]];
             if (edge->capacity != 0 && dist[edge->to] == dist[source] + 1) {
                 C pushed = dinicImpl(edge->to, min(flow, edge->capacity));
                 if (pushed != 0) {

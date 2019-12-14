@@ -1,7 +1,9 @@
 #pragma once
+
 #include "../general.h"
 #include "../numbers/doubles.h"
 #include "../collections/arr.h"
+#include "../collections/mdarr.h"
 
 inline bool isWhitespace(int c) {
     return isspace(c) || c == EOF;
@@ -139,17 +141,19 @@ public:
     }
 
     template<typename T>
-    vector<vector<T> > readTable(int rows, int cols) {
-        vector<vector<T> > result;
+    arr2d<T> readTable(int rows, int cols) {
+        arr2d<T> result(rows, cols);
         result.reserve(rows);
         for (int i = 0; i < rows; ++i) {
-            result.push_back(readArray<T>(cols));
+            for (int j = 0; j < cols; ++j) {
+                result(i, j) = readType<T>();
+            }
         }
         return result;
     }
 
     string readLine() {
-//        skipWhitespace();
+        skipWhitespace();
         int c = get();
         if (c == EOF) {
             throw "Input exhausted";

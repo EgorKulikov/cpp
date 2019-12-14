@@ -25,11 +25,11 @@ public:
         while (size > 0) {
             int current = stack[size - 1];
             int& cEdge = edge[current];
-            if (cEdge == graph.edges[current].size()) {
+            if (cEdge == graph[current].size()) {
                 end[current] = index;
                 size--;
             } else {
-                int next = graph.edges[current][cEdge]->to;
+                int next = graph[current][cEdge]->to;
                 if (next == last[current]) {
                     cEdge++;
                     continue;

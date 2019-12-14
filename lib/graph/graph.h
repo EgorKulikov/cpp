@@ -12,7 +12,7 @@ public:
     const int to;
     W weight;
     C capacity;
-    int id;
+    mutable int id;
 
     WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
         reverseEdge = new WeightedFlowEdge(this);
@@ -43,7 +43,7 @@ public:
     const int from;
     const int to;
     C capacity;
-    int id;
+    mutable int id;
 
     FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
         reverseEdge = new FlowEdge(this);
@@ -71,7 +71,7 @@ public:
     const int from;
     const int to;
     W weight;
-    int id;
+    mutable int id;
 
     WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
     }
@@ -81,91 +81,96 @@ public:
 };
 
 template <typename W>
-class BidirectionalWeightedEdge {
+class BiWeightedEdge {
 private:
-    BidirectionalWeightedEdge<W>* transposedEdge;
+    BiWeightedEdge<W>* transposedEdge;
 
 public:
     const int from;
     const int to;
     W weight;
-    int id;
+    mutable int id;
 
-    BidirectionalWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-        transposedEdge = new BidirectionalWeightedEdge(this);
+    BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+        transposedEdge = new BiWeightedEdge(this);
     }
 
-    BidirectionalWeightedEdge<W>* transposed() { return transposedEdge; }
-    BidirectionalWeightedEdge<W>* reverse() { return nullptr; }
+    BiWeightedEdge<W>* transposed() { return transposedEdge; }
+    BiWeightedEdge<W>* reverse() { return nullptr; }
 
 private:
-    BidirectionalWeightedEdge(BidirectionalWeightedEdge<W>* transposed) : from(transposed->to), to(transposed->from), weight(transposed->weight) {
+    BiWeightedEdge(BiWeightedEdge<W>* transposed) : from(transposed->to), to(transposed->from), weight(transposed->weight) {
         transposedEdge = transposed;
     }
 };
 
-class SimpleEdge {
+class BaseEdge {
 public:
     const int from;
     const int to;
-    int id;
+    mutable int id;
 
-    SimpleEdge(int from, int to) : from(from), to(to) {
+    BaseEdge(int from, int to) : from(from), to(to) {
     }
 
-    SimpleEdge* transposed() { return nullptr; }
-    SimpleEdge* reverse() { return nullptr; }
+    BaseEdge* transposed() { return nullptr; }
+    BaseEdge* reverse() { return nullptr; }
 };
 
-class BidirectionalEdge {
+class BiEdge {
 private:
-    BidirectionalEdge* transposedEdge;
+    BiEdge* transposedEdge;
 
 public:
     const int from;
     const int to;
-    int id;
+    mutable int id;
 
-    BidirectionalEdge(int from, int to) : from(from), to(to) {
-        transposedEdge = new BidirectionalEdge(this);
+    BiEdge(int from, int to) : from(from), to(to) {
+        transposedEdge = new BiEdge(this);
     }
 
-    BidirectionalEdge* transposed() { return transposedEdge; }
-    BidirectionalEdge* reverse() { return nullptr; }
+    BiEdge* transposed() { return transposedEdge; }
+    BiEdge* reverse() { return nullptr; }
 
 private:
-    BidirectionalEdge(BidirectionalEdge* transposed) : from(transposed->to), to(transposed->from) {
+    BiEdge(BiEdge* transposed) : from(transposed->to), to(transposed->from) {
         transposedEdge = transposed;
     }
 };
 
 template <class Edge>
 class Graph {
+    arr<vector<Edge*> > edges;
 public:
     int vertexCount;
     int edgeCount = 0;
-    vector<vector<Edge*> > edges;
 
-    Graph(int vertexCount) : vertexCount(vertexCount) {
-        edges.resize(vertexCount);
-    }
+    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vector<Edge*>()) {}
 
     void addEdge(Edge* edge) {
         edge->id = edgeCount;
         edges[edge->from].push_back(edge);
-        if (edge->reverse() != nullptr) {
-            edge->reverse()->id = edgeCount;
-            edges[edge->reverse()->from].push_back(edge->reverse());
+        Edge* reverse = edge->reverse();
+        if (reverse != nullptr) {
+            reverse->id = edgeCount;
+            edges[reverse->from].push_back(reverse);
         }
-        if (edge->transposed() != nullptr) {
-            edges[edge->transposed()->from].push_back(edge->transposed());
-            edge->transposed()->id = edgeCount;
-            if (edge->transposed()->reverse() != nullptr) {
-                edges[edge->transposed()->reverse()->from].push_back(edge->transposed()->reverse());
-                edge->transposed()->reverse()->id = edgeCount;
+        Edge* transposed = edge->transposed();
+        if (transposed != nullptr) {
+            edges[transposed->from].push_back(transposed);
+            transposed->id = edgeCount;
+            Edge* transRev = transposed->reverse();
+            if (transRev != nullptr) {
+                edges[transRev->from].push_back(transRev);
+                transRev->id = edgeCount;
             }
         }
         edgeCount++;
+    }
+
+    vector<Edge*>& operator [](int at) {
+        return edges[at];
     }
 };
 
@@ -173,5 +178,5 @@ typedef FlowEdge<ll> LongFlowEdge;
 typedef WeightedEdge<ll> LongWeightedEdge;
 typedef FlowEdge<int> IntFlowEdge;
 typedef WeightedEdge<int> IntWeightedEdge;
-typedef BidirectionalWeightedEdge<ll> LongBiWeightedEdge;
-typedef BidirectionalWeightedEdge<int> IntBiWeightedEdge;
+typedef BiWeightedEdge<ll> LongBiWeightedEdge;
+typedef BiWeightedEdge<int> IntBiWeightedEdge;

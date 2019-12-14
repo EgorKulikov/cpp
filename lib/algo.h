@@ -1,6 +1,7 @@
 #pragma once
 
 #include "general.h"
+#include "collections/arr.h"
 
 template <typename T>
 inline void unique(vector<T>& v) {
@@ -43,10 +44,24 @@ void collect(vector<T>& all, vector<T>& a, Vs&...vs) {
     collect(all, vs...);
 }
 
+template <typename T, class ...Vs>
+void collect(vector<T>& all, arr<T>& a, Vs&...vs) {
+    addAll(all, all(a));
+    collect(all, vs...);
+}
+
 void replace(const vi& all) {}
 
 template <class ...Vs>
 void replace(const vi& all, vi& a, Vs&...vs) {
+    for (int& i : a) {
+        i = lower_bound(all(all), i) - all.begin();
+    }
+    replace(all, vs...);
+}
+
+template <class ...Vs>
+void replace(const vi& all, arri& a, Vs&...vs) {
     for (int& i : a) {
         i = lower_bound(all(all), i) - all.begin();
     }

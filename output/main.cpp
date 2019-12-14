@@ -630,135 +630,425 @@ public:
 };
 
 
-template<typename T>
-inline void unique(vector<T> &v) {
-    v.resize(unique(all(v)) - v.begin());
-}
+template<typename W, typename C>
+class WeightedFlowEdge {
+private:
+    WeightedFlowEdge<W, C> *reverseEdge;
 
-arri createOrder(int n) {
-    arri order(n);
-    for (int i = 0; i < n; i++) {
-        order[i] = i;
-    }
-    return order;
-}
-
-template<typename T, typename Iterator>
-inline void addAll(vector<T> &v, Iterator begin, Iterator end) {
-    v.insert(v.end(), begin, end);
-}
-
-template<typename Collection>
-arri getQty(const Collection &arr, int length) {
-    arri res(length);
-    for (int i : arr) {
-        res[i]++;
-    }
-    return res;
-}
-
-template<typename Collection>
-arri getQty(const Collection &arr) {
-    return getQty(arr, *max_element(all(arr)) + 1);
-}
-
-template<typename T>
-void collect(vector<T> &all) {}
-
-template<typename T, class ...Vs>
-void collect(vector<T> &all, vector<T> &a, Vs &...vs) {
-    addAll(all, all(a));
-    collect(all, vs...);
-}
-
-void replace(const vi &all) {}
-
-template<class ...Vs>
-void replace(const vi &all, vi &a, Vs &...vs) {
-    for (int &i : a) {
-        i = lower_bound(all(all), i) - all.begin();
-    }
-    replace(all, vs...);
-}
-
-template<class ...Vs>
-vi compress(Vs &...vs) {
-    vi vals;
-    collect(vals, vs...);
-    sort(all(vals));
-    unique(vals);
-    replace(vals, vs...);
-    return vals;
-}
-
-
-class ReverseNumberIterator : public NumberIterator {
 public:
-    ReverseNumberIterator(int v) : NumberIterator(v) {}
+    const int from;
+    const int to;
+    W weight;
+    C capacity;
+    mutable int id;
 
-    ReverseNumberIterator &operator++() {
-        --v;
-        return *this;
+    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
+        reverseEdge = new WeightedFlowEdge(this);
+    }
+
+    WeightedFlowEdge<W, C> *transposed() { return nullptr; }
+
+    WeightedFlowEdge<W, C> *reverse() { return reverseEdge; }
+
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
+    }
+
+    C flow() const {
+        return reverseEdge->capacity;
+    }
+
+private:
+    WeightedFlowEdge(WeightedFlowEdge<W, C> *reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight),
+                                                        capacity(0) {
+        reverseEdge = reverse;
     }
 };
 
-class RevRange : pii {
+template<typename C>
+class FlowEdge {
+private:
+    FlowEdge<C> *reverseEdge;
+
 public:
-    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
+    const int from;
+    const int to;
+    C capacity;
+    mutable int id;
 
-    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
-
-    ReverseNumberIterator begin() {
-        return first;
+    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
+        reverseEdge = new FlowEdge(this);
     }
 
-    ReverseNumberIterator end() {
-        return second;
+    FlowEdge<C> *transposed() { return nullptr; }
+
+    FlowEdge<C> *reverse() { return reverseEdge; }
+
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
+    }
+
+    C flow() const {
+        return reverseEdge->capacity;
+    }
+
+private:
+    FlowEdge(FlowEdge<C> *reverse) : from(reverse->to), to(reverse->from), capacity(0) {
+        reverseEdge = reverse;
+    }
+};
+
+template<typename W>
+class WeightedEdge {
+public:
+    const int from;
+    const int to;
+    W weight;
+    mutable int id;
+
+    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+    }
+
+    WeightedEdge<W> *transposed() { return nullptr; }
+
+    WeightedEdge<W> *reverse() { return nullptr; }
+};
+
+template<typename W>
+class BiWeightedEdge {
+private:
+    BiWeightedEdge<W> *transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    W weight;
+    mutable int id;
+
+    BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+        transposedEdge = new BiWeightedEdge(this);
+    }
+
+    BiWeightedEdge<W> *transposed() { return transposedEdge; }
+
+    BiWeightedEdge<W> *reverse() { return nullptr; }
+
+private:
+    BiWeightedEdge(BiWeightedEdge<W> *transposed) : from(transposed->to), to(transposed->from),
+                                                    weight(transposed->weight) {
+        transposedEdge = transposed;
+    }
+};
+
+class BaseEdge {
+public:
+    const int from;
+    const int to;
+    mutable int id;
+
+    BaseEdge(int from, int to) : from(from), to(to) {
+    }
+
+    BaseEdge *transposed() { return nullptr; }
+
+    BaseEdge *reverse() { return nullptr; }
+};
+
+class BiEdge {
+private:
+    BiEdge *transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    mutable int id;
+
+    BiEdge(int from, int to) : from(from), to(to) {
+        transposedEdge = new BiEdge(this);
+    }
+
+    BiEdge *transposed() { return transposedEdge; }
+
+    BiEdge *reverse() { return nullptr; }
+
+private:
+    BiEdge(BiEdge *transposed) : from(transposed->to), to(transposed->from) {
+        transposedEdge = transposed;
+    }
+};
+
+template<class Edge>
+class Graph {
+    arr<vector<Edge *> > edges;
+public:
+    int vertexCount;
+    int edgeCount = 0;
+
+    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vector<Edge *>()) {}
+
+    void addEdge(Edge *edge) {
+        edge->id = edgeCount;
+        edges[edge->from].push_back(edge);
+        Edge *reverse = edge->reverse();
+        if (reverse != nullptr) {
+            reverse->id = edgeCount;
+            edges[reverse->from].push_back(reverse);
+        }
+        Edge *transposed = edge->transposed();
+        if (transposed != nullptr) {
+            edges[transposed->from].push_back(transposed);
+            transposed->id = edgeCount;
+            Edge *transRev = transposed->reverse();
+            if (transRev != nullptr) {
+                edges[transRev->from].push_back(transRev);
+                transRev->id = edgeCount;
+            }
+        }
+        edgeCount++;
+    }
+
+    vector<Edge *> &operator[](int at) {
+        return edges[at];
+    }
+};
+
+typedef FlowEdge<ll> LongFlowEdge;
+typedef WeightedEdge<ll> LongWeightedEdge;
+typedef FlowEdge<int> IntFlowEdge;
+typedef WeightedEdge<int> IntWeightedEdge;
+typedef BiWeightedEdge<ll> LongBiWeightedEdge;
+typedef BiWeightedEdge<int> IntBiWeightedEdge;
+
+
+template<typename Value, typename Delta, Value defaultValue = 0, Delta defaultDelta = 0>
+class IntervalTree {
+    const int size;
+    function<Value(Value, Value)> joinValue;
+    function<Delta(Delta, Delta)> joinDelta;
+    function<Value(Value, Delta, int, int)> accumulate;
+    function<Value(int)> initValue;
+    arr<Value> value;
+    arr<Delta> delta;
+
+    void init(int root, int left, int right) {
+        if (left + 1 == right) {
+            value[root] = initValue(left);
+        } else {
+            int mid = (left + right) >> 1;
+            init(2 * root + 1, left, mid);
+            init(2 * root + 2, mid, right);
+            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
+        }
+    }
+
+    void apply(int root, Delta dlt, int left, int right) {
+        value[root] = accumulate(value[root], dlt, left, right);
+        delta[root] = joinDelta(delta[root], dlt);
+    }
+
+    void pushDown(int root, int left, int mid, int right) {
+        apply(2 * root + 1, delta[root], left, mid);
+        apply(2 * root + 2, delta[root], mid, right);
+        delta[root] = defaultDelta;
+    }
+
+    void update(int root, int left, int right, int from, int to, Delta dlt) {
+        if (left >= from && right <= to) {
+            apply(root, dlt, left, right);
+            return;
+        }
+        if (right <= from || left >= to) {
+            return;
+        }
+        int mid = (left + right) >> 1;
+        pushDown(root, left, mid, right);
+        update(2 * root + 1, left, mid, from, to, dlt);
+        update(2 * root + 2, mid, right, from, to, dlt);
+        value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
+    }
+
+    Value query(int root, int left, int right, int from, int to) {
+        if (left >= from && right <= to) {
+            return value[root];
+        }
+        if (right <= from || left >= to) {
+            return defaultValue;
+        }
+        int mid = (left + right) >> 1;
+        pushDown(root, left, mid, right);
+        return joinValue(query(2 * root + 1, left, mid, from, to), query(2 * root + 2, mid, right, from, to));
+    }
+
+public:
+    IntervalTree(int size, function<Value(Value, Value)> joinValue,
+                 function<Delta(Delta, Delta)> joinDelta,
+                 function<Value(Value, Delta, int, int)> accumulate,
+                 function<Value(int)> initValue = [](int at) -> Value { return defaultValue; }) :
+            size(size), joinValue(joinValue), joinDelta(joinDelta), accumulate(accumulate), initValue(initValue) {
+        int vertexSize = size * 4;
+        value = arr<Value>(vertexSize);
+        delta = arr<Delta>(vertexSize, defaultDelta);
+        init(0, 0, size);
+    }
+
+    void update(int from, int to, Delta delta) {
+        update(0, 0, size, from, to, delta);
+    }
+
+    Value query(int from, int to) {
+        return query(0, 0, size, from, to);
+    }
+};
+
+template<typename Value, Value defaultValue = 0>
+class ReadOnlyIntervalTree {
+private:
+    const int size;
+    function<Value(Value, Value)> joinValue;
+    arr<Value> value;
+
+    void init(int root, int left, int right, const vector<Value> &array) {
+        if (left + 1 == right) {
+            value[root] = array[left];
+        } else {
+            int mid = (left + right) >> 1;
+            init(2 * root + 1, left, mid, array);
+            init(2 * root + 2, mid, right, array);
+            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
+        }
+    }
+
+    Value query(int root, int left, int right, int from, int to) const {
+        if (left >= from && right <= to) {
+            return value[root];
+        }
+        if (right <= from || left >= to) {
+            return defaultValue;
+        }
+        int mid = (left + right) >> 1;
+        Value lValue = query(2 * root + 1, left, mid, from, to);
+        Value rValue = query(2 * root + 2, mid, right, from, to);
+        return joinValue(lValue, rValue);
+    }
+
+public:
+    ReadOnlyIntervalTree(const arr<Value> &array, function<Value(Value, Value)> joinValue) :
+            size(array.size()), joinValue(joinValue) {
+        int vertexSize = size * 4;
+        value = arr<Value>(vertexSize);
+        init(0, 0, size, array);
+    }
+
+    Value query(int from, int to) const {
+        return query(0, 0, size, from, to);
+    }
+};
+
+
+template<class Edge>
+class DFSOrder {
+public:
+    arri position;
+    arri end;
+
+    DFSOrder(Graph<Edge> &graph, int root = 0) {
+        int count = graph.vertexCount;
+        position = arri(count);
+        end = arri(count);
+        arri edge(count, 0);
+        arri stack(count);
+        arri last(count);
+        stack[0] = root;
+        last[root] = -1;
+        int size = 1;
+        position[root] = 0;
+        int index = 0;
+        while (size > 0) {
+            int current = stack[size - 1];
+            int &cEdge = edge[current];
+            if (cEdge == graph[current].size()) {
+                end[current] = index;
+                size--;
+            } else {
+                int next = graph[current][cEdge]->to;
+                if (next == last[current]) {
+                    cEdge++;
+                    continue;
+                }
+                cEdge++;
+                position[next] = ++index;
+                last[next] = current;
+                stack[size++] = next;
+            }
+        }
     }
 };
 
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class Pieaters {
+class Snowcow {
 public:
     void solve(istream &inp, ostream &outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        int m = in.readInt();
-        arri w, l, r;
-        in.readArrays(m, w, l, r);
-        decreaseByOne(l, r);
-        auto b = arr2d<int>(n, n, 0);
-        for (int i : Range(m)) {
-            b(l[i], r[i]) = w[i];
+        int q = in.readInt();
+        arri a, b;
+        in.readArrays(n - 1, a, b);
+        arri type(q);
+        arri x(q);
+        arri c(q);
+        for (int i : Range(q)) {
+            type[i] = in.readInt();
+            x[i] = in.readInt() - 1;
+            if (type[i] == 1) {
+                c[i] = in.readInt() - 1;
+            }
         }
-        auto bb = arr3d<int>(n, n, n);
-        for (int i : RevRange(n)) {
-            for (int j : Range(i, n)) {
-                for (int k : Range(i, j + 1)) {
-                    bb(i, j, k) = max(b(i, j), max(i < n - 1 ? bb(i + 1, j, k) : 0, j > 0 ? bb(i, j - 1, k) : 0));
+        decreaseByOne(a, b);
+        typedef BiEdge edge;
+        Graph<edge> graph(n);
+        for (int i : Range(n - 1)) {
+            graph.addEdge(new edge(a[i], b[i]));
+        }
+        DFSOrder<edge> order(graph);
+        unordered_map<int, set<int> > changes;
+        auto sum = [](ll a, ll b) -> ll { return a + b; };
+        IntervalTree<ll, ll> tree(n, sum, sum, [](ll val, ll delta, int from, int to) -> ll {
+            return val + delta * (to - from);
+        });
+        arri end(n);
+        for (int i = 0; i < n; i++) {
+            end[order.position[i]] = order.end[i];
+        }
+        for (int i : Range(q)) {
+            if (type[i] == 2) {
+                out.printLine(tree.query(order.position[x[i]], order.end[x[i]] + 1));
+            } else {
+                set<int> &m = changes[c[i]];
+                auto it = m.lower_bound(order.position[x[i]]);
+                if (it != m.end() && *it == order.position[x[i]]) {
+                    continue;
                 }
+                if (it != m.begin()) {
+                    auto jit = it;
+                    jit--;
+                    if (end[*jit] >= order.position[x[i]]) {
+                        continue;
+                    }
+                }
+                while (it != m.end() && *it <= order.end[x[i]]) {
+                    tree.update(*it, end[*it] + 1, -1);
+                    it = m.erase(it);
+                }
+                tree.update(order.position[x[i]], order.end[x[i]] + 1, 1);
+                m.insert(order.position[x[i]]);
             }
         }
-        auto ans = arr2d<int>(n, n, -1);
-        function<int(int, int)> go = [&](int f, int t) -> int {
-            if (f > t) {
-                return 0;
-            }
-            int &res = ans(f, t);
-            if (res != -1) {
-                return res;
-            }
-            res = b(f, t);
-            for (int i : Range(f, t + 1)) {
-                maxim(res, bb(f, t, i) + go(f, i - 1) + go(i + 1, t));
-            }
-            return res;
-        };
-        out.printLine(go(0, n - 1));
     }
 };
 
@@ -766,7 +1056,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    Pieaters solver;
+    Snowcow solver;
     std::istream &in(std::cin);
     std::ostream &out(std::cout);
     solver.solve(in, out);
