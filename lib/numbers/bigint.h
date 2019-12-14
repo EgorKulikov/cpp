@@ -9,7 +9,7 @@ private:
     bool sign;
     vi n;
 
-    BigInt(bool sign, const vi &n) : sign(sign), n(n) {}
+    BigInt(bool sign, vi n) : sign(sign), n(move(n)) {}
 
     static bool less(const vi& a, const vi& b) {
         if (a.size() != b.size()) {

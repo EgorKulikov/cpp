@@ -141,12 +141,12 @@ private:
 
 template <class Edge>
 class Graph {
-    arr<vector<Edge*> > edges;
+    arr<vec<Edge*> > edges;
 public:
     int vertexCount;
     int edgeCount = 0;
 
-    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vector<Edge*>()) {}
+    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vec<Edge*>()) {}
 
     void addEdge(Edge* edge) {
         edge->id = edgeCount;
@@ -169,7 +169,7 @@ public:
         edgeCount++;
     }
 
-    vector<Edge*>& operator [](int at) {
+    vec<Edge*>& operator [](int at) {
         return edges[at];
     }
 };

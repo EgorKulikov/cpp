@@ -8,8 +8,8 @@ namespace prime_fft {
     modint root;
     modint reverseRoot;
     int rootPower;
-    vector<modint> aa;
-    vector<modint> bb;
+    vec<modint> aa;
+    vec<modint> bb;
 }
 
 void initPrimeFFT() {
@@ -37,7 +37,7 @@ void initPrimeFFT() {
 }
 
 namespace prime_fft {
-    void primeFFT(vector<modint>& array, bool invert, int n) {
+    void primeFFT(vec<modint>& array, bool invert, int n) {
         for (int i = 1, j = 0; i < n; ++i) {
             int bit = n >> 1;
             for (; j >= bit; bit >>= 1) {
@@ -93,8 +93,8 @@ void multiply(const It fBegin, const It fEnd, const It sBegin, const It sEnd, It
     while (resultSize < resLen) {
         resultSize *= 2;
     }
-    vector<modint>& aa = prime_fft::aa;
-    vector<modint>& bb = prime_fft::bb;
+    vec<modint>& aa = prime_fft::aa;
+    vec<modint>& bb = prime_fft::bb;
     if (aa.size() < resultSize) {
         aa.resize(resultSize);
         bb.resize(resultSize);
@@ -118,9 +118,9 @@ void multiply(const It fBegin, const It fEnd, const It sBegin, const It sEnd, It
     }
 }
 
-vector<modint> multiply(vector<modint>& first, vector<modint>& second) {
+vec<modint> multiply(vec<modint>& first, vec<modint>& second) {
     auto len = first.size() + second.size() - 1;
-    vector<modint> res(len);
+    vec<modint> res(len);
     multiply(all(first), all(second), res.begin());
     return res;
 }

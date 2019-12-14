@@ -3,7 +3,7 @@
 #include "../general.h"
 
 void iterate(ll from, ll to, function<void(ll, int)> process, int base = 10) {
-    vector<ll> power;
+    vec<ll> power;
     ll max = numeric_limits<ll>::max();
     power.push_back(1);
     while (max / power.back() >= base) {

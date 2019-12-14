@@ -4,7 +4,7 @@
 #include "collections/arr.h"
 
 template <typename T>
-inline void unique(vector<T>& v) {
+inline void unique(vec<T>& v) {
     v.resize(unique(all(v)) - v.begin());
 }
 
@@ -16,8 +16,8 @@ arri createOrder(int n) {
     return order;
 }
 
-template <typename T, typename Iterator>
-inline void addAll(vector<T>& v, Iterator begin, Iterator end) {
+template <class Collection, typename Iterator>
+inline void addAll(Collection& v, Iterator begin, Iterator end) {
     v.insert(v.end(), begin, end);
 }
 
@@ -35,17 +35,11 @@ arri getQty(const Collection& arr) {
     return getQty(arr, *max_element(all(arr)) + 1);
 }
 
-template <typename T>
-void collect(vector<T>& all) {}
+template <class Collection>
+void collect(Collection& all) {}
 
-template <typename T, class ...Vs>
-void collect(vector<T>& all, vector<T>& a, Vs&...vs) {
-    addAll(all, all(a));
-    collect(all, vs...);
-}
-
-template <typename T, class ...Vs>
-void collect(vector<T>& all, arr<T>& a, Vs&...vs) {
+template <class Collection, class ...Vs>
+void collect(Collection& all, Collection& a, Vs&...vs) {
     addAll(all, all(a));
     collect(all, vs...);
 }

@@ -37,16 +37,16 @@ public:
                 }
             }
         }
-        vector<vector<arr<modint> > > res(n + 1);
-        vector<vector<modint> > qq(n + 1);
-        res[0] = vector<arr<modint> >(1);
-        qq[0] = vector<modint>(1, 1);
+        vec<vec<arr<modint> > > res(n + 1);
+        vec<vec<modint> > qq(n + 1);
+        res[0] = vec<arr<modint> >(1);
+        qq[0] = vec<modint>(1, 1);
         auto temp = arr2d<modint>(k + 1, n, modint(0));
-        vector<modint> qtemp(k + 1);
-        vector<modint> localq(k + 1);
+        vec<modint> qtemp(k + 1);
+        vec<modint> localq(k + 1);
         for (int i = 1; i <= n; i++) {
-            res[i] = vector<arr<modint> >(min(k + 1, i * (i - 1) / 2 + 1));
-            qq[i] = vector<modint>(res[i].size());
+            res[i] = vec<arr<modint> >(min(k + 1, i * (i - 1) / 2 + 1));
+            qq[i] = vec<modint>(res[i].size());
             for (auto& row : res[i]) {
                 row = arr<modint>(i, 0);
             }

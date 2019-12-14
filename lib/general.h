@@ -1,13 +1,10 @@
 #pragma once
 
-#include <bits/stdc++.h>
-
-using namespace std;
+#include "collections/vector.h"
 
 #define all(v) (v).begin(), (v).end()
 
 typedef long long ll;
-typedef vector<int> vi;
 typedef pair<int, int> pii;
 
 const double PI = atan(1) * 4;

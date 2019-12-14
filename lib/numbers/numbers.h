@@ -2,6 +2,7 @@
 
 #include "../general.h"
 #include "modulo.h"
+#include "../collections/arr.h"
 
 template <typename T>
 T gcd(T a, T b) {

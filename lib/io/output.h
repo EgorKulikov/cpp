@@ -12,7 +12,7 @@ private:
         out << value;
     }
 
-    template<typename T> void printSingle(const vector<T>& array) {
+    template<typename T> void printSingle(const vec<T>& array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];

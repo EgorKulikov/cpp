@@ -7,14 +7,70 @@
 
 
 
+
+
+
 #include <bits/stdc++.h>
 
 using namespace std;
 
+template<typename T>
+class vec : public vector<T> {
+    typedef vector<T> parent;
+public:
+    vec() : parent() {}
+
+    explicit vec(size_t __n) : parent(__n) {}
+
+    vec(size_t __n, const T &__value) : parent(__n, __value) {}
+
+    explicit vec(const parent &__x) : parent(__x) {}
+
+    vec(const vec &__x) : parent(__x) {}
+
+    vec(vec &&__x) noexcept : parent(move(__x)) {}
+
+    vec(initializer_list<T> __l) : parent(__l) {}
+
+    template<typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
+    vec(_InputIterator __first, _InputIterator __last) : parent(__first, __last) {}
+
+    const T &operator[](size_t ind) const {
+#ifdef LOCAL
+        if (ind >= parent::size()) {
+            throw "Out of bounds";
+        }
+#endif
+        return *(parent::_M_impl._M_start + ind);
+    }
+
+    T &operator[](size_t ind) {
+#ifdef LOCAL
+        if (ind >= parent::size()) {
+            throw "Out of bounds";
+        }
+#endif
+        return *(parent::_M_impl._M_start + ind);
+    }
+
+    vec<T> &operator=(vec<T> &&__x) noexcept {
+        parent::operator=(__x);
+        return *this;
+    }
+
+    vec<T> &operator=(const vec<T> &__x) {
+        parent::operator=(__x);
+        return *this;
+    }
+
+};
+
+typedef vec<int> vi;
+
+
 #define all(v) (v).begin(), (v).end()
 
 typedef long long ll;
-typedef vector<int> vi;
 typedef pair<int, int> pii;
 
 const double PI = atan(1) * 4;
@@ -126,247 +182,6 @@ void decreaseByOne(arr<pair<T, U> > &v) {
         p.first--;
         p.second--;
     }
-}
-
-
-inline bool isWhitespace(int c) {
-    return isspace(c) || c == EOF;
-}
-
-class Input {
-private:
-    istream &in;
-    bool exhausted = false;
-
-    inline int get() {
-        if (exhausted) {
-            throw "Input exhausted";
-        }
-        int c = in.get();
-        if (c == EOF) {
-            exhausted = true;
-        }
-        return c;
-    }
-
-    template<typename T>
-    inline T readInteger() {
-        skipWhitespace();
-        int c = get();
-        int sgn = 1;
-        if (c == '-') {
-            sgn = -1;
-            c = get();
-        }
-        T res = 0;
-        do {
-            if (!isdigit(c)) {
-                throw "Number format error";
-            }
-            res *= 10;
-            res += c - '0';
-            c = get();
-        } while (!isWhitespace(c));
-        return res * sgn;
-    }
-
-    void initArrays(int n) {}
-
-    template<typename T, class...Vs>
-    void initArrays(int n, arr<T> &array, Vs &...vs) {
-        array = arr<T>(n);
-        initArrays(n, vs...);
-    }
-
-    void readImpl(int i) {}
-
-    template<typename T, class...Vs>
-    void readImpl(int i, arr<T> &arr, Vs &...vs) {
-        arr[i] = readType<T>();
-        readImpl(i, vs...);
-    }
-
-public:
-    Input(istream &in) : in(in) {};
-
-    inline void skipWhitespace() {
-        int c;
-        while (isWhitespace(c = in.peek()) && c != EOF) {
-            in.get();
-        }
-        if (c == EOF) {
-            exhausted = true;
-        }
-    }
-
-    inline int readInt() {
-        return readInteger<int>();
-    }
-
-    ll readLong() {
-        return readInteger<ll>();
-    }
-
-    string readString() {
-        skipWhitespace();
-        int c = get();
-        if (c == EOF) {
-            throw "Input exhausted";
-        }
-        vector<char> res;
-        do {
-            res.push_back(c);
-        } while (!isWhitespace(c = get()));
-        return string(all(res));
-    }
-
-    arri readIntArray(int size) {
-        return readArray<int>(size);
-    }
-
-    template<typename T>
-    T readType() {
-        throw "Operation not supported";
-    }
-
-    template<typename U, typename V>
-    pair<U, V> readType() {
-        U first = readType<U>();
-        V second = readType<V>();
-        return make_pair(first, second);
-    }
-
-    template<typename T>
-    arr<T> readArray(int n) {
-        arr<T> res(n);
-        for (int i = 0; i < n; i++) {
-            res[i] = readType<T>();
-        }
-        return res;
-    }
-
-
-    template<class...Vs>
-    void readArrays(int n, Vs &...vs) {
-        initArrays(n, vs...);
-        for (int i = 0; i < n; i++) {
-            readImpl(i, vs...);
-        }
-    }
-
-    template<typename U, typename V>
-    arr<pair<U, V> > readArray(int n) {
-        arr<pair<U, V> > res(n);
-        for (int i = 0; i < n; i++) {
-            res[i] = readType<U, V>();
-        }
-        return res;
-    }
-
-    template<typename T>
-    vector<vector<T> > readTable(int rows, int cols) {
-        vector<vector<T> > result;
-        result.reserve(rows);
-        for (int i = 0; i < rows; ++i) {
-            result.push_back(readArray<T>(cols));
-        }
-        return result;
-    }
-
-    string readLine() {
-//        skipWhitespace();
-        int c = get();
-        if (c == EOF) {
-            throw "Input exhausted";
-        }
-        int length = 0;
-        vector<char> res;
-        do {
-            res.push_back(c);
-            if (!isWhitespace(c)) {
-                length = res.size();
-            }
-            c = get();
-        } while (c != '\n' && c != '\r' && c != EOF);
-        return string(res.begin(), res.begin() + length);
-    }
-
-    double readDouble() {
-        skipWhitespace();
-        int c = get();
-        int sgn = 1;
-        if (c == '-') {
-            sgn = -1;
-            c = get();
-        }
-        double res = 0;
-        do {
-            if (tolower(c) == 'e') {
-                return sgn * res * dPower(10, readInt());
-            }
-            if (!isdigit(c)) {
-                throw "Number format error";
-            }
-            res *= 10;
-            res += c - '0';
-            c = get();
-        } while (!isWhitespace(c) && c != '.');
-        if (c == '.') {
-            double add = 0;
-            int length = 0;
-            c = get();
-            do {
-                if (tolower(c) == 'e') {
-                    return sgn * (res + add * dPower(10, -length)) * dPower(10, readInt());
-                }
-                if (!isdigit(c)) {
-                    throw "Number format error";
-                }
-                add *= 10;
-                add += c - '0';
-                length++;
-                c = get();
-            } while (!isWhitespace(c));
-            res += add * dPower(10, -length);
-        }
-        return res * sgn;
-    }
-
-    char readChar() {
-        skipWhitespace();
-        int c = get();
-        if (c == EOF) {
-            throw "Input exhausted";
-        }
-        return c;
-    }
-
-    bool isExhausted() { return exhausted; }
-};
-
-template<>
-double Input::readType() {
-    return readDouble();
-}
-
-template<>
-int Input::readType() {
-    return readInt();
-}
-
-template<>
-ll Input::readType() {
-    return readLong();
-}
-
-template<>
-char Input::readType() {
-    return readChar();
-}
-
-template<>
-string Input::readType() {
-    return readString();
 }
 
 
@@ -522,6 +337,249 @@ public:
 };
 
 
+inline bool isWhitespace(int c) {
+    return isspace(c) || c == EOF;
+}
+
+class Input {
+private:
+    istream &in;
+    bool exhausted = false;
+
+    inline int get() {
+        if (exhausted) {
+            throw "Input exhausted";
+        }
+        int c = in.get();
+        if (c == EOF) {
+            exhausted = true;
+        }
+        return c;
+    }
+
+    template<typename T>
+    inline T readInteger() {
+        skipWhitespace();
+        int c = get();
+        int sgn = 1;
+        if (c == '-') {
+            sgn = -1;
+            c = get();
+        }
+        T res = 0;
+        do {
+            if (!isdigit(c)) {
+                throw "Number format error";
+            }
+            res *= 10;
+            res += c - '0';
+            c = get();
+        } while (!isWhitespace(c));
+        return res * sgn;
+    }
+
+    void initArrays(int n) {}
+
+    template<typename T, class...Vs>
+    void initArrays(int n, arr<T> &array, Vs &...vs) {
+        array = arr<T>(n);
+        initArrays(n, vs...);
+    }
+
+    void readImpl(int i) {}
+
+    template<typename T, class...Vs>
+    void readImpl(int i, arr<T> &arr, Vs &...vs) {
+        arr[i] = readType<T>();
+        readImpl(i, vs...);
+    }
+
+public:
+    Input(istream &in) : in(in) {};
+
+    inline void skipWhitespace() {
+        int c;
+        while (isWhitespace(c = in.peek()) && c != EOF) {
+            in.get();
+        }
+        if (c == EOF) {
+            exhausted = true;
+        }
+    }
+
+    inline int readInt() {
+        return readInteger<int>();
+    }
+
+    ll readLong() {
+        return readInteger<ll>();
+    }
+
+    string readString() {
+        skipWhitespace();
+        int c = get();
+        if (c == EOF) {
+            throw "Input exhausted";
+        }
+        vec<char> res;
+        do {
+            res.push_back(c);
+        } while (!isWhitespace(c = get()));
+        return string(all(res));
+    }
+
+    arri readIntArray(int size) {
+        return readArray<int>(size);
+    }
+
+    template<typename T>
+    T readType() {
+        throw "Operation not supported";
+    }
+
+    template<typename U, typename V>
+    pair<U, V> readType() {
+        U first = readType<U>();
+        V second = readType<V>();
+        return make_pair(first, second);
+    }
+
+    template<typename T>
+    arr<T> readArray(int n) {
+        arr<T> res(n);
+        for (int i = 0; i < n; i++) {
+            res[i] = readType<T>();
+        }
+        return res;
+    }
+
+
+    template<class...Vs>
+    void readArrays(int n, Vs &...vs) {
+        initArrays(n, vs...);
+        for (int i = 0; i < n; i++) {
+            readImpl(i, vs...);
+        }
+    }
+
+    template<typename U, typename V>
+    arr<pair<U, V> > readArray(int n) {
+        arr<pair<U, V> > res(n);
+        for (int i = 0; i < n; i++) {
+            res[i] = readType<U, V>();
+        }
+        return res;
+    }
+
+    template<typename T>
+    arr2d<T> readTable(int rows, int cols) {
+        arr2d<T> result(rows, cols);
+        result.reserve(rows);
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                result(i, j) = readType<T>();
+            }
+        }
+        return result;
+    }
+
+    string readLine() {
+        skipWhitespace();
+        int c = get();
+        if (c == EOF) {
+            throw "Input exhausted";
+        }
+        int length = 0;
+        vec<char> res;
+        do {
+            res.push_back(c);
+            if (!isWhitespace(c)) {
+                length = res.size();
+            }
+            c = get();
+        } while (c != '\n' && c != '\r' && c != EOF);
+        return string(res.begin(), res.begin() + length);
+    }
+
+    double readDouble() {
+        skipWhitespace();
+        int c = get();
+        int sgn = 1;
+        if (c == '-') {
+            sgn = -1;
+            c = get();
+        }
+        double res = 0;
+        do {
+            if (tolower(c) == 'e') {
+                return sgn * res * dPower(10, readInt());
+            }
+            if (!isdigit(c)) {
+                throw "Number format error";
+            }
+            res *= 10;
+            res += c - '0';
+            c = get();
+        } while (!isWhitespace(c) && c != '.');
+        if (c == '.') {
+            double add = 0;
+            int length = 0;
+            c = get();
+            do {
+                if (tolower(c) == 'e') {
+                    return sgn * (res + add * dPower(10, -length)) * dPower(10, readInt());
+                }
+                if (!isdigit(c)) {
+                    throw "Number format error";
+                }
+                add *= 10;
+                add += c - '0';
+                length++;
+                c = get();
+            } while (!isWhitespace(c));
+            res += add * dPower(10, -length);
+        }
+        return res * sgn;
+    }
+
+    char readChar() {
+        skipWhitespace();
+        int c = get();
+        if (c == EOF) {
+            throw "Input exhausted";
+        }
+        return c;
+    }
+
+    bool isExhausted() { return exhausted; }
+};
+
+template<>
+double Input::readType() {
+    return readDouble();
+}
+
+template<>
+int Input::readType() {
+    return readInt();
+}
+
+template<>
+ll Input::readType() {
+    return readLong();
+}
+
+template<>
+char Input::readType() {
+    return readChar();
+}
+
+template<>
+string Input::readType() {
+    return readString();
+}
+
+
 class Output {
 private:
     ostream &out;
@@ -532,7 +590,7 @@ private:
     }
 
     template<typename T>
-    void printSingle(const vector<T> &array) {
+    void printSingle(const vec<T> &array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -630,425 +688,193 @@ public:
 };
 
 
-template<typename W, typename C>
-class WeightedFlowEdge {
-private:
-    WeightedFlowEdge<W, C> *reverseEdge;
+const int DX_KNIGHT[] = {2, 1, -1, -2, -2, -1, 1, 2};
+const int DY_KNIGHT[] = {1, 2, 2, 1, -1, -2, -2, -1};
+const int DX4[] = {1, 0, -1, 0};
+const int DY4[] = {0, 1, 0, -1};
+const int DX8[] = {1, 1, 1, 0, -1, -1, -1, 0};
+const int DY8[] = {-1, 0, 1, 1, 1, 0, -1, -1};
 
-public:
-    const int from;
-    const int to;
-    W weight;
-    C capacity;
-    mutable int id;
+bool isValidCell(int r, int c, int n, int m) {
+    return r >= 0 && c >= 0 && r < n && c < m;
+}
 
-    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
-        reverseEdge = new WeightedFlowEdge(this);
-    }
-
-    WeightedFlowEdge<W, C> *transposed() { return nullptr; }
-
-    WeightedFlowEdge<W, C> *reverse() { return reverseEdge; }
-
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    WeightedFlowEdge(WeightedFlowEdge<W, C> *reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight),
-                                                        capacity(0) {
-        reverseEdge = reverse;
-    }
-};
-
-template<typename C>
-class FlowEdge {
-private:
-    FlowEdge<C> *reverseEdge;
-
-public:
-    const int from;
-    const int to;
-    C capacity;
-    mutable int id;
-
-    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
-        reverseEdge = new FlowEdge(this);
-    }
-
-    FlowEdge<C> *transposed() { return nullptr; }
-
-    FlowEdge<C> *reverse() { return reverseEdge; }
-
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    FlowEdge(FlowEdge<C> *reverse) : from(reverse->to), to(reverse->from), capacity(0) {
-        reverseEdge = reverse;
-    }
-};
-
-template<typename W>
-class WeightedEdge {
-public:
-    const int from;
-    const int to;
-    W weight;
-    mutable int id;
-
-    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-    }
-
-    WeightedEdge<W> *transposed() { return nullptr; }
-
-    WeightedEdge<W> *reverse() { return nullptr; }
-};
-
-template<typename W>
-class BiWeightedEdge {
-private:
-    BiWeightedEdge<W> *transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    W weight;
-    mutable int id;
-
-    BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-        transposedEdge = new BiWeightedEdge(this);
-    }
-
-    BiWeightedEdge<W> *transposed() { return transposedEdge; }
-
-    BiWeightedEdge<W> *reverse() { return nullptr; }
-
-private:
-    BiWeightedEdge(BiWeightedEdge<W> *transposed) : from(transposed->to), to(transposed->from),
-                                                    weight(transposed->weight) {
-        transposedEdge = transposed;
-    }
-};
-
-class BaseEdge {
-public:
-    const int from;
-    const int to;
-    mutable int id;
-
-    BaseEdge(int from, int to) : from(from), to(to) {
-    }
-
-    BaseEdge *transposed() { return nullptr; }
-
-    BaseEdge *reverse() { return nullptr; }
-};
-
-class BiEdge {
-private:
-    BiEdge *transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    mutable int id;
-
-    BiEdge(int from, int to) : from(from), to(to) {
-        transposedEdge = new BiEdge(this);
-    }
-
-    BiEdge *transposed() { return transposedEdge; }
-
-    BiEdge *reverse() { return nullptr; }
-
-private:
-    BiEdge(BiEdge *transposed) : from(transposed->to), to(transposed->from) {
-        transposedEdge = transposed;
-    }
-};
-
-template<class Edge>
-class Graph {
-    arr<vector<Edge *> > edges;
-public:
-    int vertexCount;
-    int edgeCount = 0;
-
-    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vector<Edge *>()) {}
-
-    void addEdge(Edge *edge) {
-        edge->id = edgeCount;
-        edges[edge->from].push_back(edge);
-        Edge *reverse = edge->reverse();
-        if (reverse != nullptr) {
-            reverse->id = edgeCount;
-            edges[reverse->from].push_back(reverse);
-        }
-        Edge *transposed = edge->transposed();
-        if (transposed != nullptr) {
-            edges[transposed->from].push_back(transposed);
-            transposed->id = edgeCount;
-            Edge *transRev = transposed->reverse();
-            if (transRev != nullptr) {
-                edges[transRev->from].push_back(transRev);
-                transRev->id = edgeCount;
-            }
-        }
-        edgeCount++;
-    }
-
-    vector<Edge *> &operator[](int at) {
-        return edges[at];
-    }
-};
-
-typedef FlowEdge<ll> LongFlowEdge;
-typedef WeightedEdge<ll> LongWeightedEdge;
-typedef FlowEdge<int> IntFlowEdge;
-typedef WeightedEdge<int> IntWeightedEdge;
-typedef BiWeightedEdge<ll> LongBiWeightedEdge;
-typedef BiWeightedEdge<int> IntBiWeightedEdge;
-
-
-template<typename Value, typename Delta, Value defaultValue = 0, Delta defaultDelta = 0>
-class IntervalTree {
-    const int size;
-    function<Value(Value, Value)> joinValue;
-    function<Delta(Delta, Delta)> joinDelta;
-    function<Value(Value, Delta, int, int)> accumulate;
-    function<Value(int)> initValue;
-    arr<Value> value;
-    arr<Delta> delta;
-
-    void init(int root, int left, int right) {
-        if (left + 1 == right) {
-            value[root] = initValue(left);
-        } else {
-            int mid = (left + right) >> 1;
-            init(2 * root + 1, left, mid);
-            init(2 * root + 2, mid, right);
-            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
-        }
-    }
-
-    void apply(int root, Delta dlt, int left, int right) {
-        value[root] = accumulate(value[root], dlt, left, right);
-        delta[root] = joinDelta(delta[root], dlt);
-    }
-
-    void pushDown(int root, int left, int mid, int right) {
-        apply(2 * root + 1, delta[root], left, mid);
-        apply(2 * root + 2, delta[root], mid, right);
-        delta[root] = defaultDelta;
-    }
-
-    void update(int root, int left, int right, int from, int to, Delta dlt) {
-        if (left >= from && right <= to) {
-            apply(root, dlt, left, right);
-            return;
-        }
-        if (right <= from || left >= to) {
-            return;
-        }
-        int mid = (left + right) >> 1;
-        pushDown(root, left, mid, right);
-        update(2 * root + 1, left, mid, from, to, dlt);
-        update(2 * root + 2, mid, right, from, to, dlt);
-        value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
-    }
-
-    Value query(int root, int left, int right, int from, int to) {
-        if (left >= from && right <= to) {
-            return value[root];
-        }
-        if (right <= from || left >= to) {
-            return defaultValue;
-        }
-        int mid = (left + right) >> 1;
-        pushDown(root, left, mid, right);
-        return joinValue(query(2 * root + 1, left, mid, from, to), query(2 * root + 2, mid, right, from, to));
-    }
-
-public:
-    IntervalTree(int size, function<Value(Value, Value)> joinValue,
-                 function<Delta(Delta, Delta)> joinDelta,
-                 function<Value(Value, Delta, int, int)> accumulate,
-                 function<Value(int)> initValue = [](int at) -> Value { return defaultValue; }) :
-            size(size), joinValue(joinValue), joinDelta(joinDelta), accumulate(accumulate), initValue(initValue) {
-        int vertexSize = size * 4;
-        value = arr<Value>(vertexSize);
-        delta = arr<Delta>(vertexSize, defaultDelta);
-        init(0, 0, size);
-    }
-
-    void update(int from, int to, Delta delta) {
-        update(0, 0, size, from, to, delta);
-    }
-
-    Value query(int from, int to) {
-        return query(0, 0, size, from, to);
-    }
-};
-
-template<typename Value, Value defaultValue = 0>
-class ReadOnlyIntervalTree {
-private:
-    const int size;
-    function<Value(Value, Value)> joinValue;
-    arr<Value> value;
-
-    void init(int root, int left, int right, const vector<Value> &array) {
-        if (left + 1 == right) {
-            value[root] = array[left];
-        } else {
-            int mid = (left + right) >> 1;
-            init(2 * root + 1, left, mid, array);
-            init(2 * root + 2, mid, right, array);
-            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
-        }
-    }
-
-    Value query(int root, int left, int right, int from, int to) const {
-        if (left >= from && right <= to) {
-            return value[root];
-        }
-        if (right <= from || left >= to) {
-            return defaultValue;
-        }
-        int mid = (left + right) >> 1;
-        Value lValue = query(2 * root + 1, left, mid, from, to);
-        Value rValue = query(2 * root + 2, mid, right, from, to);
-        return joinValue(lValue, rValue);
-    }
-
-public:
-    ReadOnlyIntervalTree(const arr<Value> &array, function<Value(Value, Value)> joinValue) :
-            size(array.size()), joinValue(joinValue) {
-        int vertexSize = size * 4;
-        value = arr<Value>(vertexSize);
-        init(0, 0, size, array);
-    }
-
-    Value query(int from, int to) const {
-        return query(0, 0, size, from, to);
-    }
-};
-
-
-template<class Edge>
-class DFSOrder {
-public:
-    arri position;
-    arri end;
-
-    DFSOrder(Graph<Edge> &graph, int root = 0) {
-        int count = graph.vertexCount;
-        position = arri(count);
-        end = arri(count);
-        arri edge(count, 0);
-        arri stack(count);
-        arri last(count);
-        stack[0] = root;
-        last[root] = -1;
-        int size = 1;
-        position[root] = 0;
-        int index = 0;
-        while (size > 0) {
-            int current = stack[size - 1];
-            int &cEdge = edge[current];
-            if (cEdge == graph[current].size()) {
-                end[current] = index;
-                size--;
-            } else {
-                int next = graph[current][cEdge]->to;
-                if (next == last[current]) {
-                    cEdge++;
-                    continue;
-                }
-                cEdge++;
-                position[next] = ++index;
-                last[next] = current;
-                stack[size++] = next;
-            }
-        }
-    }
-};
+inline bool isSubset(int set, int subSet) {
+    return (set & subSet) == subSet;
+}
 
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class Snowcow {
+enum state {
+    FINISHED,
+    WAITING,
+    CRASHED
+};
+
+struct program {
+    map<ll, ll> mem;
+    ll at = 0;
+    ll rel = 0;
+
+    program(const vec<ll> &mem) {
+        for (int i : Range(mem.size())) {
+            this->mem[i] = mem[i];
+        }
+    }
+
+    pair<state, vec<ll> > run(const vec<ll> &inputs) {
+        vec<ll> result;
+        int inAt = 0;
+        auto get = [&](ll at, int mode) -> ll & {
+            if (mode == 0) {
+                return mem[mem[at]];
+            } else if (mode == 1) {
+                return mem[at];
+            } else {
+                return mem[mem[at] + rel];
+            }
+        };
+        while (true) {
+            int op = mem[at] % 100;
+            int firstMode = mem[at] / 100 % 10;
+            int secondMode = mem[at] / 1000 % 10;
+            int thirdMode = mem[at] / 10000 % 10;
+            if (op == 99) {
+                return make_pair(FINISHED, result);
+            }
+            if (op == 1) {
+                get(at + 3, thirdMode) = get(at + 1, firstMode) + get(at + 2, secondMode);
+                at += 4;
+            } else if (op == 2) {
+                get(at + 3, thirdMode) = get(at + 1, firstMode) * get(at + 2, secondMode);
+                at += 4;
+            } else if (op == 3) {
+                if (inAt == inputs.size()) {
+                    return make_pair(WAITING, result);
+                }
+                get(at + 1, firstMode) = inputs[inAt++];
+                at += 2;
+            } else if (op == 4) {
+                int first = firstMode ? mem[at + 1] : mem[mem[at + 1]];
+                result.push_back(get(at + 1, firstMode));
+                at += 2;
+            } else if (op == 5) {
+                if (get(at + 1, firstMode) != 0) {
+                    at = get(at + 2, secondMode);
+                } else {
+                    at += 3;
+                }
+            } else if (op == 6) {
+                if (get(at + 1, firstMode) == 0) {
+                    at = get(at + 2, secondMode);
+                } else {
+                    at += 3;
+                }
+            } else if (op == 7) {
+                get(at + 3, thirdMode) = get(at + 1, firstMode) < get(at + 2, secondMode) ? 1 : 0;
+                at += 4;
+            } else if (op == 8) {
+                get(at + 3, thirdMode) = get(at + 1, firstMode) == get(at + 2, secondMode) ? 1 : 0;
+                at += 4;
+            } else if (op == 9) {
+                rel += get(at + 1, firstMode);
+                at += 2;
+            } else {
+                return make_pair(CRASHED, result);
+            }
+        }
+    }
+};
+
+class day2 {
 public:
     void solve(istream &inp, ostream &outp) {
         Input in(inp);
         Output out(outp);
 
-        int n = in.readInt();
-        int q = in.readInt();
-        arri a, b;
-        in.readArrays(n - 1, a, b);
-        arri type(q);
-        arri x(q);
-        arri c(q);
-        for (int i : Range(q)) {
-            type[i] = in.readInt();
-            x[i] = in.readInt() - 1;
-            if (type[i] == 1) {
-                c[i] = in.readInt() - 1;
+        string input = in.readString();
+        replace(all(input), ',', ' ');
+        istringstream str(input);
+        Input sin(str);
+        vec<ll> mem;
+        while (!sin.isExhausted()) {
+            mem.push_back(sin.readLong());
+        }
+
+        auto p = program(mem);
+        vec<ll> inputs;
+        ll score = 0;
+        while (true) {
+            map<pii, int> hull;
+            auto res = p.run(inputs);
+            if (res.first == CRASHED) {
+                cerr << "******" << endl;
             }
-        }
-        decreaseByOne(a, b);
-        typedef BiEdge edge;
-        Graph<edge> graph(n);
-        for (int i : Range(n - 1)) {
-            graph.addEdge(new edge(a[i], b[i]));
-        }
-        DFSOrder<edge> order(graph);
-        unordered_map<int, set<int> > changes;
-        auto sum = [](ll a, ll b) -> ll { return a + b; };
-        IntervalTree<ll, ll> tree(n, sum, sum, [](ll val, ll delta, int from, int to) -> ll {
-            return val + delta * (to - from);
-        });
-        arri end(n);
-        for (int i = 0; i < n; i++) {
-            end[order.position[i]] = order.end[i];
-        }
-        for (int i : Range(q)) {
-            if (type[i] == 2) {
-                out.printLine(tree.query(order.position[x[i]], order.end[x[i]] + 1));
-            } else {
-                set<int> &m = changes[c[i]];
-                auto it = m.lower_bound(order.position[x[i]]);
-                if (it != m.end() && *it == order.position[x[i]]) {
+            auto vec = res.second;
+            for (int i = 0; i < vec.size(); i += 3) {
+                if (vec[i] == -1 && vec[i + 1] == 0) {
+                    score = vec[i + 2];
                     continue;
                 }
-                if (it != m.begin()) {
-                    auto jit = it;
-                    jit--;
-                    if (end[*jit] >= order.position[x[i]]) {
-                        continue;
-                    }
+                hull[make_pair(vec[i], vec[i + 1])] = vec[i + 2];
+            }
+            cerr << score << endl;
+            int paddlePos;
+            int ballPos;
+            int numBlocks = 0;
+
+            for (const auto &p : hull) {
+                if (p.second == 1) {
+                    numBlocks++;
+                } else if (p.second == 3) {
+                    paddlePos = p.first.first;
+                } else if (p.second == 4) {
+                    ballPos = p.first.first;
                 }
-                while (it != m.end() && *it <= order.end[x[i]]) {
-                    tree.update(*it, end[*it] + 1, -1);
-                    it = m.erase(it);
-                }
-                tree.update(order.position[x[i]], order.end[x[i]] + 1, 1);
-                m.insert(order.position[x[i]]);
+            }
+            inputs.clear();
+            if (ballPos < paddlePos) {
+                inputs.push_back(-1);
+            } else if (ballPos > paddlePos) {
+                inputs.push_back(1);
+            } else {
+                inputs.push_back(0);
+            }
+            if (res.first == FINISHED) {
+                break;
             }
         }
+        out.printLine(score);
+/*        auto res = p.run({});
+        int mix = numeric_limits<int>::max();
+        int max = numeric_limits<int>::min();
+        int miy = numeric_limits<int>::max();
+        int may = numeric_limits<int>::min();
+        for (const auto& p : hull) {
+            minim(mix, p.first.first);
+            maxim(max, p.first.first);
+            minim(miy, p.first.second);
+            maxim(may, p.first.second);
+        }
+        int r = 0;
+        vec<string> answer(may - miy + 1, string(max - mix + 1, ' '));
+        for (const auto& p : hull) {
+            if (p.second == 1) {
+                answer[p.first.second - miy][p.first.first - mix] = 'X';
+            } else if (p.second == 2) {
+                answer[p.first.second - miy][p.first.first - mix] = '*';
+                r++;
+            } else if (p.second == 3) {
+                answer[p.first.second - miy][p.first.first - mix] = '-';
+            } else if (p.second == 4) {
+                answer[p.first.second - miy][p.first.first - mix] = 'o';
+            }
+        }
+        for (const auto& row : answer) {
+            out.printLine(row);
+        }
+        out.printLine(r);*/
     }
 };
 
@@ -1056,7 +882,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    Snowcow solver;
+    day2 solver;
     std::istream &in(std::cin);
     std::ostream &out(std::cout);
     solver.solve(in, out);

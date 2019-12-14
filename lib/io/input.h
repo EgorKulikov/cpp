@@ -89,7 +89,7 @@ public:
         if (c == EOF) {
             throw "Input exhausted";
         }
-        vector<char> res;
+        vec<char> res;
         do {
             res.push_back(c);
         } while (!isWhitespace(c = get()));
@@ -159,7 +159,7 @@ public:
             throw "Input exhausted";
         }
         int length = 0;
-        vector<char> res;
+        vec<char> res;
         do {
             res.push_back(c);
             if (!isWhitespace(c)) {

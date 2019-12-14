@@ -2,7 +2,7 @@
 
 #include "general.h"
 
-double EPS = 1e-9;
+double eps = 1e-9;
 
 template <typename T>
 class Point {
@@ -42,8 +42,8 @@ public:
     Segment(const Point<T> &a, const Point<T> &b) : a(a), b(b), l(line(a, b)) {}
 
     bool contains(const Point<T>& c) {
-        return distance(l, c) < EPS && c.x > min(a.x, b.x) - EPS && c.x < max(a.x, b.x) + EPS &&
-            c.y > min(a.y, b.y) - EPS && c.y < max(a.y, b.y) + EPS;
+        return distance(l, c) < eps && c.x > min(a.x, b.x) - eps && c.x < max(a.x, b.x) + eps &&
+            c.y > min(a.y, b.y) - eps && c.y < max(a.y, b.y) + eps;
     }
 
     T length() {
@@ -82,18 +82,18 @@ Point<T> intersect(const Line<T>& a, const Line<T>& b) {
 }
 
 template <typename T>
-vector<Point<T> > intersect(const Circle<T>& c, const Line<T>& l) {
+vec<Point<T> > intersect(const Circle<T>& c, const Line<T>& l) {
     T dist = distance(l, c.center);
-    if (dist > c.r + EPS) {
-        return vector<Point<T> >(0);
+    if (dist > c.r + eps) {
+        return vec<Point<T> >(0);
     }
     auto perp = perpendicular(l, c.center);
     auto base = intersect(l, perp);
-    if (dist > c.r - EPS) {
-        return vector<Point<T> >(1, base);
+    if (dist > c.r - eps) {
+        return vec<Point<T> >(1, base);
     }
     T delta = sqrt(c.r * c.r - dist * dist);
-    vector<Point<T> > result;
+    vec<Point<T> > result;
     result.reserve(2);
     result.push_back(Point<T>(base.x + perp.a * delta, base.y + perp.b * delta));
     result.push_back(Point<T>(base.x - perp.a * delta, base.y - perp.b * delta));
@@ -106,10 +106,10 @@ T distance(const Point<T>& a, const Point<T>& b) {
 }
 
 template <typename T>
-vector<Point<T> > intersect(const Circle<T>& c, const Circle<T>& d) {
+vec<Point<T> > intersect(const Circle<T>& c, const Circle<T>& d) {
     T dist = distance(c, d);
-    if (dist < EPS) {
-        return vector<Point<T> >(0);
+    if (dist < eps) {
+        return vec<Point<T> >(0);
     }
     T a = 2 * (d.center.x - c.center.x);
     T b = 2 * (d.center.y - c.center.y);
@@ -119,13 +119,13 @@ vector<Point<T> > intersect(const Circle<T>& c, const Circle<T>& d) {
 }
 
 template <typename T>
-vector<Point<T> > touchingPoints(const Circle<T>& c, const Point<T>& p) {
+vec<Point<T> > touchingPoints(const Circle<T>& c, const Point<T>& p) {
     T dist = distance(c.center, p);
-    if (dist < c.r - EPS) {
-        return vector<Point<T> >(0);
+    if (dist < c.r - eps) {
+        return vec<Point<T> >(0);
     }
-    if (dist < c.r + EPS) {
-        return vector<Point<T> >(1, p);
+    if (dist < c.r + eps) {
+        return vec<Point<T> >(1, p);
     }
     Circle<T> power(p, sqrt((dist - c.r) * (dist + c.r)));
     return intersect(c, power);

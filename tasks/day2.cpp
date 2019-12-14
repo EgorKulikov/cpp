@@ -16,14 +16,14 @@ struct program {
     ll at = 0;
     ll rel = 0;
 
-    program(const vector<ll> &mem) {
+    program(const vec<ll> &mem) {
         for (int i : Range(mem.size())) {
             this->mem[i] = mem[i];
         }
     }
 
-    pair<state, vector<ll> > run(const vector<ll>& inputs) {
-        vector<ll> result;
+    pair<state, vec<ll> > run(const vec<ll>& inputs) {
+        vec<ll> result;
         int inAt = 0;
         auto get = [&](ll at, int mode) -> ll& {
             if (mode == 0) {
@@ -96,13 +96,12 @@ public:
         replace(all(input), ',', ' ');
         istringstream str(input);
         Input sin(str);
-        vector<ll> mem;
+        vec<ll> mem;
         while (!sin.isExhausted()) {
             mem.push_back(sin.readLong());
         }
-
         auto p = program(mem);
-        vector<ll> inputs;
+        vec<ll> inputs;
         ll score = 0;
         while (true) {
             map<pii, int> hull;
@@ -157,7 +156,7 @@ public:
             maxim(may, p.first.second);
         }
         int r = 0;
-        vector<string> answer(may - miy + 1, string(max - mix + 1, ' '));
+        vec<string> answer(may - miy + 1, string(max - mix + 1, ' '));
         for (const auto& p : hull) {
             if (p.second == 1) {
                 answer[p.first.second - miy][p.first.first - mix] = 'X';
