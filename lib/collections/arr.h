@@ -11,14 +11,41 @@ public:
     arr() : b(nullptr), e(nullptr), n(0) {}
 
     arr(int n) : n(n) {
-        b = new T[n];
-        e = b + n;
+#ifdef LOCAL
+        if (n < 0) {
+            throw "bad alloc";
+        }
+#endif
+        if (n > 0) {
+            b = new T[n];
+            e = b + n;
+        } else {
+            b = e = nullptr;
+        }
     }
 
     arr(int n, const T& init) : n(n) {
-        b = new T[n];
-        e = b + n;
-        fill(b, e, init);
+#ifdef LOCAL
+        if (n < 0) {
+            throw "bad alloc";
+        }
+#endif
+        if (n > 0) {
+            b = new T[n];
+            e = b + n;
+            fill(b, e, init);
+        } else {
+            b = e = nullptr;
+        }
+    }
+    arr(initializer_list<T> l) : n(l.size()) {
+        if (n == 0) {
+            b = e = nullptr;
+        } else {
+            b = new T[l.size()];
+            e = b + n;
+            copy(all(l), b);
+        }
     }
 
     arr(T* b, int n) : b(b), e(b + n), n(n) {}

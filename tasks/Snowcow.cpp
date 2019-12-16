@@ -20,7 +20,7 @@ public:
         arri type(q);
         arri x(q);
         arri c(q);
-        for (int i : Range(q)) {
+        for (int i : range(q)) {
             type[i] = in.readInt();
             x[i] = in.readInt() - 1;
             if (type[i] == 1) {
@@ -30,7 +30,7 @@ public:
         decreaseByOne(a, b);
         typedef BiEdge edge;
         Graph<edge> graph(n);
-        for (int i : Range(n - 1)) {
+        for (int i : range(n - 1)) {
             graph.addEdge(new edge(a[i], b[i]));
         }
         DFSOrder<edge> order(graph);
@@ -43,7 +43,7 @@ public:
         for (int i = 0; i < n; i++) {
             end[order.position[i]] = order.end[i];
         }
-        for (int i : Range(q)) {
+        for (int i : range(q)) {
             if (type[i] == 2) {
                 out.printLine(tree.query(order.position[x[i]], order.end[x[i]] + 1));
             } else {

@@ -6,7 +6,7 @@ add_executable(testrunner testrunner/main.cpp)
 file(GLOB TASKS "tasks/*.cpp")
 file(GLOB_RECURSE HEADERS "lib/*.h" )
 
-ADD_DEFINITIONS(-std=c++14)
+ADD_DEFINITIONS(-std=c++14 -Wall -Wextra -Wno-sign-compare)
 
 add_executable(test ${TASKS} ${HEADERS})
 #add_executable(direct direct/main.c)

@@ -13,11 +13,11 @@ public:
     int operator*() { return v; }
 };
 
-class Range : pii {
+class range : pii {
 public:
-    Range(int begin, int end) : pii(begin, max(begin, end)) {}
+    range(int begin, int end) : pii(begin, max(begin, end)) {}
 
-    Range(int n) : pii(0, max(0, n)) {}
+    range(int n) : pii(0, max(0, n)) {}
 
     NumberIterator begin() {
         return first;

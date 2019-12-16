@@ -2,6 +2,7 @@
 #include "../lib/io/output.h"
 #include "../lib/range/range.h"
 #include "../lib/misc.h"
+#include "../lib/collections/queue.h"
 
 //#pragma comment(linker, "/STACK:200000000")
 
@@ -17,7 +18,7 @@ struct program {
     ll rel = 0;
 
     program(const vec<ll> &mem) {
-        for (int i : Range(mem.size())) {
+        for (int i : range(mem.size())) {
             this->mem[i] = mem[i];
         }
     }
@@ -55,7 +56,6 @@ struct program {
                 get(at + 1, firstMode) = inputs[inAt++];
                 at += 2;
             } else if (op == 4) {
-                int first = firstMode ? mem[at + 1] : mem[mem[at + 1]];
                 result.push_back(get(at + 1, firstMode));
                 at += 2;
             } else if (op == 5) {
@@ -101,77 +101,97 @@ public:
             mem.push_back(sin.readLong());
         }
         auto p = program(mem);
-        vec<ll> inputs;
-        ll score = 0;
-        while (true) {
-            map<pii, int> hull;
-            auto res = p.run(inputs);
-            if (res.first == CRASHED) {
-                cerr << "******" << endl;
+        arri comm = {4, 1, 3, 2};
+        int x = 0;
+        int y = 0;
+        map<pii, char> m;
+        int dist = 0;
+        vi order;
+        m[{0, 0}] = 's';
+        int ex, ey;
+        auto printMap = [&]() {
+            int mix = numeric_limits<int>::max();
+            int max = numeric_limits<int>::min();
+            int miy = numeric_limits<int>::max();
+            int may = numeric_limits<int>::min();
+            for (const auto& p : m) {
+                minim(mix, p.first.first);
+                maxim(max, p.first.first);
+                minim(miy, p.first.second);
+                maxim(may, p.first.second);
             }
-            auto vec = res.second;
-            for (int i = 0; i < vec.size(); i += 3) {
-                if (vec[i] == -1 && vec[i + 1] == 0) {
-                    score = vec[i + 2];
+            vec<string> answer(may - miy + 1, string(max - mix + 1, '?'));
+            for (const auto& p : m) {
+                answer[p.first.second - miy][p.first.first - mix] = p.second;
+            }
+            for (const auto& row : answer) {
+                out.printLine(row);
+            }
+        };
+        while (true) {
+            bool move = false;
+            for (int i : range(4)) {
+                int nx = x + DX4[i];
+                int ny = y + DY4[i];
+                if (m.count({nx, ny}) == 0) {
+                    auto pair = p.run({comm[i]});
+                    if (pair.first != WAITING || pair.second.size() != 1) {
+                        cerr << "********" << endl;
+                    }
+                    int res = pair.second[0];
+                    if (res == 0) {
+                        m[{nx, ny}] = '#';
+                        continue;
+                    }
+                    if (res == 2) {
+                        m[{nx, ny}] = 't';
+                        cerr << dist + 1 << endl;
+//                        out.printLine(dist + 1);
+                        ex = nx;
+                        ey = ny;
+                    } else {
+                        m[{nx, ny}] = '.';
+                    }
+                    order.push_back(i);
+                    dist++;
+                    x = nx;
+                    y = ny;
+                    move = true;
+                    break;
+                }
+            }
+            if (!move) {
+                if (order.empty()) {
+                    printMap();
+                    break;
+                }
+                int i = order.back();
+                x -= DX4[i];
+                y -= DY4[i];
+                p.run({comm[i ^ 2]});
+                dist--;
+                order.pop_back();
+            }
+        }
+        que<pii> q;
+        q.push({ex, ey});
+        map<pii, int> dst;
+        dst[{ex, ey}] = 0;
+        int answer = 0;
+        while (!q.empty()) {
+            int x, y;
+            tie(x, y) = q.pop();
+            maxim(answer, dst[{x, y}]);
+            for (int i : range(4)) {
+                int nx = x + DX4[i];
+                int ny = y + DY4[i];
+                if (m[{nx, ny}] == '#' || dst.count({nx, ny})) {
                     continue;
                 }
-                hull[make_pair(vec[i], vec[i + 1])] = vec[i + 2];
-            }
-            cerr << score << endl;
-            int paddlePos;
-            int ballPos;
-            int numBlocks = 0;
-
-            for (const auto& p : hull) {
-                if (p.second == 1) {
-                    numBlocks++;
-                } else if (p.second == 3) {
-                    paddlePos = p.first.first;
-                } else if (p.second == 4) {
-                    ballPos = p.first.first;
-                }
-            }
-            inputs.clear();
-            if (ballPos < paddlePos) {
-                inputs.push_back(-1);
-            } else if (ballPos > paddlePos) {
-                inputs.push_back(1);
-            } else {
-                inputs.push_back(0);
-            }
-            if (res.first == FINISHED) {
-                break;
+                dst[{nx, ny}] = dst[{x, y}] + 1;
+                q.push({nx, ny});
             }
         }
-        out.printLine(score);
-/*        auto res = p.run({});
-        int mix = numeric_limits<int>::max();
-        int max = numeric_limits<int>::min();
-        int miy = numeric_limits<int>::max();
-        int may = numeric_limits<int>::min();
-        for (const auto& p : hull) {
-            minim(mix, p.first.first);
-            maxim(max, p.first.first);
-            minim(miy, p.first.second);
-            maxim(may, p.first.second);
-        }
-        int r = 0;
-        vec<string> answer(may - miy + 1, string(max - mix + 1, ' '));
-        for (const auto& p : hull) {
-            if (p.second == 1) {
-                answer[p.first.second - miy][p.first.first - mix] = 'X';
-            } else if (p.second == 2) {
-                answer[p.first.second - miy][p.first.first - mix] = '*';
-                r++;
-            } else if (p.second == 3) {
-                answer[p.first.second - miy][p.first.first - mix] = '-';
-            } else if (p.second == 4) {
-                answer[p.first.second - miy][p.first.first - mix] = 'o';
-            }
-        }
-        for (const auto& row : answer) {
-            out.printLine(row);
-        }
-        out.printLine(r);*/
+        out.printLine(answer);
 	}
 };

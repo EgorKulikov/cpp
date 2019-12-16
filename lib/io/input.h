@@ -46,7 +46,7 @@ private:
         return res * sgn;
     }
 
-    void initArrays(int n) {}
+    void initArrays(int) {}
 
     template <typename T, class...Vs>
     void initArrays(int n, arr<T>& array, Vs&...vs) {
@@ -54,7 +54,7 @@ private:
         initArrays(n, vs...);
     }
 
-    void readImpl(int i) {}
+    void readImpl(int) {}
 
     template <typename T, class...Vs>
     void readImpl(int i, arr<T>& arr, Vs&...vs) {
@@ -143,7 +143,6 @@ public:
     template<typename T>
     arr2d<T> readTable(int rows, int cols) {
         arr2d<T> result(rows, cols);
-        result.reserve(rows);
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
                 result(i, j) = readType<T>();

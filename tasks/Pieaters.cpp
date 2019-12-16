@@ -18,13 +18,13 @@ public:
         in.readArrays(m, w, l, r);
         decreaseByOne(l, r);
         auto b = arr2d<int>(n, n, 0);
-        for (int i : Range(m)) {
+        for (int i : range(m)) {
             b(l[i], r[i]) = w[i];
         }
         auto bb = arr3d<int>(n, n, n);
         for (int i : RevRange(n)) {
-            for (int j : Range(i, n)) {
-                for (int k : Range(i, j + 1)) {
+            for (int j : range(i, n)) {
+                for (int k : range(i, j + 1)) {
                     bb(i, j, k) = max(b(i, j), max(i < n - 1 ? bb(i + 1, j, k) : 0, j > 0 ? bb(i, j - 1, k) : 0));
                 }
             }
@@ -39,7 +39,7 @@ public:
                 return res;
             }
             res = b(f, t);
-            for (int i : Range(f, t + 1)) {
+            for (int i : range(f, t + 1)) {
                 maxim(res, bb(f, t, i) + go(f, i - 1) + go(i + 1, t));
             }
             return res;

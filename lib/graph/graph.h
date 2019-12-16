@@ -141,11 +141,13 @@ private:
 
 template <class Edge>
 class Graph {
-    arr<vec<Edge*> > edges;
 public:
     int vertexCount;
     int edgeCount = 0;
+private:
+    arr<vec<Edge*> > edges;
 
+public:
     Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vec<Edge*>()) {}
 
     void addEdge(Edge* edge) {
