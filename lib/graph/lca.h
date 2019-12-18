@@ -13,7 +13,7 @@ private:
     arri level;
 
 public:
-    LCA(const Graph<Edge>& graph, int root = 0) {
+    LCA(Graph<Edge>& graph, int root = 0) {
         int vertexCount = graph.vertexCount;
         order = arri(2 * vertexCount - 1);
         position = arri(vertexCount, -1);

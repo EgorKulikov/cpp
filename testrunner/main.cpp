@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/dec15.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/FreaksOfTheNumberUniverse.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"5\nmerry christmas\nhappy new year\njana jylynyzben\nunyaka omusha omuhle\nheri ya mwaka mpya", "11", true, true},{"4\nhappy holidays\nschastlivyh prazdnikov\nglada helgdagar\ngwyliau hapus", "7", true, true},{"3\nmore champagne\nand the fireworks are through\nhere we are me and you", "11", true, true},{"3\ntugas ini sudah\njawaban dalam tugas ini\nditambah satu", "10", true, true},
+		{"2\n1 2\n", "NO\n", true, true},{"8\n1 2\n2 3\n1 4\n3 6\n7 3\n1 5\n8 3\n", "YES\n2\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -49,7 +49,7 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    dec15 solver;
+			    FreaksOfTheNumberUniverse solver;
 			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;

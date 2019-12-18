@@ -2,8 +2,8 @@
 
 #include "../general.h"
 
-vec<bool> primalityTable(int n) {
-    vec<bool> res(n, true);
+vector<bool> primalityTable(int n) {
+    vector<bool> res(n, true);
     if (n > 0) {
         res[0] = false;
     }

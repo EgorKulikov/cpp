@@ -36,7 +36,7 @@ arri getQty(const Collection& arr) {
 }
 
 template <class Collection>
-void collect(Collection& all) {}
+void collect(Collection&) {}
 
 template <class Collection, class ...Vs>
 void collect(Collection& all, Collection& a, Vs&...vs) {
@@ -44,7 +44,7 @@ void collect(Collection& all, Collection& a, Vs&...vs) {
     collect(all, vs...);
 }
 
-void replace(const vi& all) {}
+void replace(const vi&) {}
 
 template <class ...Vs>
 void replace(const vi& all, vi& a, Vs&...vs) {

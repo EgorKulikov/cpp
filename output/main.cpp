@@ -720,38 +720,311 @@ public:
 };
 
 
+vector<bool> primalityTable(int n) {
+    vector<bool> res(n, true);
+    if (n > 0) {
+        res[0] = false;
+    }
+    if (n > 1) {
+        res[1] = false;
+    }
+    for (int i = 2; i * i < n; i++) {
+        if (res[i]) {
+            for (int j = i * i; j < n; j += i) {
+                res[j] = false;
+            }
+        }
+    }
+    return res;
+}
+
+vi primes(int n) {
+    auto isPrime = primalityTable(n);
+    vi res;
+    for (int i = 0; i < n; ++i) {
+        if (isPrime[i]) {
+            res.push_back(i);
+        }
+    }
+    return res;
+}
+
+
+template<typename W, typename C>
+class WeightedFlowEdge {
+private:
+    WeightedFlowEdge<W, C> *reverseEdge;
+
+public:
+    const int from;
+    const int to;
+    W weight;
+    C capacity;
+    mutable int id;
+
+    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
+        reverseEdge = new WeightedFlowEdge(this);
+    }
+
+    WeightedFlowEdge<W, C> *transposed() { return nullptr; }
+
+    WeightedFlowEdge<W, C> *reverse() { return reverseEdge; }
+
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
+    }
+
+    C flow() const {
+        return reverseEdge->capacity;
+    }
+
+private:
+    WeightedFlowEdge(WeightedFlowEdge<W, C> *reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight),
+                                                        capacity(0) {
+        reverseEdge = reverse;
+    }
+};
+
+template<typename C>
+class FlowEdge {
+private:
+    FlowEdge<C> *reverseEdge;
+
+public:
+    const int from;
+    const int to;
+    C capacity;
+    mutable int id;
+
+    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
+        reverseEdge = new FlowEdge(this);
+    }
+
+    FlowEdge<C> *transposed() { return nullptr; }
+
+    FlowEdge<C> *reverse() { return reverseEdge; }
+
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
+    }
+
+    C flow() const {
+        return reverseEdge->capacity;
+    }
+
+private:
+    FlowEdge(FlowEdge<C> *reverse) : from(reverse->to), to(reverse->from), capacity(0) {
+        reverseEdge = reverse;
+    }
+};
+
+template<typename W>
+class WeightedEdge {
+public:
+    const int from;
+    const int to;
+    W weight;
+    mutable int id;
+
+    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+    }
+
+    WeightedEdge<W> *transposed() { return nullptr; }
+
+    WeightedEdge<W> *reverse() { return nullptr; }
+};
+
+template<typename W>
+class BiWeightedEdge {
+private:
+    BiWeightedEdge<W> *transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    W weight;
+    mutable int id;
+
+    BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+        transposedEdge = new BiWeightedEdge(this);
+    }
+
+    BiWeightedEdge<W> *transposed() { return transposedEdge; }
+
+    BiWeightedEdge<W> *reverse() { return nullptr; }
+
+private:
+    BiWeightedEdge(BiWeightedEdge<W> *transposed) : from(transposed->to), to(transposed->from),
+                                                    weight(transposed->weight) {
+        transposedEdge = transposed;
+    }
+};
+
+class BaseEdge {
+public:
+    const int from;
+    const int to;
+    mutable int id;
+
+    BaseEdge(int from, int to) : from(from), to(to) {
+    }
+
+    BaseEdge *transposed() { return nullptr; }
+
+    BaseEdge *reverse() { return nullptr; }
+};
+
+class BiEdge {
+private:
+    BiEdge *transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    mutable int id;
+
+    BiEdge(int from, int to) : from(from), to(to) {
+        transposedEdge = new BiEdge(this);
+    }
+
+    BiEdge *transposed() { return transposedEdge; }
+
+    BiEdge *reverse() { return nullptr; }
+
+private:
+    BiEdge(BiEdge *transposed) : from(transposed->to), to(transposed->from) {
+        transposedEdge = transposed;
+    }
+};
+
+template<class Edge>
+class Graph {
+public:
+    int vertexCount;
+    int edgeCount = 0;
+private:
+    arr<vec<Edge *> > edges;
+
+public:
+    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vec<Edge *>()) {}
+
+    void addEdge(Edge *edge) {
+        edge->id = edgeCount;
+        edges[edge->from].push_back(edge);
+        Edge *reverse = edge->reverse();
+        if (reverse != nullptr) {
+            reverse->id = edgeCount;
+            edges[reverse->from].push_back(reverse);
+        }
+        Edge *transposed = edge->transposed();
+        if (transposed != nullptr) {
+            edges[transposed->from].push_back(transposed);
+            transposed->id = edgeCount;
+            Edge *transRev = transposed->reverse();
+            if (transRev != nullptr) {
+                edges[transRev->from].push_back(transRev);
+                transRev->id = edgeCount;
+            }
+        }
+        edgeCount++;
+    }
+
+    vec<Edge *> &operator[](int at) {
+        return edges[at];
+    }
+};
+
+typedef FlowEdge<ll> LongFlowEdge;
+typedef WeightedEdge<ll> LongWeightedEdge;
+typedef FlowEdge<int> IntFlowEdge;
+typedef WeightedEdge<int> IntWeightedEdge;
+typedef BiWeightedEdge<ll> LongBiWeightedEdge;
+typedef BiWeightedEdge<int> IntBiWeightedEdge;
+
+
 //#pragma comment(linker, "/STACK:200000000")
 
-class dec15 {
+class FreaksOfTheNumberUniverse {
 public:
     void solve(istream &inp, ostream &outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        arr<string> s(n);
-        for (int i : range(n)) {
-            s[i] = in.readLine();
-        }
+        arri a, b;
+        in.readArrays(n - 1, a, b);
+        decreaseByOne(a, b);
 
-        arri q(26, 0);
-        int sum = 0;
-        for (const auto &ss : s) {
-            arri qq(26, 0);
-            int ssum = 0;
-            for (char c : ss) {
-                if (c != ' ') {
-                    q[c - 'a']++;
-                    qq[c - 'a']++;
-                    sum += c - 'a';
-                    ssum += c - 'a';
-                }
-            }
-            out.printLine(ssum, ssum % 26, accumulate(all(qq), 0), 26 - count(all(qq), 0));
-            out.printLine(qq);
+        arri deg(n, 0);
+        for (int i : a) {
+            deg[i]++;
         }
-        out.printLine(sum, sum % 26, accumulate(all(q), 0), 26 - count(all(q), 0));
-        out.printLine(q);
+        for (int i : b) {
+            deg[i]++;
+        }
+        auto isp = primalityTable(n);
+        vi roots;
+        vi mandRoots;
+        for (int i : range(n)) {
+            if (isp[deg[i]]) {
+                roots.push_back(i);
+                if (!isp[deg[i] - 1]) {
+                    mandRoots.push_back(i);
+                }
+            } else if (deg[i] != 1 && !isp[deg[i] - 1]) {
+                out.printLine("NO");
+                return;
+            }
+        }
+        if (mandRoots.size() > 1) {
+            out.printLine("NO");
+            return;
+        }
+        if (mandRoots.size() == 1) {
+            roots = mandRoots;
+        }
+        using edge = BiEdge;
+        Graph<edge> graph(n);
+        for (int i : range(n - 1)) {
+            graph.addEdge(new edge(a[i], b[i]));
+        }
+        for (int i : roots) {
+            unordered_map<int, unordered_set<int>> m;
+            bool ok = true;
+            int maxLevel = 0;
+            function<void(int, int, int)> dfs = [&](int vert, int last, int level) {
+                maxim(maxLevel, level);
+                int cdeg = deg[vert];
+                if (last != -1) {
+                    cdeg--;
+                }
+                if (cdeg != 0) {
+                    if (m[level].count(cdeg)) {
+                        ok = false;
+                        return;
+                    }
+                    m[level].insert(cdeg);
+                }
+                for (edge *e : graph[vert]) {
+                    int next = e->to;
+                    if (last != next) {
+                        dfs(next, vert, level + 1);
+                        if (!ok) {
+                            return;
+                        }
+                    }
+                }
+            };
+            dfs(i, -1, 0);
+            if (ok) {
+                out.printLine("YES");
+                out.printLine(maxLevel);
+                return;
+            }
+        }
+        out.printLine("NO");
     }
 };
 
@@ -759,7 +1032,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    dec15 solver;
+    FreaksOfTheNumberUniverse solver;
     std::istream &in(std::cin);
     std::ostream &out(std::cout);
     solver.solve(in, out);

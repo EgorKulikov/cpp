@@ -101,97 +101,79 @@ public:
             mem.push_back(sin.readLong());
         }
         auto p = program(mem);
-        arri comm = {4, 1, 3, 2};
-        int x = 0;
-        int y = 0;
-        map<pii, char> m;
-        int dist = 0;
-        vi order;
-        m[{0, 0}] = 's';
-        int ex, ey;
-        auto printMap = [&]() {
-            int mix = numeric_limits<int>::max();
-            int max = numeric_limits<int>::min();
-            int miy = numeric_limits<int>::max();
-            int may = numeric_limits<int>::min();
-            for (const auto& p : m) {
-                minim(mix, p.first.first);
-                maxim(max, p.first.first);
-                minim(miy, p.first.second);
-                maxim(may, p.first.second);
+        arr<string> progr = {"A,B,A,C,A,B,C,B,C,B", "R,10,R,10,R,6,R,4", "R,10,R,10,L,4", "R,4,L,4,L,10,L,10", "n"};
+        vec<ll> inps;
+        for (const auto& s : progr) {
+            for (char c : s) {
+                inps.push_back(c);
             }
-            vec<string> answer(may - miy + 1, string(max - mix + 1, '?'));
-            for (const auto& p : m) {
-                answer[p.first.second - miy][p.first.first - mix] = p.second;
+            inps.push_back(10);
+        }
+        auto res = p.run(inps);
+        if (res.first != FINISHED) {
+            cerr << "******" << endl;
+        }
+        cerr << res.second.size() << endl;
+        vec<vec<char>> map(1);
+        for (ll i : res.second) {
+            if (i >= 256) {
+                continue;
             }
-            for (const auto& row : answer) {
-                out.printLine(row);
+            if (i == 10) {
+                map.emplace_back();
+            } else {
+                map.back().push_back(char(i));
             }
-        };
+        }
+        while (map.back().empty()) {
+            map.pop_back();
+        }
+        int n = 39;
+        int m = map[0].size();
+        int sr = -1, sc;
+        for (int i : range(n)) {
+            for (int j : range(m)) {
+                if (map[i][j] == '^') {
+                    sr = i;
+                    sc = j;
+                }
+            }
+        }
+        int dir = 2;
+        vi program;
+        int r = sr;
+        int c = sc;
         while (true) {
-            bool move = false;
-            for (int i : range(4)) {
-                int nx = x + DX4[i];
-                int ny = y + DY4[i];
-                if (m.count({nx, ny}) == 0) {
-                    auto pair = p.run({comm[i]});
-                    if (pair.first != WAITING || pair.second.size() != 1) {
-                        cerr << "********" << endl;
-                    }
-                    int res = pair.second[0];
-                    if (res == 0) {
-                        m[{nx, ny}] = '#';
-                        continue;
-                    }
-                    if (res == 2) {
-                        m[{nx, ny}] = 't';
-                        cerr << dist + 1 << endl;
-//                        out.printLine(dist + 1);
-                        ex = nx;
-                        ey = ny;
-                    } else {
-                        m[{nx, ny}] = '.';
-                    }
-                    order.push_back(i);
-                    dist++;
-                    x = nx;
-                    y = ny;
-                    move = true;
-                    break;
-                }
+            int nr = r + DX4[dir];
+            int nc = c + DY4[dir];
+            if (isValidCell(nr, nc, n, m) && map[nr][nc] == '#') {
+                program.back()++;
+                r = nr;
+                c = nc;
+                continue;
             }
-            if (!move) {
-                if (order.empty()) {
-                    printMap();
-                    break;
-                }
-                int i = order.back();
-                x -= DX4[i];
-                y -= DY4[i];
-                p.run({comm[i ^ 2]});
-                dist--;
-                order.pop_back();
+            nr = r + DX4[(dir + 3) & 3];
+            nc = c + DY4[(dir + 3) & 3];
+            if (isValidCell(nr, nc, n, m) && map[nr][nc] == '#') {
+                program.push_back(-1);
+                program.push_back(0);
+                dir = (dir + 3) & 3;
+                continue;
             }
+            nr = r + DX4[(dir + 1) & 3];
+            nc = c + DY4[(dir + 1) & 3];
+            if (isValidCell(nr, nc, n, m) && map[nr][nc] == '#') {
+                program.push_back(-2);
+                program.push_back(0);
+                dir = (dir + 1) & 3;
+                continue;
+            }
+            break;
         }
-        que<pii> q;
-        q.push({ex, ey});
-        map<pii, int> dst;
-        dst[{ex, ey}] = 0;
-        int answer = 0;
-        while (!q.empty()) {
-            int x, y;
-            tie(x, y) = q.pop();
-            maxim(answer, dst[{x, y}]);
-            for (int i : range(4)) {
-                int nx = x + DX4[i];
-                int ny = y + DY4[i];
-                if (m[{nx, ny}] == '#' || dst.count({nx, ny})) {
-                    continue;
-                }
-                dst[{nx, ny}] = dst[{x, y}] + 1;
-                q.push({nx, ny});
-            }
+        for (const auto& row : map) {
+            out.printLine(string(all(row)));
         }
-        out.printLine(answer);
+        out.printLine(program);
+        out.printLine(res.second.back());
 	}
 };

@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Problem 1. Greedy Pie Eaters" type="name.admitriev.jhelper.configuration.TaskConfigurationType" factoryName="Task" className="Pieaters" cppPath="tasks/Pieaters.cpp" inputType="CUSTOM" inputFile="pieaters.in" outputType="CUSTOM" outputFile="pieaters.out" testType="SINGLE">
-    <tests>
-      <test input="2 2&#10;100 1 2&#10;100 1 1&#10;" output="200&#10;" active="true" />
-    </tests>
-    <method v="2" />
-  </configuration>
-</component>

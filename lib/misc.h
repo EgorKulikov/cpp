@@ -14,3 +14,11 @@ bool isValidCell(int r, int c, int n, int m) {
 inline bool isSubset(int set, int subSet) {
     return (set & subSet) == subSet;
 }
+
+inline int bitCount(int x) {
+    return __builtin_popcount(x);
+}
+
+inline int bitCount(ll x) {
+    return __builtin_popcountll(x);
+}

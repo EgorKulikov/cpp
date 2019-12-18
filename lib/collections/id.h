@@ -3,9 +3,9 @@
 #include "../general.h"
 #include "arr.h"
 
-template <typename T>
+template <typename T, class Map = unordered_map<T, int>>
 class Id {
-    unordered_map<T, int> map;
+    Map map;
     int next = 0;
 
 public:

@@ -90,7 +90,7 @@ private:
     function<Value(Value, Value)> joinValue;
     arr<Value> value;
 
-    void init(int root, int left, int right, const vec<Value>& array) {
+    void init(int root, int left, int right, const arr<Value>& array) {
         if (left + 1 == right) {
             value[root] = array[left];
         } else {
