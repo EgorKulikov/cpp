@@ -4,19 +4,30 @@
 
 template<typename T>
 class que : public queue<T> {
+    using parent = queue<T>;
 public:
-    que() : queue<T>() {}
-    que(const que<T>& q) : queue<T>(q) {}
-    que(que<T>&& q) noexcept : queue<T>(move(q)) {}
+    que() : parent() {}
+    que(const que<T>& q) : parent(q) {}
+    que(que<T>&& q) noexcept : parent(move(q)) {}
 
     T pop() {
 #ifdef LOCAL
-        if (queue<T>::empty()) {
+        if (parent::empty()) {
             throw "Pop on empty queue";
         }
 #endif
-        T res = queue<T>::front();
-        queue<T>::pop();
+        T res = parent::front();
+        parent::pop();
         return res;
+    }
+
+    que<T>& operator =(que<T>&& __x) noexcept {
+        parent::operator=(__x);
+        return *this;
+    }
+
+    que<T>& operator =(const que<T>& __x) {
+        parent::operator=(__x);
+        return *this;
     }
 };

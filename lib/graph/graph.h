@@ -12,7 +12,7 @@ public:
     const int to;
     W weight;
     C capacity;
-    mutable int id;
+    int id;
 
     WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
         reverseEdge = new WeightedFlowEdge(this);
@@ -43,7 +43,7 @@ public:
     const int from;
     const int to;
     C capacity;
-    mutable int id;
+    int id;
 
     FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
         reverseEdge = new FlowEdge(this);
@@ -71,7 +71,7 @@ public:
     const int from;
     const int to;
     W weight;
-    mutable int id;
+    int id;
 
     WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
     }
@@ -89,7 +89,7 @@ public:
     const int from;
     const int to;
     W weight;
-    mutable int id;
+    int id;
 
     BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
         transposedEdge = new BiWeightedEdge(this);
@@ -108,7 +108,7 @@ class BaseEdge {
 public:
     const int from;
     const int to;
-    mutable int id;
+    int id;
 
     BaseEdge(int from, int to) : from(from), to(to) {
     }
@@ -124,7 +124,7 @@ private:
 public:
     const int from;
     const int to;
-    mutable int id;
+    int id;
 
     BiEdge(int from, int to) : from(from), to(to) {
         transposedEdge = new BiEdge(this);
@@ -175,10 +175,3 @@ public:
         return edges[at];
     }
 };
-
-typedef FlowEdge<ll> LongFlowEdge;
-typedef WeightedEdge<ll> LongWeightedEdge;
-typedef FlowEdge<int> IntFlowEdge;
-typedef WeightedEdge<int> IntWeightedEdge;
-typedef BiWeightedEdge<ll> LongBiWeightedEdge;
-typedef BiWeightedEdge<int> IntBiWeightedEdge;

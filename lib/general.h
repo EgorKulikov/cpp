@@ -4,8 +4,8 @@
 
 #define all(v) (v).begin(), (v).end()
 
-typedef long long ll;
-typedef pair<int, int> pii;
+using ll = long long;
+using pii = pair<int, int>;
 
 const double PI = atan(1) * 4;
 

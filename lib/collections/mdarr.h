@@ -36,7 +36,7 @@ public:
     }
 
     size_t dim2() const {
-        return d1;
+        return d2;
     }
 
     T* begin() {
@@ -110,7 +110,7 @@ public:
     }
 
     size_t dim2() const {
-        return d1;
+        return d2;
     }
 
     size_t dim3() const {
