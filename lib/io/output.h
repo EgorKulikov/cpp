@@ -51,7 +51,7 @@ private:
 
 public:
     Output(ostream& out) : out(out) {
-        out << fixed << setprecision(12);
+        out << fixed << setprecision(20);
     }
 
     void print() {}

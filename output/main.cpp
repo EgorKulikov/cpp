@@ -16,7 +16,7 @@ using namespace std;
 
 template<typename T>
 class Vector : public vector<T> {
-    typedef vector<T> parent;
+    using parent = vector<T>;
 public:
     Vector() : parent() {}
 
@@ -64,19 +64,71 @@ public:
     }
 };
 
+template<>
+class Vector<bool> : public vector<bool> {
+    using parent = vector<bool>;
+public:
+    Vector() : parent() {}
+
+    explicit Vector(size_t __n) : parent(__n) {}
+
+    Vector(size_t __n, const bool &__value) : parent(__n, __value) {}
+
+    explicit Vector(const parent &__x) : parent(__x) {}
+
+    Vector(const Vector &__x) : parent(__x) {}
+
+    Vector(Vector &&__x) noexcept : parent(move(__x)) {}
+
+    Vector(initializer_list<bool> __l) : parent(__l) {}
+
+    template<typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
+    Vector(_InputIterator __first, _InputIterator __last) : parent(__first, __last) {}
+
+    parent::const_reference operator[](size_t ind) const {
+#ifdef LOCAL
+        if (ind >= parent::size()) {
+            throw "Out of bounds";
+        }
+#endif
+        return *const_iterator(this->_M_impl._M_start._M_p
+                               + ind / int(_S_word_bit), ind % int(_S_word_bit));
+    }
+
+    parent::reference operator[](size_t ind) {
+#ifdef LOCAL
+        if (ind >= parent::size()) {
+            throw "Out of bounds";
+        }
+#endif
+        return *iterator(this->_M_impl._M_start._M_p
+                         + ind / int(_S_word_bit), ind % int(_S_word_bit));
+    }
+
+    Vector<bool> &operator=(Vector<bool> &&__x) noexcept {
+        parent::operator=(__x);
+        return *this;
+    }
+
+    Vector<bool> &operator=(const Vector<bool> &__x) {
+        parent::operator=(__x);
+        return *this;
+    }
+};
+
 #ifdef LOCAL
 #define vec Vector
 #else
 #define vec vector
 #endif
 
-typedef vec<int> vi;
+using vi = vec<int>;
 
 
 #define all(v) (v).begin(), (v).end()
 
-typedef long long ll;
-typedef pair<int, int> pii;
+using ll = long long;
+using pii = pair<int, int>;
 
 const double PI = atan(1) * 4;
 
@@ -194,6 +246,12 @@ public:
 #endif
         return b[at];
     }
+
+    void swap(arr<T> &arr) {
+        std::swap(b, arr.b);
+        std::swap(e, arr.e);
+        std::swap(n, arr.n);
+    }
 };
 
 typedef arr<int> arri;
@@ -251,7 +309,7 @@ public:
     }
 
     size_t dim2() const {
-        return d1;
+        return d2;
     }
 
     T *begin() {
@@ -326,7 +384,7 @@ public:
     }
 
     size_t dim2() const {
-        return d1;
+        return d2;
     }
 
     size_t dim3() const {
@@ -667,7 +725,7 @@ private:
 
 public:
     Output(ostream &out) : out(out) {
-        out << fixed << setprecision(12);
+        out << fixed << setprecision(20);
     }
 
     void print() {}
@@ -720,36 +778,6 @@ public:
 };
 
 
-vector<bool> primalityTable(int n) {
-    vector<bool> res(n, true);
-    if (n > 0) {
-        res[0] = false;
-    }
-    if (n > 1) {
-        res[1] = false;
-    }
-    for (int i = 2; i * i < n; i++) {
-        if (res[i]) {
-            for (int j = i * i; j < n; j += i) {
-                res[j] = false;
-            }
-        }
-    }
-    return res;
-}
-
-vi primes(int n) {
-    auto isPrime = primalityTable(n);
-    vi res;
-    for (int i = 0; i < n; ++i) {
-        if (isPrime[i]) {
-            res.push_back(i);
-        }
-    }
-    return res;
-}
-
-
 template<typename W, typename C>
 class WeightedFlowEdge {
 private:
@@ -760,7 +788,7 @@ public:
     const int to;
     W weight;
     C capacity;
-    mutable int id;
+    int id;
 
     WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
         reverseEdge = new WeightedFlowEdge(this);
@@ -795,7 +823,7 @@ public:
     const int from;
     const int to;
     C capacity;
-    mutable int id;
+    int id;
 
     FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
         reverseEdge = new FlowEdge(this);
@@ -826,7 +854,7 @@ public:
     const int from;
     const int to;
     W weight;
-    mutable int id;
+    int id;
 
     WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
     }
@@ -845,7 +873,7 @@ public:
     const int from;
     const int to;
     W weight;
-    mutable int id;
+    int id;
 
     BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
         transposedEdge = new BiWeightedEdge(this);
@@ -866,7 +894,7 @@ class BaseEdge {
 public:
     const int from;
     const int to;
-    mutable int id;
+    int id;
 
     BaseEdge(int from, int to) : from(from), to(to) {
     }
@@ -883,7 +911,7 @@ private:
 public:
     const int from;
     const int to;
-    mutable int id;
+    int id;
 
     BiEdge(int from, int to) : from(from), to(to) {
         transposedEdge = new BiEdge(this);
@@ -936,95 +964,233 @@ public:
     }
 };
 
-typedef FlowEdge<ll> LongFlowEdge;
-typedef WeightedEdge<ll> LongWeightedEdge;
-typedef FlowEdge<int> IntFlowEdge;
-typedef WeightedEdge<int> IntWeightedEdge;
-typedef BiWeightedEdge<ll> LongBiWeightedEdge;
-typedef BiWeightedEdge<int> IntBiWeightedEdge;
+
+template<typename T>
+class que : public queue<T> {
+    using parent = queue<T>;
+public:
+    que() : parent() {}
+
+    que(const que<T> &q) : parent(q) {}
+
+    que(que<T> &&q) noexcept : parent(move(q)) {}
+
+    T pop() {
+#ifdef LOCAL
+        if (parent::empty()) {
+            throw "Pop on empty queue";
+        }
+#endif
+        T res = parent::front();
+        parent::pop();
+        return res;
+    }
+
+    que<T> &operator=(que<T> &&__x) noexcept {
+        parent::operator=(__x);
+        return *this;
+    }
+
+    que<T> &operator=(const que<T> &__x) {
+        parent::operator=(__x);
+        return *this;
+    }
+};
+
+
+class ReverseNumberIterator : public NumberIterator {
+public:
+    ReverseNumberIterator(int v) : NumberIterator(v) {}
+
+    ReverseNumberIterator &operator++() {
+        --v;
+        return *this;
+    }
+};
+
+class RevRange : pii {
+public:
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
+
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
+
+    ReverseNumberIterator begin() {
+        return first;
+    }
+
+    ReverseNumberIterator end() {
+        return second;
+    }
+};
+
+
+template<typename T>
+inline void unique(vec<T> &v) {
+    v.resize(unique(all(v)) - v.begin());
+}
+
+arri createOrder(int n) {
+    arri order(n);
+    for (int i = 0; i < n; i++) {
+        order[i] = i;
+    }
+    return order;
+}
+
+template<class Collection, typename Iterator>
+inline void addAll(Collection &v, Iterator begin, Iterator end) {
+    v.insert(v.end(), begin, end);
+}
+
+template<typename Collection>
+arri getQty(const Collection &arr, int length) {
+    arri res(length);
+    for (int i : arr) {
+        res[i]++;
+    }
+    return res;
+}
+
+template<typename Collection>
+arri getQty(const Collection &arr) {
+    return getQty(arr, *max_element(all(arr)) + 1);
+}
+
+template<class Collection>
+void collect(Collection &) {}
+
+template<class Collection, class ...Vs>
+void collect(Collection &all, Collection &a, Vs &...vs) {
+    addAll(all, all(a));
+    collect(all, vs...);
+}
+
+void replace(const vi &) {}
+
+template<class ...Vs>
+void replace(const vi &all, vi &a, Vs &...vs) {
+    for (int &i : a) {
+        i = lower_bound(all(all), i) - all.begin();
+    }
+    replace(all, vs...);
+}
+
+template<class ...Vs>
+void replace(const vi &all, arri &a, Vs &...vs) {
+    for (int &i : a) {
+        i = lower_bound(all(all), i) - all.begin();
+    }
+    replace(all, vs...);
+}
+
+template<class ...Vs>
+vi compress(Vs &...vs) {
+    vi vals;
+    collect(vals, vs...);
+    sort(all(vals));
+    unique(vals);
+    replace(vals, vs...);
+    return vals;
+}
 
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class FreaksOfTheNumberUniverse {
+class BeautifulWalk {
 public:
     void solve(istream &inp, ostream &outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
+        int m = in.readInt();
         arri a, b;
-        in.readArrays(n - 1, a, b);
+        in.readArrays(m, a, b);
         decreaseByOne(a, b);
 
-        arri deg(n, 0);
-        for (int i : a) {
-            deg[i]++;
-        }
-        for (int i : b) {
-            deg[i]++;
-        }
-        auto isp = primalityTable(n);
-        vi roots;
-        vi mandRoots;
-        for (int i : range(n)) {
-            if (isp[deg[i]]) {
-                roots.push_back(i);
-                if (!isp[deg[i] - 1]) {
-                    mandRoots.push_back(i);
-                }
-            } else if (deg[i] != 1 && !isp[deg[i] - 1]) {
-                out.printLine("NO");
-                return;
-            }
-        }
-        if (mandRoots.size() > 1) {
-            out.printLine("NO");
-            return;
-        }
-        if (mandRoots.size() == 1) {
-            roots = mandRoots;
-        }
-        using edge = BiEdge;
+        using edge = BaseEdge;
         Graph<edge> graph(n);
-        for (int i : range(n - 1)) {
+        for (int i : range(m)) {
             graph.addEdge(new edge(a[i], b[i]));
         }
-        for (int i : roots) {
-            unordered_map<int, unordered_set<int>> m;
-            bool ok = true;
-            int maxLevel = 0;
-            function<void(int, int, int)> dfs = [&](int vert, int last, int level) {
-                maxim(maxLevel, level);
-                int cdeg = deg[vert];
-                if (last != -1) {
-                    cdeg--;
+        arr2d<int> length(n, n);
+        arr2d<int> last(n, n, -1);
+        arri reach(n);
+        for (int i : range(n)) {
+            length(i, i) = 0;
+            last(i, i) = -2;
+            que<int> q;
+            q.push(i);
+            reach[i] = 1;
+            while (!q.empty()) {
+                int vert = q.pop();
+                for (edge *e : graph[vert]) {
+                    int to = e->to;
+                    if (last(i, to) == -1) {
+                        last(i, to) = vert;
+                        length(i, to) = length(i, vert) + 1;
+                        q.push(to);
+                        reach[i]++;
+                    }
                 }
-                if (cdeg != 0) {
-                    if (m[level].count(cdeg)) {
-                        ok = false;
+            }
+            for (int j : range(i)) {
+                if (last(i, j) == -1 && last(j, i) == -1) {
+                    out.printLine(-1);
+                    return;
+                }
+            }
+        }
+        arr<vi> slices(n + 1, vi());
+        for (int i : range(n)) {
+            slices[reach[i]].push_back(i);
+        }
+        for (int x = 0;; x++) {
+            arr<bool> done(n, false);
+            int cur = -1;
+            vi answer;
+            for (int i : RevRange(n + 1)) {
+                if (slices[i].empty()) {
+                    continue;
+                }
+                int rem = slices[i].size();
+                if (cur == -1) {
+                    if (slices[i].size() == x) {
+                        out.printLine(-1);
                         return;
                     }
-                    m[level].insert(cdeg);
+                    cur = slices[i][x];
+                    done[cur] = true;
+                    answer.push_back(cur + 1);
+                    rem--;
                 }
-                for (edge *e : graph[vert]) {
-                    int next = e->to;
-                    if (last != next) {
-                        dfs(next, vert, level + 1);
-                        if (!ok) {
-                            return;
+                while (rem > 0) {
+                    int best = -1;
+                    int dst = n + 1;
+                    for (int j : slices[i]) {
+                        if (!done[j] && length(cur, j) < dst) {
+                            dst = length(cur, j);
+                            best = j;
                         }
                     }
+                    vi part;
+                    int at = best;
+                    while (at != cur) {
+                        part.push_back(at + 1);
+                        at = last(cur, at);
+                    }
+                    reverse(all(part));
+                    addAll(answer, all(part));
+                    rem--;
+                    cur = best;
+                    done[cur] = true;
                 }
-            };
-            dfs(i, -1, 0);
-            if (ok) {
-                out.printLine("YES");
-                out.printLine(maxLevel);
+            }
+            if (answer.size() - 1 <= n * n / 4) {
+                out.printLine(answer.size() - 1, answer);
                 return;
             }
         }
-        out.printLine("NO");
     }
 };
 
@@ -1032,9 +1198,14 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    FreaksOfTheNumberUniverse solver;
+    BeautifulWalk solver;
     std::istream &in(std::cin);
     std::ostream &out(std::cout);
-    solver.solve(in, out);
+    int n;
+    in >> n;
+    for (int i = 0; i < n; ++i) {
+        solver.solve(in, out);
+    }
+
     return 0;
 }

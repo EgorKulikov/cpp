@@ -86,6 +86,12 @@ public:
 #endif
         return b[at];
     }
+
+    void swap(arr<T> &arr) {
+        std::swap(b, arr.b);
+        std::swap(e, arr.e);
+        std::swap(n, arr.n);
+    }
 };
 
 typedef arr<int> arri;
