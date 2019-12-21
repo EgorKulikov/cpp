@@ -1,4 +1,4 @@
-#include "C:/Users/kulikov/proj/cpp/tasks/BeautifulWalk.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/TaskE.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"2\n5 6\n1 2\n2 3\n3 1\n1 4\n4 5\n5 1\n3 2\n1 2\n1 3\n", "5 1 2 3 1 4 5\n-1\n", true, true},
+		{"3 3\n1 2\n2 3\n3 1\n", "2 2 2 \n", true, true},{"5 4\n1 2\n2 3\n3 4\n4 5\n", "4 4 3 2 1 \n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -49,13 +49,8 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    BeautifulWalk solver;
-			    int n;
-in >> n;
-for(int i = 0; i < n; ++i) {
-	solver.solve(in, out);
-}
-
+			    TaskE solver;
+			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;
             }

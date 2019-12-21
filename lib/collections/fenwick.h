@@ -18,7 +18,7 @@ class FenwickTree {
 
 public:
     FenwickTree(int size) {
-        value = arr<ll>(size);
+        value = arr<ll>(size, 0);
     }
 
     void add(int at, ll val) {

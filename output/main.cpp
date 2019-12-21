@@ -778,6 +778,32 @@ public:
 };
 
 
+class ReverseNumberIterator : public NumberIterator {
+public:
+    ReverseNumberIterator(int v) : NumberIterator(v) {}
+
+    ReverseNumberIterator &operator++() {
+        --v;
+        return *this;
+    }
+};
+
+class RevRange : pii {
+public:
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
+
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
+
+    ReverseNumberIterator begin() {
+        return first;
+    }
+
+    ReverseNumberIterator end() {
+        return second;
+    }
+};
+
+
 template<typename W, typename C>
 class WeightedFlowEdge {
 private:
@@ -959,67 +985,13 @@ public:
         edgeCount++;
     }
 
+    template<typename...Ts>
+    void addEdge(Ts...ts) {
+        addEdge(new Edge(ts...));
+    }
+
     vec<Edge *> &operator[](int at) {
         return edges[at];
-    }
-};
-
-
-template<typename T>
-class que : public queue<T> {
-    using parent = queue<T>;
-public:
-    que() : parent() {}
-
-    que(const que<T> &q) : parent(q) {}
-
-    que(que<T> &&q) noexcept : parent(move(q)) {}
-
-    T pop() {
-#ifdef LOCAL
-        if (parent::empty()) {
-            throw "Pop on empty queue";
-        }
-#endif
-        T res = parent::front();
-        parent::pop();
-        return res;
-    }
-
-    que<T> &operator=(que<T> &&__x) noexcept {
-        parent::operator=(__x);
-        return *this;
-    }
-
-    que<T> &operator=(const que<T> &__x) {
-        parent::operator=(__x);
-        return *this;
-    }
-};
-
-
-class ReverseNumberIterator : public NumberIterator {
-public:
-    ReverseNumberIterator(int v) : NumberIterator(v) {}
-
-    ReverseNumberIterator &operator++() {
-        --v;
-        return *this;
-    }
-};
-
-class RevRange : pii {
-public:
-    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
-
-    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
-
-    ReverseNumberIterator begin() {
-        return first;
-    }
-
-    ReverseNumberIterator end() {
-        return second;
     }
 };
 
@@ -1096,7 +1068,7 @@ vi compress(Vs &...vs) {
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class BeautifulWalk {
+class TaskE {
 public:
     void solve(istream &inp, ostream &outp) {
         Input in(inp);
@@ -1108,89 +1080,101 @@ public:
         in.readArrays(m, a, b);
         decreaseByOne(a, b);
 
-        using edge = BaseEdge;
-        Graph<edge> graph(n);
+        Graph<BiEdge> graph(n);
         for (int i : range(m)) {
-            graph.addEdge(new edge(a[i], b[i]));
+            graph.addEdge(a[i], b[i]);
         }
-        arr2d<int> length(n, n);
-        arr2d<int> last(n, n, -1);
-        arri reach(n);
-        for (int i : range(n)) {
-            length(i, i) = 0;
-            last(i, i) = -2;
-            que<int> q;
-            q.push(i);
-            reach[i] = 1;
-            while (!q.empty()) {
-                int vert = q.pop();
-                for (edge *e : graph[vert]) {
-                    int to = e->to;
-                    if (last(i, to) == -1) {
-                        last(i, to) = vert;
-                        length(i, to) = length(i, vert) + 1;
-                        q.push(to);
-                        reach[i]++;
-                    }
-                }
-            }
-            for (int j : range(i)) {
-                if (last(i, j) == -1 && last(j, i) == -1) {
-                    out.printLine(-1);
+        vec<vi> paths;
+        vi stack;
+        arr<bool> visited(n, false);
+        arr<bool> onStack(n, false);
+        function<void(int, int)> dfs = [&](int vert, int last) {
+            if (visited[vert]) {
+                if (!onStack[vert]) {
                     return;
                 }
-            }
-        }
-        arr<vi> slices(n + 1, vi());
-        for (int i : range(n)) {
-            slices[reach[i]].push_back(i);
-        }
-        for (int x = 0;; x++) {
-            arr<bool> done(n, false);
-            int cur = -1;
-            vi answer;
-            for (int i : RevRange(n + 1)) {
-                if (slices[i].empty()) {
-                    continue;
+                vi cur;
+                int at = stack.size() - 1;
+                while (cur.size() < 2 || a[stack[at]] != vert && b[stack[at]] != vert) {
+                    cur.push_back(stack[at--]);
                 }
-                int rem = slices[i].size();
-                if (cur == -1) {
-                    if (slices[i].size() == x) {
-                        out.printLine(-1);
-                        return;
-                    }
-                    cur = slices[i][x];
-                    done[cur] = true;
-                    answer.push_back(cur + 1);
-                    rem--;
-                }
-                while (rem > 0) {
-                    int best = -1;
-                    int dst = n + 1;
-                    for (int j : slices[i]) {
-                        if (!done[j] && length(cur, j) < dst) {
-                            dst = length(cur, j);
-                            best = j;
-                        }
-                    }
-                    vi part;
-                    int at = best;
-                    while (at != cur) {
-                        part.push_back(at + 1);
-                        at = last(cur, at);
-                    }
-                    reverse(all(part));
-                    addAll(answer, all(part));
-                    rem--;
-                    cur = best;
-                    done[cur] = true;
-                }
-            }
-            if (answer.size() - 1 <= n * n / 4) {
-                out.printLine(answer.size() - 1, answer);
+                cur.push_back(stack[at]);
+                paths.push_back(cur);
                 return;
             }
+            visited[vert] = true;
+            onStack[vert] = true;
+            for (auto *e : graph[vert]) {
+                if (e->to == last) {
+                    continue;
+                }
+                stack.push_back(e->id);
+                dfs(e->to, vert);
+                stack.pop_back();
+            }
+            onStack[vert] = false;
+        };
+        for (int i : range(n)) {
+            if (!visited[i]) {
+                dfs(i, -1);
+            }
         }
+        arri delta(m, -1);
+        arri mult(m);
+        for (const auto &path : paths) {
+            int at = min_element(all(path)) - path.begin();
+            vi pp(path.begin() + at, path.end());
+            addAll(pp, path.begin(), path.begin() + at);
+            auto stuff = [&]() -> bool {
+                bool good = true;
+                for (int i = 0; i < path.size() - 1; i++) {
+                    if (pp[i] > pp[i + 1]) {
+                        good = false;
+                        break;
+                    }
+                }
+                if (good) {
+                    delta[pp[0]] = pp.back();
+                    mult[pp[0]] = 2;
+                }
+                return good;
+            };
+            if (stuff()) {
+                continue;
+            }
+            reverse(pp.begin() + 1, pp.end());
+            if (stuff()) {
+                continue;
+            }
+            int i;
+            for (i = 0; i < pp.size() - 1; i++) {
+                if (pp[i] > pp[i + 1]) {
+                    break;
+                }
+            }
+            int j;
+            for (j = pp.size() - 2; j >= 0; j--) {
+                if (pp[j] < pp[j + 1]) {
+                    break;
+                }
+            }
+            if (i != j) {
+                continue;
+            }
+            delta[pp[0]] = pp[i];
+            mult[pp[0]] = 1;
+        }
+        arri answer(n, 0);
+        arri store(m);
+        for (int i : RevRange(m)) {
+            int res = answer[a[i]] + answer[b[i]] + 1;
+            store[i] = res;
+            if (delta[i] != -1) {
+                res -= store[delta[i]] * mult[i];
+            }
+            answer[a[i]] = answer[b[i]] = res;
+        }
+        out.printLine(answer);
     }
 };
 
@@ -1198,14 +1182,9 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    BeautifulWalk solver;
+    TaskE solver;
     std::istream &in(std::cin);
     std::ostream &out(std::cout);
-    int n;
-    in >> n;
-    for (int i = 0; i < n; ++i) {
-        solver.solve(in, out);
-    }
-
+    solver.solve(in, out);
     return 0;
 }

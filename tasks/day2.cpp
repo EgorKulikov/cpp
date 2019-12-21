@@ -6,6 +6,8 @@
 
 //#pragma comment(linker, "/STACK:200000000")
 
+const bool ASCII = true;
+
 enum state {
     FINISHED,
     WAITING,
@@ -56,7 +58,15 @@ struct program {
                 get(at + 1, firstMode) = inputs[inAt++];
                 at += 2;
             } else if (op == 4) {
-                result.push_back(get(at + 1, firstMode));
+                ll val = get(at + 1, firstMode);
+                if (ASCII) {
+                    if (val < 128) {
+                        cerr << char(val);
+                    } else {
+                        cerr << val << endl;
+                    }
+                }
+                result.push_back(val);
                 at += 2;
             } else if (op == 5) {
                 if (get(at + 1, firstMode) != 0) {
@@ -101,79 +111,18 @@ public:
             mem.push_back(sin.readLong());
         }
         auto p = program(mem);
-        arr<string> progr = {"A,B,A,C,A,B,C,B,C,B", "R,10,R,10,R,6,R,4", "R,10,R,10,L,4", "R,4,L,4,L,10,L,10", "n"};
-        vec<ll> inps;
-        for (const auto& s : progr) {
-            for (char c : s) {
-                inps.push_back(c);
-            }
-            inps.push_back(10);
-        }
-        auto res = p.run(inps);
-        if (res.first != FINISHED) {
-            cerr << "******" << endl;
-        }
-        cerr << res.second.size() << endl;
-        vec<vec<char>> map(1);
-        for (ll i : res.second) {
-            if (i >= 256) {
-                continue;
-            }
-            if (i == 10) {
-                map.emplace_back();
-            } else {
-                map.back().push_back(char(i));
-            }
-        }
-        while (map.back().empty()) {
-            map.pop_back();
-        }
-        int n = 39;
-        int m = map[0].size();
-        int sr = -1, sc;
-        for (int i : range(n)) {
-            for (int j : range(m)) {
-                if (map[i][j] == '^') {
-                    sr = i;
-                    sc = j;
-                }
-            }
-        }
-        int dir = 2;
-        vi program;
-        int r = sr;
-        int c = sc;
+        vec<ll> pInput;
+        Input cons(cin);
         while (true) {
-            int nr = r + DX4[dir];
-            int nc = c + DY4[dir];
-            if (isValidCell(nr, nc, n, m) && map[nr][nc] == '#') {
-                program.back()++;
-                r = nr;
-                c = nc;
-                continue;
+            if (p.run(pInput).first == FINISHED) {
+                break;
             }
-            nr = r + DX4[(dir + 3) & 3];
-            nc = c + DY4[(dir + 3) & 3];
-            if (isValidCell(nr, nc, n, m) && map[nr][nc] == '#') {
-                program.push_back(-1);
-                program.push_back(0);
-                dir = (dir + 3) & 3;
-                continue;
+            string s = cons.readLine();
+            pInput.clear();
+            for (char c : s) {
+                pInput.push_back(c);
             }
-            nr = r + DX4[(dir + 1) & 3];
-            nc = c + DY4[(dir + 1) & 3];
-            if (isValidCell(nr, nc, n, m) && map[nr][nc] == '#') {
-                program.push_back(-2);
-                program.push_back(0);
-                dir = (dir + 1) & 3;
-                continue;
-            }
-            break;
+            pInput.push_back(10);
         }
-        for (const auto& row : map) {
-            out.printLine(string(all(row)));
-        }
-        out.printLine(program);
-        out.printLine(res.second.back());
 	}
 };
