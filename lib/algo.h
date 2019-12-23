@@ -21,18 +21,18 @@ inline void addAll(Collection& v, Iterator begin, Iterator end) {
     v.insert(v.end(), begin, end);
 }
 
-template <typename Collection>
-arri getQty(const Collection& arr, int length) {
-    arri res(length);
-    for (int i : arr) {
-        res[i]++;
+template <typename Iterator>
+arri getQty(Iterator begin, Iterator end, int length) {
+    arri res(length, 0);
+    for (Iterator it = begin; it != end; it++) {
+        res[*it]++;
     }
     return res;
 }
 
-template <typename Collection>
-arri getQty(const Collection& arr) {
-    return getQty(arr, *max_element(all(arr)) + 1);
+template <typename Iterator>
+arri getQty(Iterator begin, Iterator end) {
+    return getQty(begin, end, *max_element(begin, end) + 1);
 }
 
 template <class Collection>

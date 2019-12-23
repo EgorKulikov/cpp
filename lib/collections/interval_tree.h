@@ -3,19 +3,20 @@
 #include "../general.h"
 #include "arr.h"
 
-template<typename Value, typename Delta, Value defaultValue = 0, Delta defaultDelta = 0>
-class IntervalTree {
+template<typename Value, typename Delta>
+class SegmentTree {
     const int size;
+    const Value defaultValue;
+    const Delta defaultDelta;
     function<Value(Value, Value)> joinValue;
     function<Delta(Delta, Delta)> joinDelta;
     function<Value(Value, Delta, int, int)> accumulate;
-    function<Value(int)> initValue;
     arr<Value> value;
     arr<Delta> delta;
 
     void init(int root, int left, int right) {
         if (left + 1 == right) {
-            value[root] = initValue(left);
+            value[root] = defaultValue;
         } else {
             int mid = (left + right) >> 1;
             init(2 * root + 1, left, mid);
@@ -63,28 +64,31 @@ class IntervalTree {
     }
 
 public:
-    IntervalTree(int size, function<Value(Value, Value)> joinValue,
-                 function<Delta(Delta, Delta)> joinDelta,
-                 function<Value(Value, Delta, int, int)> accumulate,
-                 function<Value(int)> initValue = [](int at) -> Value { return defaultValue; }) :
-            size(size), joinValue(joinValue), joinDelta(joinDelta), accumulate(accumulate), initValue(initValue) {
+    SegmentTree(int size, function<Value(Value, Value)> joinValue,
+                function<Delta(Delta, Delta)> joinDelta,
+                function<Value(Value, Delta, int, int)> accumulate,
+                Value defaultValue = 0, Delta defaultDelta = 0 ) :
+                size(size), joinValue(joinValue), joinDelta(joinDelta), accumulate(accumulate),
+                defaultValue(defaultValue), defaultDelta(defaultDelta) {
         int vertexSize = size * 4;
         value = arr<Value>(vertexSize);
         delta = arr<Delta>(vertexSize, defaultDelta);
-        init(0, 0, size);
+        if (size > 0) {
+            init(0, 0, size);
+        }
     }
 
     void update(int from, int to, Delta delta) {
-        update(0, 0, size, from, to, delta);
+        update(0, 0, size, max(0, from), to, delta);
     }
 
     Value query(int from, int to) {
-        return query(0, 0, size, from, to);
+        return query(0, 0, size, max(0, from), to);
     }
 };
 
 template <typename Value, Value defaultValue = 0>
-class ReadOnlyIntervalTree {
+class ReadOnlySegmentTree {
 private:
     const int size;
     function<Value(Value, Value)> joinValue;
@@ -115,14 +119,16 @@ private:
     }
 
 public:
-    ReadOnlyIntervalTree(const arr<Value>& array, function<Value(Value, Value)> joinValue) :
+    ReadOnlySegmentTree(const arr<Value>& array, function<Value(Value, Value)> joinValue) :
             size(array.size()), joinValue(joinValue) {
         int vertexSize = size * 4;
         value = arr<Value>(vertexSize);
-        init(0, 0, size, array);
+        if (size > 0) {
+            init(0, 0, size, array);
+        }
     }
 
     Value query(int from, int to) const {
-        return query(0, 0, size, from, to);
+        return query(0, 0, size, max(0, from), to);
     }
 };

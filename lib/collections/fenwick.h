@@ -3,12 +3,13 @@
 #include "../general.h"
 #include "arr.h"
 
+template <typename T>
 class FenwickTree {
-    arr<ll> value;
+    arr<T> value;
 
-    ll get(int to) const {
+    T get(int to) const {
         minim(to, int(value.size()) - 1);
-        ll result = 0;
+        T result = 0;
         while (to >= 0) {
             result += value[to];
             to = (to & (to + 1)) - 1;
@@ -18,17 +19,17 @@ class FenwickTree {
 
 public:
     FenwickTree(int size) {
-        value = arr<ll>(size, 0);
+        value = arr<T>(size, 0);
     }
 
-    void add(int at, ll val) {
+    void add(int at, T val) {
         while (at < value.size()) {
             value[at] += val;
             at = at | (at + 1);
         }
     }
 
-    ll get(int from, int to) const {
+    T get(int from, int to) const {
         if (from >= to) {
             return 0;
         }

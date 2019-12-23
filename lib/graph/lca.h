@@ -9,10 +9,12 @@ class LCA {
 private:
     arri order;
     arri position;
-    ReadOnlyIntervalTree<int, -1>* lcaTree;
-    arri level;
+    ReadOnlySegmentTree<int, -1>* lcaTree;
 
 public:
+    arri level;
+    arri parent;
+
     LCA(Graph<Edge>& graph, int root = 0) {
         int vertexCount = graph.vertexCount;
         order = arri(2 * vertexCount - 1);
@@ -20,7 +22,8 @@ public:
         level = arri(vertexCount);
         level[root] = 0;
         arri index(vertexCount, 0);
-        arri last(vertexCount);
+        parent = arri(vertexCount);
+        arri& last = parent;
         arri stack(vertexCount);
         stack[0] = root;
         int size = 1;
@@ -46,7 +49,7 @@ public:
                 index[vertex]++;
             }
         }
-        lcaTree = new ReadOnlyIntervalTree<int, -1>(order, [this](int left, int right) -> int {
+        lcaTree = new ReadOnlySegmentTree<int, -1>(order, [this](int left, int right) -> int {
             if (left == -1) {
                 return right;
             }
@@ -60,14 +63,10 @@ public:
         });
     }
 
-    int getPosition(int vertex) const { return position[vertex]; }
-    int getLCA(int first, int second) const {
+    int lca(int first, int second) const {
         return lcaTree->query(min(position[first], position[second]), max(position[first], position[second]) + 1);
     }
-    int getLevel(int vertex) const {
-        return level[vertex];
-    }
-    int getPathLength(int first, int second) const {
-        return level[first] + level[second] - 2 * level[getLCA(first, second)];
+    int pathLength(int first, int second) const {
+        return level[first] + level[second] - 2 * level[lca(first, second)];
     }
 };

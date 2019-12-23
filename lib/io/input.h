@@ -16,7 +16,10 @@ private:
 
     inline int get() {
         if (exhausted) {
+#ifdef LOCAL
             throw "Input exhausted";
+#endif
+            return EOF;
         }
         int c = in.get();
         if (c == EOF) {
@@ -37,7 +40,10 @@ private:
         T res = 0;
         do {
             if (!isdigit(c)) {
+#ifdef LOCAL
                 throw "Number format error";
+#endif
+                return sgn * res;
             }
             res *= 10;
             res += c - '0';
@@ -87,7 +93,10 @@ public:
         skipWhitespace();
         int c = get();
         if (c == EOF) {
+#ifdef LOCAL
             throw "Input exhausted";
+#endif
+            return "";
         }
         vec<char> res;
         do {
@@ -152,21 +161,19 @@ public:
     }
 
     string readLine() {
-        skipWhitespace();
         int c = get();
         if (c == EOF) {
+#ifdef LOCAL
             throw "Input exhausted";
+#endif
+            return "";
         }
-        int length = 0;
         vec<char> res;
         do {
             res.push_back(c);
-            if (!isWhitespace(c)) {
-                length = res.size();
-            }
             c = get();
         } while (c != '\n' && c != '\r' && c != EOF);
-        return string(res.begin(), res.begin() + length);
+        return string(all(res));
     }
 
     double readDouble() {
@@ -183,7 +190,10 @@ public:
                 return sgn * res * dPower(10, readInt());
             }
             if (!isdigit(c)) {
+#ifdef LOCAL
                 throw "Number format error";
+#endif
+                return sgn * res;
             }
             res *= 10;
             res += c - '0';
@@ -198,7 +208,11 @@ public:
                     return sgn * (res + add * dPower(10, -length)) * dPower(10, readInt());
                 }
                 if (!isdigit(c)) {
+#ifdef LOCAL
                     throw "Number format error";
+#endif
+                    res += add * dPower(10, -length);
+                    return res * sgn;
                 }
                 add *= 10;
                 add += c - '0';
@@ -214,7 +228,10 @@ public:
         skipWhitespace();
         int c = get();
         if (c == EOF) {
+#ifdef LOCAL
             throw "Input exhausted";
+#endif
+            return 0;
         }
         return c;
     }

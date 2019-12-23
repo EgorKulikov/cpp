@@ -4,129 +4,118 @@
 
 double eps = 1e-9;
 
-template <typename T>
+using DoubleType = double;
+
 class Point {
 public:
-    const T x;
-    const T y;
+    const DoubleType x;
+    const DoubleType y;
 
     Point() : x(0), y(0) {}
-    Point(const T x, const T y) : x(x), y(y) {}
+    Point(const DoubleType x, const DoubleType y) : x(x), y(y) {}
 };
 
-template <typename T>
 class Line {
 public:
-    const T a;
-    const T b;
-    const T c;
+    const DoubleType a;
+    const DoubleType b;
+    const DoubleType c;
 
-    Line(const T a, const T b, const T c) : a(a), b(b), c(c) {}
+    Line(const DoubleType a, const DoubleType b, const DoubleType c) : a(a), b(b), c(c) {}
 };
 
-template <typename T>
 class Circle {
 public:
-    const Point<T> center;
-    const T r;
+    const Point center;
+    const DoubleType r;
 
-    Circle(const Point<T> &center, const T r) : center(center), r(r) {}
+    Circle(const Point &center, const DoubleType r) : center(center), r(r) {}
 };
 
-template <typename T>
+Line getLine(DoubleType a, DoubleType b, DoubleType c) {
+    DoubleType g = hypot(a, b);
+    return Line(a / g, b / g, c / g);
+}
+
+Line line(const Point& p, const Point& q) {
+    DoubleType a = p.y - q.y;
+    DoubleType b = q.x - p.x;
+    DoubleType c = -a * p.x - b * p.y;
+    return getLine(a, b, c);
+}
+
+DoubleType distance(const Line& l, const Point& p) {
+    return abs(l.a * p.x + l.b * p.y + l.c);
+}
+
+DoubleType distance(const Point& a, const Point& b) {
+    return hypot(a.x - b.x, a.y - b.y);
+}
+
 class Segment {
 public:
-    const Point<T> a, b;
-    const Line<T> l;
+    const Point a, b;
+    const Line l;
 
-    Segment(const Point<T> &a, const Point<T> &b) : a(a), b(b), l(line(a, b)) {}
+    Segment(const Point &a, const Point &b) : a(a), b(b), l(line(a, b)) {}
 
-    bool contains(const Point<T>& c) {
+    bool contains(const Point& c) {
         return distance(l, c) < eps && c.x > min(a.x, b.x) - eps && c.x < max(a.x, b.x) + eps &&
             c.y > min(a.y, b.y) - eps && c.y < max(a.y, b.y) + eps;
     }
 
-    T length() {
+    DoubleType length() {
         return distance(a, b);
     }
 };
 
-template <typename T>
-Line<T> getLine(T a, T b, T c) {
-    T g = hypot(a, b);
-    return Line<T>(a / g, b / g, c / g);
+Line perpendicular(const Line& l, const Point& p) {
+    return Line(-l.b, l.a, p.x * l.b - p.y * l.a);
 }
 
-template <typename T>
-Line<T> line(const Point<T>& p, const Point<T>& q) {
-    T a = p.y - q.y;
-    T b = q.x - p.x;
-    T c = -a * p.x - b * p.y;
-    return getLine(a, b, c);
+Point intersect(const Line& a, const Line& b) {
+    DoubleType det = a.b * b.a - a.a * b.b;
+    return Point((a.c * b.b - a.b * b.c) / det, (a.a * b.c - a.c * b.a) / det);
 }
 
-template <typename T>
-T distance(const Line<T>& l, const Point<T>& p) {
-    return abs(l.a * p.x + l.b * p.y + l.c);
-}
-
-template <typename T>
-Line<T> perpendicular(const Line<T>& l, const Point<T>& p) {
-    return Line<T>(-l.b, l.a, p.x * l.b - p.y * l.a);
-}
-
-template <typename T>
-Point<T> intersect(const Line<T>& a, const Line<T>& b) {
-    T det = a.b * b.a - a.a * b.b;
-    return Point<T>((a.c * b.b - a.b * b.c) / det, (a.a * b.c - a.c * b.a) / det);
-}
-
-template <typename T>
-vec<Point<T> > intersect(const Circle<T>& c, const Line<T>& l) {
-    T dist = distance(l, c.center);
+vec<Point> intersect(const Circle& c, const Line& l) {
+    DoubleType dist = distance(l, c.center);
     if (dist > c.r + eps) {
-        return vec<Point<T> >(0);
+        return vec<Point>(0);
     }
     auto perp = perpendicular(l, c.center);
     auto base = intersect(l, perp);
     if (dist > c.r - eps) {
-        return vec<Point<T> >(1, base);
+        return vec<Point>(1, base);
     }
-    T delta = sqrt(c.r * c.r - dist * dist);
-    vec<Point<T> > result;
+    DoubleType delta = sqrt(c.r * c.r - dist * dist);
+    vec<Point> result;
     result.reserve(2);
-    result.push_back(Point<T>(base.x + perp.a * delta, base.y + perp.b * delta));
-    result.push_back(Point<T>(base.x - perp.a * delta, base.y - perp.b * delta));
+    result.push_back(Point(base.x + perp.a * delta, base.y + perp.b * delta));
+    result.push_back(Point(base.x - perp.a * delta, base.y - perp.b * delta));
     return result;
 }
 
-template <typename T>
-T distance(const Point<T>& a, const Point<T>& b) {
-    return hypot(a.x - b.x, a.y - b.y);
-}
-
-template <typename T>
-vec<Point<T> > intersect(const Circle<T>& c, const Circle<T>& d) {
-    T dist = distance(c, d);
+vec<Point> intersect(const Circle& c, const Circle& d) {
+    DoubleType dist = distance(c.center, d.center);
     if (dist < eps) {
-        return vec<Point<T> >(0);
+        return vec<Point>(0);
     }
-    T a = 2 * (d.center.x - c.center.x);
-    T b = 2 * (d.center.y - c.center.y);
-    T f = d.r * d.r - c.r * c.r + c.center.c * c.center.x - d.center.x * d.center.x + c.center.y * c.center.y - d.center.y * d.center.y;
+    DoubleType a = 2 * (d.center.x - c.center.x);
+    DoubleType b = 2 * (d.center.y - c.center.y);
+    DoubleType f = d.r * d.r - c.r * c.r + c.center.x * c.center.x - d.center.x * d.center.x + c.center.y * c.center.y - d.center.y * d.center.y;
     auto l = getLine(a, b, f);
     return intersect(c, l);
 }
 
-template <typename T>
-vec<Point<T> > touchingPoints(const Circle<T>& c, const Point<T>& p) {
-    T dist = distance(c.center, p);
+vec<Point> touchingPoints(const Circle& c, const Point& p) {
+    DoubleType dist = distance(c.center, p);
     if (dist < c.r - eps) {
-        return vec<Point<T> >(0);
+        return vec<Point>(0);
     }
     if (dist < c.r + eps) {
-        return vec<Point<T> >(1, p);
+        return vec<Point>(1, p);
     }
-    Circle<T> power(p, sqrt((dist - c.r) * (dist + c.r)));
+    Circle power(p, sqrt((dist - c.r) * (dist + c.r)));
     return intersect(c, power);
 }

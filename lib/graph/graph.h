@@ -171,9 +171,9 @@ public:
         edgeCount++;
     }
 
-    template<typename...Ts>
-    void addEdge(Ts...ts) {
-        addEdge(new Edge(ts...));
+    template <typename...Ts>
+    void addEdge(Ts...args) {
+        addEdge(new Edge(args...));
     }
 
     vec<Edge*>& operator [](int at) {
