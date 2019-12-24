@@ -9,6 +9,6 @@ file(GLOB_RECURSE HEADERS "lib/*.h" )
 ADD_DEFINITIONS(-std=c++14 -Wall -Wextra -Wno-sign-compare)
 
 add_executable(test ${TASKS} ${HEADERS})
-add_executable(direct direct/main.cpp)
+add_executable(direct direct/main.cpp lib/collections/treap.h lib/collections/treap_set.h)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLOCAL")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLOCAL")
