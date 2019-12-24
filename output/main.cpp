@@ -890,254 +890,174 @@ public:
 };
 
 
-template <typename T>
-inline void unique(vec<T>& v) {
-    v.resize(unique(all(v)) - v.begin());
-}
+const int MOD7 = 1000000007;
+const int MOD9 = 1000000009;
+const int MODF = 998244353;
 
-arri createOrder(int n) {
-    arri order(n);
-    for (int i = 0; i < n; i++) {
-        order[i] = i;
-    }
-    return order;
-}
-
-template <class Collection, typename Iterator>
-inline void addAll(Collection& v, Iterator begin, Iterator end) {
-    v.insert(v.end(), begin, end);
-}
-
-template <typename Iterator>
-arri getQty(Iterator begin, Iterator end, int length) {
-    arri res(length, 0);
-    for (Iterator it = begin; it != end; it++) {
-        res[*it]++;
-    }
-    return res;
-}
-
-template <typename Iterator>
-arri getQty(Iterator begin, Iterator end) {
-    return getQty(begin, end, *max_element(begin, end) + 1);
-}
-
-template <class Collection>
-void collect(Collection&) {}
-
-template <class Collection, class ...Vs>
-void collect(Collection& all, Collection& a, Vs& ...vs) {
-    addAll(all, all(a));
-    collect(all, vs...);
-}
-
-void replace(const vi&) {}
-
-template <class ...Vs>
-void replace(const vi& all, vi& a, Vs& ...vs) {
-    for (int& i : a) {
-        i = lower_bound(all(all), i) - all.begin();
-    }
-    replace(all, vs...);
-}
-
-template <class ...Vs>
-void replace(const vi& all, arri& a, Vs& ...vs) {
-    for (int& i : a) {
-        i = lower_bound(all(all), i) - all.begin();
-    }
-    replace(all, vs...);
-}
-
-template <class ...Vs>
-vi compress(Vs& ...vs) {
-    vi vals;
-    collect(vals, vs...);
-    sort(all(vals));
-    unique(vals);
-    replace(vals, vs...);
-    return vals;
-}
-
-
-random_device rd;
-mt19937_64 gen(rd());
-
-template <typename T, typename Data>
-class TreapNode {
-public:
-    ll priority = gen();
-    T key;
-    Data data;
-    TreapNode* left;
-    TreapNode* right;
-
-    TreapNode(T key, Data data = Data(), TreapNode* left = nullptr, TreapNode* right = nullptr) : key(key), data(data),
-                                                                                                  left(left),
-                                                                                                  right(right) {
-        dataUpdate();
-    }
-
-    void dataUpdate() {
-        data.update(left == nullptr ? nullptr : &left->data, right == nullptr ? nullptr : &right->data);
-    }
-
-    pair<TreapNode<T, Data>*, TreapNode<T, Data>*> split(T splitKey) {
-        if (key < splitKey) {
-            auto result = right == nullptr ? make_pair(nullptr, nullptr) : right->split(splitKey);
-            right = result.first;
-            dataUpdate();
-            result.first = this;
-            return result;
-        }
-        auto result = left == nullptr ? make_pair(nullptr, nullptr) : left->split(splitKey);
-        left = result.second;
-        dataUpdate();
-        result.second = this;
-        return result;
-    }
-
-    TreapNode<T, Data>* leftmost() {
-        if (left == nullptr) {
-            return this;
-        }
-        return left->leftmost();
-    }
-};
-
-template <typename T, typename Data>
-TreapNode<T, Data>* merge(TreapNode<T, Data>* left, TreapNode<T, Data>* right) {
-    if (left == nullptr) {
-        return right;
-    }
-    if (right == nullptr) {
-        return left;
-    }
-    if (left->priority > right->priority) {
-        left->right = merge(left->right, right);
-        left->dataUpdate();
-        return left;
-    }
-    right->left = merge(left, right->left);
-    right->dataUpdate();
-    return right;
-}
-
-class SizeData {
-public:
-    int size;
-
-    void update(SizeData* left, SizeData* right) {
-        size = 1 + (left == nullptr ? 0 : left->size) + (right == nullptr ? 0 : right->size);
-    }
-};
-
+int mod = MOD7;
 
 template <typename T>
-struct TreapSet {
-    using Node = TreapNode<T, SizeData>;
-    mutable Node* root = nullptr;
+T gcd(T a, T b, T& x, T& y) {
+    if (a == 0) {
+        x = 0;
+        y = 1;
+        return b;
+    }
+    int d = gcd(b % a, a, y, x);
+    x -= (b / a) * y;
+    return d;
+}
 
-    bool insert(const T& element) {
-        auto* node = new Node(element);
-        if (root == nullptr) {
-            root = node;
-            return true;
-        } else {
-            auto split = root->split(element);
-            if (split.second != nullptr && split.second->leftmost()->key == element) {
-                root = merge(split.first, split.second);
-                return false;
-            }
-            root = merge(split.first, node);
-            root = merge(root, split.second);
-            return true;
+class modint {
+public:
+    int n;
+
+    modint() : n(0) {}
+
+    modint(ll n) {
+        if (n >= 0 && n < mod) {
+            this->n = n;
+            return;
         }
-    }
-
-    int index(const T& element) const {
-        auto split = root->split(element);
-        if (split.second == nullptr || split.second->leftmost() != element) {
-            root = merge(split.first, split.second);
-            return -1;
+        n %= mod;
+        if (n < 0) {
+            n += mod;
         }
-        int res = split.first == nullptr ? 0 : split.first->data.size;
-        root = merge(split.first, split.second);
-        return res;
+        this->n = n;
     }
 
-    bool contains(const T& element) const {
-        return index(element) != -1;
+    modint& operator +=(const modint& other) {
+        n += other.n;
+        if (n >= mod) {
+            n -= mod;
+        }
+        return *this;
     }
 
-    int size() const { return root == nullptr ? 0 : root->data.size; }
+    modint& operator -=(const modint& other) {
+        n -= other.n;
+        if (n < 0) {
+            n += mod;
+        }
+        return *this;
+    }
 
-    const T& get(int index) const {
+    modint& operator *=(const modint& other) {
+        n = ll(n) * other.n % mod;
+        return *this;
+    }
+
+    modint operator -() {
+        if (n == 0) {
+            return 0;
+        }
+        return modint(mod - n);
+    }
+
+    modint inverse() {
+        ll x, y;
+        ll g = gcd(ll(n), ll(mod), x, y);
 #ifdef LOCAL
-        int sz = size();
-        if (index < 0 || index >= sz) {
-            throw "Index out of bounds";
+        if (g != 1) {
+            throw "not inversable";
         }
 #endif
-        Node* node = root;
-        while (true) {
-            int leftSize = node->left == nullptr ? 0 : node->left->data.size;
-            if (leftSize == index) {
-                return node->key;
-            }
-            if (leftSize > index) {
-                node = node->left;
-            } else {
-                index -= leftSize + 1;
-                node = node->right;
-            }
-        }
+        return x;
     }
 
+    int log(modint alpha);
 };
+
+modint operator +(const modint& a, const modint& b) {
+    return modint(a) += b;
+}
+
+modint operator -(const modint& a, const modint& b) {
+    return modint(a) -= b;
+}
+
+modint operator *(const modint& a, const modint& b) {
+    return modint(a) *= b;
+}
+
+ostream& operator <<(ostream& out, const modint& val) {
+    return out << val.n;
+}
+
+bool operator ==(const modint& a, const modint& b) {
+    return a.n == b.n;
+}
+
+bool operator !=(const modint& a, const modint& b) {
+    return a.n != b.n;
+}
+
+namespace std {
+    template <>
+    struct hash<modint> {
+        size_t operator ()(const modint& n) const {
+            return n.n;
+        }
+    };
+}
+
+int modint::log(modint alpha) {
+    unordered_map<modint, int> base;
+    int exp = 0;
+    modint pow = 1;
+    modint inv = *this;
+    modint alInv = alpha.inverse();
+    while (exp * exp < mod) {
+        if (inv == 1) {
+            return exp;
+        }
+        base[inv] = exp++;
+        pow *= alpha;
+        inv *= alInv;
+    }
+    modint step = pow;
+    for (int i = 1;; i++) {
+        if (base.count(pow)) {
+            return exp * i + base[pow];
+        }
+        pow *= step;
+    }
+}
 
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class Transaction {
+class DexterPlaysWithGP {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
-        int t = in.readInt();
-        int q = in.readInt();
-        auto cost = in.readIntArray(t);
-        auto req = in.readArray<int, int>(q);
+        int r = in.readInt();
+        int s = in.readInt();
+        int p = in.readInt();
 
-        struct request {
-            int m, n, id;
-
-            request(int m = 0, int n = 0, int id = 0) : m(m), n(n), id(id) {}
-
-            bool operator <(const request& o) {
-                return m > o.m;
-            }
-        };
-        arr<request> requests(q);
-        for (int i : range(q)) {
-            requests[i] = request(req[i].first, req[i].second, i);
+        mod = p;
+        modint alpha = r;
+        modint beta = (alpha - 1) * s + 1;
+        if (beta == 0) {
+            out.printLine(-1);
+            return;
         }
-        sort(all(requests));
-        arri order = createOrder(t);
-        sort(all(order), [&](int a, int b) -> bool { return cost[a] > cost[b]; });
-        int at = 0;
-        TreapSet<int> s;
-        arri answer(q);
-        for (const auto& r : requests) {
-            while (at < t && cost[order[at]] >= r.m) {
-                s.insert(order[at++]);
-            }
-            answer[r.id] = r.n > s.size() ? -1 : cost[s.get(r.n - 1)];
+        int answer = beta.log(alpha);
+        if (answer == 0) {
+            answer = p - 1;
         }
-        for (int i : answer) {
-            out.printLine(i);
+/*        modint check = 0;
+        modint add = 1;
+        for (int i : range(answer)) {
+            check += add;
+            add *= alpha;
         }
+        if (check != s) {
+            exit(1);
+        }*/
+        out.printLine(answer);
     }
 };
 
@@ -1145,9 +1065,14 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    Transaction solver;
+    DexterPlaysWithGP solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
-    solver.solve(in, out);
+    int n;
+    in >> n;
+    for (int i = 0; i < n; ++i) {
+        solver.solve(in, out);
+    }
+
     return 0;
 }

@@ -1,4 +1,4 @@
-#include "C:/Users/kulikov/proj/cpp/tasks/Transaction.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/DexterPlaysWithGP.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"5 5\n1 2 3 4 5\n1 2\n2 3\n3 1\n3 4\n4 8\n", "2\n4\n3\n-1\n-1\n", true, true},{"5 5\n1 3 5 4 2\n1 2\n2 3\n3 1\n3 4\n4 8\n", "3\n4\n3\n-1\n-1\n", true, true},
+		{"2\n5 2 7\n5 5 7\n", "4\n-1\n", true, true},{"1\n1 1 2\n", "1", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -49,8 +49,13 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    Transaction solver;
-			    solver.solve(in, out);
+			    DexterPlaysWithGP solver;
+			    int n;
+in >> n;
+for(int i = 0; i < n; ++i) {
+	solver.solve(in, out);
+}
+
             } catch (const char* e) {
                 std::cerr << e << std::endl;
             }

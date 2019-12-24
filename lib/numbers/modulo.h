@@ -61,9 +61,15 @@ public:
     }
     modint inverse() {
         ll x, y;
-        gcd(ll(n), ll(mod), x, y);
+        ll g = gcd(ll(n), ll(mod), x, y);
+#ifdef LOCAL
+        if (g != 1) {
+            throw "not inversable";
+        }
+#endif
         return x;
     }
+    int log(modint alpha);
 };
 
 modint operator +(const modint& a, const modint& b) {
@@ -88,4 +94,36 @@ bool operator==(const modint& a, const modint& b) {
 
 bool operator!=(const modint& a, const modint& b) {
     return a.n != b.n;
+}
+
+namespace std {
+    template <>
+    struct hash<modint> {
+        size_t operator ()(const modint& n) const {
+            return n.n;
+        }
+    };
+}
+
+int modint::log(modint alpha) {
+    unordered_map<modint, int> base;
+    int exp = 0;
+    modint pow = 1;
+    modint inv = *this;
+    modint alInv = alpha.inverse();
+    while (exp * exp < mod) {
+        if (inv == 1) {
+            return exp;
+        }
+        base[inv] = exp++;
+        pow *= alpha;
+        inv *= alInv;
+    }
+    modint step = pow;
+    for (int i = 1; ; i++) {
+        if (base.count(pow)) {
+            return exp * i + base[pow];
+        }
+        pow *= step;
+    }
 }
