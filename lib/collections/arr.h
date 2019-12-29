@@ -59,7 +59,15 @@ public:
         return b;
     }
 
+    const T* begin() const {
+        return b;
+    }
+
     T* end() {
+        return e;
+    }
+
+    const T* end() const {
         return e;
     }
 

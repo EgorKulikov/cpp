@@ -14,7 +14,7 @@
 
 using namespace std;
 
-template <typename T>
+template<typename T>
 class Vector : public vector<T> {
     using parent = vector<T>;
 public:
@@ -22,20 +22,20 @@ public:
 
     explicit Vector(size_t __n) : parent(__n) {}
 
-    Vector(size_t __n, const T& __value) : parent(__n, __value) {}
+    Vector(size_t __n, const T &__value) : parent(__n, __value) {}
 
-    explicit Vector(const parent& __x) : parent(__x) {}
+    explicit Vector(const parent &__x) : parent(__x) {}
 
-    Vector(const Vector& __x) : parent(__x) {}
+    Vector(const Vector &__x) : parent(__x) {}
 
-    Vector(Vector&& __x) noexcept : parent(move(__x)) {}
+    Vector(Vector &&__x) noexcept : parent(move(__x)) {}
 
     Vector(initializer_list<T> __l) : parent(__l) {}
 
-    template <typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
+    template<typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
     Vector(_InputIterator __first, _InputIterator __last) : parent(__first, __last) {}
 
-    const T& operator [](size_t ind) const {
+    const T &operator[](size_t ind) const {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -44,7 +44,7 @@ public:
         return *(parent::_M_impl._M_start + ind);
     }
 
-    T& operator [](size_t ind) {
+    T &operator[](size_t ind) {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -53,18 +53,18 @@ public:
         return *(parent::_M_impl._M_start + ind);
     }
 
-    Vector<T>& operator =(Vector<T>&& __x) noexcept {
-        parent::operator =(__x);
+    Vector<T> &operator=(Vector<T> &&__x) noexcept {
+        parent::operator=(__x);
         return *this;
     }
 
-    Vector<T>& operator =(const Vector<T>& __x) {
-        parent::operator =(__x);
+    Vector<T> &operator=(const Vector<T> &__x) {
+        parent::operator=(__x);
         return *this;
     }
 };
 
-template <>
+template<>
 class Vector<bool> : public vector<bool> {
     using parent = vector<bool>;
 public:
@@ -72,20 +72,20 @@ public:
 
     explicit Vector(size_t __n) : parent(__n) {}
 
-    Vector(size_t __n, const bool& __value) : parent(__n, __value) {}
+    Vector(size_t __n, const bool &__value) : parent(__n, __value) {}
 
-    explicit Vector(const parent& __x) : parent(__x) {}
+    explicit Vector(const parent &__x) : parent(__x) {}
 
-    Vector(const Vector& __x) : parent(__x) {}
+    Vector(const Vector &__x) : parent(__x) {}
 
-    Vector(Vector&& __x) noexcept : parent(move(__x)) {}
+    Vector(Vector &&__x) noexcept : parent(move(__x)) {}
 
     Vector(initializer_list<bool> __l) : parent(__l) {}
 
-    template <typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
+    template<typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
     Vector(_InputIterator __first, _InputIterator __last) : parent(__first, __last) {}
 
-    parent::const_reference operator [](size_t ind) const {
+    parent::const_reference operator[](size_t ind) const {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -95,7 +95,7 @@ public:
                                + ind / int(_S_word_bit), ind % int(_S_word_bit));
     }
 
-    parent::reference operator [](size_t ind) {
+    parent::reference operator[](size_t ind) {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -105,13 +105,13 @@ public:
                          + ind / int(_S_word_bit), ind % int(_S_word_bit));
     }
 
-    Vector<bool>& operator =(Vector<bool>&& __x) noexcept {
-        parent::operator =(__x);
+    Vector<bool> &operator=(Vector<bool> &&__x) noexcept {
+        parent::operator=(__x);
         return *this;
     }
 
-    Vector<bool>& operator =(const Vector<bool>& __x) {
-        parent::operator =(__x);
+    Vector<bool> &operator=(const Vector<bool> &__x) {
+        parent::operator=(__x);
         return *this;
     }
 };
@@ -132,18 +132,18 @@ using pii = pair<int, int>;
 
 const double PI = atan(1) * 4;
 
-template <typename T>
-T minim(T& was, T cand) {
+template<typename T>
+T minim(T &was, T cand) {
     return was = min(was, cand);
 }
 
-template <typename T>
-T maxim(T& was, T cand) {
+template<typename T>
+T maxim(T &was, T cand) {
     return was = max(was, cand);
 }
 
 
-template <typename D>
+template<typename D>
 D dPower(D base, ll exponent) {
     if (exponent < 0) {
         return dPower(1 / base, -exponent);
@@ -160,10 +160,10 @@ D dPower(D base, ll exponent) {
 }
 
 
-template <typename T>
+template<typename T>
 class arr {
-    T* b;
-    T* e;
+    T *b;
+    T *e;
     int n;
 public:
     arr() : b(nullptr), e(nullptr), n(0) {}
@@ -182,7 +182,7 @@ public:
         }
     }
 
-    arr(int n, const T& init) : n(n) {
+    arr(int n, const T &init) : n(n) {
 #ifdef LOCAL
         if (n < 0) {
             throw "bad alloc";
@@ -207,19 +207,27 @@ public:
         }
     }
 
-    arr(T* b, int n) : b(b), e(b + n), n(n) {}
+    arr(T *b, int n) : b(b), e(b + n), n(n) {}
 
-    arr(T* b, T* e) : b(b), e(e), n(e - b) {}
+    arr(T *b, T *e) : b(b), e(e), n(e - b) {}
 
     size_t size() const {
         return n;
     }
 
-    T* begin() {
+    T *begin() {
         return b;
     }
 
-    T* end() {
+    const T *begin() const {
+        return b;
+    }
+
+    T *end() {
+        return e;
+    }
+
+    const T *end() const {
         return e;
     }
 
@@ -229,7 +237,7 @@ public:
         return res;
     }
 
-    T& operator [](int at) {
+    T &operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= n) {
             throw "Out of bounds";
@@ -238,7 +246,7 @@ public:
         return b[at];
     }
 
-    const T& operator [](int at) const {
+    const T &operator[](int at) const {
 #ifdef LOCAL
         if (at < 0 || at >= n) {
             throw "Out of bounds";
@@ -247,10 +255,31 @@ public:
         return b[at];
     }
 
-    void swap(arr<T>& arr) {
+    void swap(arr<T> &arr) {
         std::swap(b, arr.b);
         std::swap(e, arr.e);
         std::swap(n, arr.n);
+    }
+};
+
+class BoolIterator : iterator<forward_iterator_tag, bool> {
+    unsigned *at;
+    unsigned pos;
+
+public:
+    BoolIterator(unsigned int *at, unsigned int pos) : at(at), pos(pos) {}
+
+    bool operator*() {
+        return (*at >> pos & 1) == 1;
+    }
+
+    BoolIterator &operator++() {
+        pos++;
+        if (pos == 32) {
+            pos = 0;
+            at++;
+        }
+        return *this;
     }
 };
 
@@ -258,8 +287,8 @@ typedef arr<int> arri;
 
 void decreaseByOne() {}
 
-template <typename T, class...Vs>
-void decreaseByOne(arr<T>& array, Vs& ...vs) {
+template<typename T, class...Vs>
+void decreaseByOne(arr<T> &array, Vs &...vs) {
     int n = array.size();
     for (int i = 0; i < n; ++i) {
         array[i]--;
@@ -267,19 +296,19 @@ void decreaseByOne(arr<T>& array, Vs& ...vs) {
     decreaseByOne(vs...);
 }
 
-template <typename T, typename U>
-void decreaseByOne(arr<pair<T, U>>& v) {
-    for (auto& p : v) {
+template<typename T, typename U>
+void decreaseByOne(arr<pair<T, U> > &v) {
+    for (auto &p : v) {
         p.first--;
         p.second--;
     }
 }
 
 
-template <typename T>
+template<typename T>
 class arr2d {
-    T* b;
-    T* e;
+    T *b;
+    T *e;
     int d1;
     int d2;
     int sz;
@@ -292,13 +321,13 @@ public:
         e = b + sz;
     }
 
-    arr2d(int d1, int d2, const T& init) : d1(d1), d2(d2), sz(d1 * d2) {
+    arr2d(int d1, int d2, const T &init) : d1(d1), d2(d2), sz(d1 * d2) {
         b = new T[sz];
         e = b + sz;
         fill(b, e, init);
     }
 
-    arr2d(T* b, int d1, int d2) : b(b), e(b + d1 * d2), d1(d1), d2(d2), sz(d1 * d2) {}
+    arr2d(T *b, int d1, int d2) : b(b), e(b + d1 * d2), d1(d1), d2(d2), sz(d1 * d2) {}
 
     size_t size() const {
         return sz;
@@ -312,15 +341,15 @@ public:
         return d2;
     }
 
-    T* begin() {
+    T *begin() {
         return b;
     }
 
-    T* end() {
+    T *end() {
         return e;
     }
 
-    T& operator ()(int i1, int i2) {
+    T &operator()(int i1, int i2) {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2) {
             throw "Out of bounds";
@@ -329,7 +358,7 @@ public:
         return b[i1 * d2 + i2];
     }
 
-    const T& operator ()(int i1, int i2) const {
+    const T &operator()(int i1, int i2) const {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2) {
             throw "Out of bounds";
@@ -338,7 +367,7 @@ public:
         return b[i1 * d2 + i2];
     }
 
-    arr<T> operator [](int at) {
+    arr<T> operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
@@ -347,7 +376,7 @@ public:
         return arr<T>(b + at * d2, d2);
     }
 
-    void swap(arr2d<T>& a) {
+    void swap(arr2d<T> &a) {
         std::swap(b, a.b);
         std::swap(e, a.e);
         std::swap(d1, a.d1);
@@ -356,10 +385,10 @@ public:
     }
 };
 
-template <typename T>
+template<typename T>
 class arr3d {
-    T* b;
-    T* e;
+    T *b;
+    T *e;
     int d1;
     int d2;
     int d3;
@@ -374,13 +403,13 @@ public:
         e = b + sz;
     }
 
-    arr3d(int d1, int d2, int d3, const T& init) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
+    arr3d(int d1, int d2, int d3, const T &init) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
         b = new T[sz];
         e = b + sz;
         fill(b, e, init);
     }
 
-    arr3d(T* b, int d1, int d2, int d3) : b(b), e(b + d1 * d2 * d3), d1(d1), d2(d2), d3(d3), shift(d2 * d3),
+    arr3d(T *b, int d1, int d2, int d3) : b(b), e(b + d1 * d2 * d3), d1(d1), d2(d2), d3(d3), shift(d2 * d3),
                                           sz(d1 * d2 * d3) {}
 
     size_t size() const {
@@ -399,15 +428,15 @@ public:
         return d3;
     }
 
-    T* begin() {
+    T *begin() {
         return b;
     }
 
-    T* end() {
+    T *end() {
         return e;
     }
 
-    T& operator ()(int i1, int i2, int i3) {
+    T &operator()(int i1, int i2, int i3) {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
             throw "Out of bounds";
@@ -416,7 +445,7 @@ public:
         return b[i1 * shift + i2 * d3 + i3];
     }
 
-    const T& operator ()(int i1, int i2, int i3) const {
+    const T &operator()(int i1, int i2, int i3) const {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
             throw "Out of bounds";
@@ -425,7 +454,7 @@ public:
         return b[i1 * shift + i2 * d3 + i3];
     }
 
-    arr2d<T> operator [](int at) {
+    arr2d<T> operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
@@ -435,10 +464,10 @@ public:
     }
 };
 
-template <typename T>
+template<typename T>
 class arr4d {
-    T* b;
-    T* e;
+    T *b;
+    T *e;
     int d1;
     int d2;
     int d3;
@@ -456,14 +485,14 @@ public:
         e = b + sz;
     }
 
-    arr4d(int d1, int d2, int d3, int d4, const T& init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
+    arr4d(int d1, int d2, int d3, int d4, const T &init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
                                                            shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
         b = new T[sz];
         e = b + sz;
         fill(b, e, init);
     }
 
-    arr4d(T* b, int d1, int d2, int d3, int d4) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4),
+    arr4d(T *b, int d1, int d2, int d3, int d4) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4),
                                                   sz(d1 * d2 * d3 * d4) {}
 
     size_t size() const {
@@ -486,15 +515,15 @@ public:
         return d4;
     }
 
-    T* begin() {
+    T *begin() {
         return b;
     }
 
-    T* end() {
+    T *end() {
         return e;
     }
 
-    T& operator ()(int i1, int i2, int i3, int i4) {
+    T &operator()(int i1, int i2, int i3, int i4) {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3 || i4 < 0 || i4 >= d4) {
             throw "Out of bounds";
@@ -503,7 +532,7 @@ public:
         return b[i1 * shift1 + i2 * shift2 + i3 * d4 + i4];
     }
 
-    const T& operator ()(int i1, int i2, int i3, int i4) const {
+    const T &operator()(int i1, int i2, int i3, int i4) const {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3 || i4 < 0 || i4 >= d4) {
             throw "Out of bounds";
@@ -512,7 +541,7 @@ public:
         return b[i1 * shift1 + i2 * shift2 + i3 * d4 + i4];
     }
 
-    arr2d<T> operator [](int at) {
+    arr2d<T> operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
@@ -529,7 +558,7 @@ inline bool isWhitespace(int c) {
 
 class Input {
 private:
-    istream& in;
+    istream &in;
     bool exhausted = false;
 
     inline int get() {
@@ -546,7 +575,7 @@ private:
         return c;
     }
 
-    template <typename T>
+    template<typename T>
     inline T readInteger() {
         skipWhitespace();
         int c = get();
@@ -572,22 +601,22 @@ private:
 
     void initArrays(int) {}
 
-    template <typename T, class...Vs>
-    void initArrays(int n, arr<T>& array, Vs& ...vs) {
+    template<typename T, class...Vs>
+    void initArrays(int n, arr<T> &array, Vs &...vs) {
         array = arr<T>(n);
         initArrays(n, vs...);
     }
 
     void readImpl(int) {}
 
-    template <typename T, class...Vs>
-    void readImpl(int i, arr<T>& arr, Vs& ...vs) {
+    template<typename T, class...Vs>
+    void readImpl(int i, arr<T> &arr, Vs &...vs) {
         arr[i] = readType<T>();
         readImpl(i, vs...);
     }
 
 public:
-    Input(istream& in) : in(in) {};
+    Input(istream &in) : in(in) {};
 
     inline void skipWhitespace() {
         int c;
@@ -627,19 +656,19 @@ public:
         return readArray<int>(size);
     }
 
-    template <typename T>
+    template<typename T>
     T readType() {
         throw "Operation not supported";
     }
 
-    template <typename U, typename V>
+    template<typename U, typename V>
     pair<U, V> readType() {
         U first = readType<U>();
         V second = readType<V>();
         return make_pair(first, second);
     }
 
-    template <typename T>
+    template<typename T>
     arr<T> readArray(int n) {
         arr<T> res(n);
         for (int i = 0; i < n; i++) {
@@ -649,24 +678,24 @@ public:
     }
 
 
-    template <class...Vs>
-    void readArrays(int n, Vs& ...vs) {
+    template<class...Vs>
+    void readArrays(int n, Vs &...vs) {
         initArrays(n, vs...);
         for (int i = 0; i < n; i++) {
             readImpl(i, vs...);
         }
     }
 
-    template <typename U, typename V>
-    arr<pair<U, V>> readArray(int n) {
-        arr<pair<U, V>> res(n);
+    template<typename U, typename V>
+    arr<pair<U, V> > readArray(int n) {
+        arr<pair<U, V> > res(n);
         for (int i = 0; i < n; i++) {
             res[i] = readType<U, V>();
         }
         return res;
     }
 
-    template <typename T>
+    template<typename T>
     arr2d<T> readTable(int rows, int cols) {
         arr2d<T> result(rows, cols);
         for (int i = 0; i < rows; ++i) {
@@ -756,27 +785,27 @@ public:
     bool isExhausted() { return exhausted; }
 };
 
-template <>
+template<>
 double Input::readType() {
     return readDouble();
 }
 
-template <>
+template<>
 int Input::readType() {
     return readInt();
 }
 
-template <>
+template<>
 ll Input::readType() {
     return readLong();
 }
 
-template <>
+template<>
 char Input::readType() {
     return readChar();
 }
 
-template <>
+template<>
 string Input::readType() {
     return readString();
 }
@@ -784,15 +813,15 @@ string Input::readType() {
 
 class Output {
 private:
-    ostream& out;
+    ostream &out;
 
-    template <typename T>
-    void printSingle(const T& value) {
+    template<typename T>
+    void printSingle(const T &value) {
         out << value;
     }
 
-    template <typename T>
-    void printSingle(const vec<T>& array) {
+    template<typename T>
+    void printSingle(const vec<T> &array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -802,8 +831,8 @@ private:
         }
     }
 
-    template <typename T>
-    void printSingle(const arr<T>& array) {
+    template<typename T>
+    void printSingle(const arr<T> &array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -813,8 +842,8 @@ private:
         }
     }
 
-    template <typename T>
-    void printSingle(const arr2d<T>& array) {
+    template<typename T>
+    void printSingle(const arr2d<T> &array) {
         size_t n = array.dim1();
         size_t m = array.dim2();
         for (int i = 0; i < n; ++i) {
@@ -830,20 +859,20 @@ private:
         }
     }
 
-    template <typename T, typename U>
-    void printSingle(const pair<T, U>& value) {
+    template<typename T, typename U>
+    void printSingle(const pair<T, U> &value) {
         out << value.first << ' ' << value.second;
     }
 
 public:
-    Output(ostream& out) : out(out) {
+    Output(ostream &out) : out(out) {
         out << fixed << setprecision(20);
     }
 
     void print() {}
 
-    template <typename T, typename...Targs>
-    void print(const T& first, const Targs... args) {
+    template<typename T, typename...Targs>
+    void print(const T &first, const Targs... args) {
         printSingle(first);
         if (sizeof...(args) != 0) {
             out << ' ';
@@ -851,7 +880,7 @@ public:
         }
     }
 
-    template <typename...Targs>
+    template<typename...Targs>
     void printLine(const Targs... args) {
         print(args...);
         out << '\n';
@@ -869,9 +898,9 @@ public:
 
     NumberIterator(int v) : v(v) {}
 
-    operator int&() { return v; }
+    operator int &() { return v; }
 
-    int operator *() { return v; }
+    int operator*() { return v; }
 };
 
 class range : pii {
@@ -890,174 +919,171 @@ public:
 };
 
 
-const int MOD7 = 1000000007;
-const int MOD9 = 1000000009;
-const int MODF = 998244353;
-
-int mod = MOD7;
-
-template <typename T>
-T gcd(T a, T b, T& x, T& y) {
-    if (a == 0) {
-        x = 0;
-        y = 1;
-        return b;
-    }
-    int d = gcd(b % a, a, y, x);
-    x -= (b / a) * y;
-    return d;
-}
-
-class modint {
+class ReverseNumberIterator : public NumberIterator {
 public:
-    int n;
+    ReverseNumberIterator(int v) : NumberIterator(v) {}
 
-    modint() : n(0) {}
-
-    modint(ll n) {
-        if (n >= 0 && n < mod) {
-            this->n = n;
-            return;
-        }
-        n %= mod;
-        if (n < 0) {
-            n += mod;
-        }
-        this->n = n;
-    }
-
-    modint& operator +=(const modint& other) {
-        n += other.n;
-        if (n >= mod) {
-            n -= mod;
-        }
+    ReverseNumberIterator &operator++() {
+        --v;
         return *this;
     }
-
-    modint& operator -=(const modint& other) {
-        n -= other.n;
-        if (n < 0) {
-            n += mod;
-        }
-        return *this;
-    }
-
-    modint& operator *=(const modint& other) {
-        n = ll(n) * other.n % mod;
-        return *this;
-    }
-
-    modint operator -() {
-        if (n == 0) {
-            return 0;
-        }
-        return modint(mod - n);
-    }
-
-    modint inverse() {
-        ll x, y;
-        ll g = gcd(ll(n), ll(mod), x, y);
-#ifdef LOCAL
-        if (g != 1) {
-            throw "not inversable";
-        }
-#endif
-        return x;
-    }
-
-    int log(modint alpha);
 };
 
-modint operator +(const modint& a, const modint& b) {
-    return modint(a) += b;
-}
+class RevRange : pii {
+public:
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
 
-modint operator -(const modint& a, const modint& b) {
-    return modint(a) -= b;
-}
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
 
-modint operator *(const modint& a, const modint& b) {
-    return modint(a) *= b;
-}
-
-ostream& operator <<(ostream& out, const modint& val) {
-    return out << val.n;
-}
-
-bool operator ==(const modint& a, const modint& b) {
-    return a.n == b.n;
-}
-
-bool operator !=(const modint& a, const modint& b) {
-    return a.n != b.n;
-}
-
-namespace std {
-    template <>
-    struct hash<modint> {
-        size_t operator ()(const modint& n) const {
-            return n.n;
-        }
-    };
-}
-
-int modint::log(modint alpha) {
-    unordered_map<modint, int> base;
-    int exp = 0;
-    modint pow = 1;
-    modint inv = *this;
-    modint alInv = alpha.inverse();
-    while (exp * exp < mod) {
-        if (inv == 1) {
-            return exp;
-        }
-        base[inv] = exp++;
-        pow *= alpha;
-        inv *= alInv;
+    ReverseNumberIterator begin() {
+        return first;
     }
-    modint step = pow;
-    for (int i = 1;; i++) {
-        if (base.count(pow)) {
-            return exp * i + base[pow];
-        }
-        pow *= step;
+
+    ReverseNumberIterator end() {
+        return second;
     }
-}
+};
 
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class DexterPlaysWithGP {
+class TaskH {
 public:
-    void solve(istream& inp, ostream& outp) {
+    void solve(istream &inp, ostream &outp) {
         Input in(inp);
         Output out(outp);
 
-        int r = in.readInt();
-        int s = in.readInt();
-        int p = in.readInt();
+        int BUBEN = 1000;
 
-        mod = p;
-        modint alpha = r;
-        modint beta = (alpha - 1) * s + 1;
-        if (beta == 0) {
-            out.printLine(-1);
-            return;
+        int n = in.readInt();
+        int q = in.readInt();
+
+        auto a = in.readIntArray(n);
+
+        int parts = (n + BUBEN - 1) / BUBEN;
+        arri st(parts);
+        arri end(parts);
+        arr<vi> mn(parts);
+        arr<vi> mx(parts);
+        for (int i : range(parts)) {
+            st[i] = i * BUBEN;
+            end[i] = min((i + 1) * BUBEN, n);
+            mn[i].reserve(end[i] - st[i]);
+            mx[i].reserve(end[i] - st[i]);
         }
-        int answer = beta.log(alpha);
-        if (answer == 0) {
-            answer = p - 1;
+        auto build = [&](int at) {
+            mn[at].clear();
+            mx[at].clear();
+            for (int j : RevRange(end[at], st[at])) {
+                int cMax = a[j];
+                int cMin = a[j];
+                while (!mn[at].empty() && mx[at].back() > cMin) {
+                    maxim(cMax, mx[at].back());
+                    minim(cMin, mn[at].back());
+                    mx[at].pop_back();
+                    mn[at].pop_back();
+                }
+                mx[at].push_back(cMax);
+                mn[at].push_back(cMin);
+            }
+        };
+        for (int i : range(parts)) {
+            build(i);
         }
-/*        modint check = 0;
-        modint add = 1;
-        for (int i : range(answer)) {
-            check += add;
-            add *= alpha;
+        arri posTo(parts);
+        arri posFr(parts);
+        vi id;
+        id.reserve(2 * parts + 1);
+        vi cmn;
+        vi cmx;
+        cmn.reserve(2 * parts + 1);
+        cmx.reserve(2 * parts + 1);
+        for (int x : range(q)) {
+            int pp = in.readInt() - 1;
+            int nVal = in.readInt();
+            a[pp] = nVal;
+            build(pp / BUBEN);
+            id.clear();
+            cmn.clear();
+            cmx.clear();
+            for (int i : RevRange(parts)) {
+                posTo[i] = mn[i].size() - 1;
+                posFr[i] = 0;
+                if (id.empty() || cmx.back() < mn[i][0]) {
+                    id.push_back(i);
+                    cmn.push_back(mn[i][0]);
+                    cmx.push_back(mx[i].back());
+                    continue;
+                }
+                int nmn = mn[i][0];
+                int nmx = mx[i][0];
+                while (!id.empty()) {
+                    if (cmx.back() < nmn) {
+                        break;
+                    }
+                    if (id.back() == -1) {
+                        maxim(nmx, cmx.back());
+                        minim(nmn, cmn.back());
+                        id.pop_back();
+                        cmx.pop_back();
+                        cmn.pop_back();
+                        continue;
+                    }
+                    if (nmn < mx[id.back()][posFr[id.back()]]) {
+                        maxim(nmx, cmx.back());
+                        minim(nmn, cmn.back());
+                        id.pop_back();
+                        cmx.pop_back();
+                        cmn.pop_back();
+                        continue;
+                    }
+                    int l = posFr[id.back()];
+                    int r = posTo[id.back()] - 1;
+                    while (l < r) {
+                        int m = (l + r + 1) >> 1;
+                        if (mx[id.back()][m] > nmn) {
+                            r = m - 1;
+                        } else {
+                            l = m;
+                        }
+                    }
+                    maxim(nmx, cmx.back());
+                    minim(nmn, mn[id.back()][l + 1]);
+                    posTo[id.back()] = l;
+                    cmx.back() = mx[id.back()][l];
+                    break;
+                }
+                int l = 0;
+                int r = mn[i].size() - 1;
+                while (l < r) {
+                    int m = (l + r + 1) >> 1;
+                    if (mn[i][m] > nmx) {
+                        r = m - 1;
+                    } else {
+                        l = m;
+                    }
+                }
+                maxim(nmx, mx[i][l]);
+                id.push_back(-1);
+                cmx.push_back(nmx);
+                cmn.push_back(nmn);
+                if (l < mn[i].size() - 1) {
+                    posFr[i] = l + 1;
+                    id.push_back(i);
+                    cmn.push_back(mn[i][l + 1]);
+                    cmx.push_back(mx[i].back());
+                }
+            }
+            int answer = 0;
+            for (int i : id) {
+                if (i == -1) {
+                    answer++;
+                } else {
+                    answer += posTo[i] - posFr[i] + 1;
+                }
+            }
+            out.printLine(answer);
         }
-        if (check != s) {
-            exit(1);
-        }*/
-        out.printLine(answer);
     }
 };
 
@@ -1065,14 +1091,9 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    DexterPlaysWithGP solver;
-    std::istream& in(std::cin);
-    std::ostream& out(std::cout);
-    int n;
-    in >> n;
-    for (int i = 0; i < n; ++i) {
-        solver.solve(in, out);
-    }
-
+    TaskH solver;
+    std::istream &in(std::cin);
+    std::ostream &out(std::cout);
+    solver.solve(in, out);
     return 0;
 }
