@@ -20,7 +20,7 @@ public:
 
     const T& operator[](size_t ind) const {
 #ifdef LOCAL
-        if (ind >= parent::size()) {
+        if (ind >= parent::size() || ind < 0) {
             throw "Out of bounds";
         }
 #endif
@@ -29,7 +29,7 @@ public:
 
     T& operator[](size_t ind) {
 #ifdef LOCAL
-        if (ind >= parent::size()) {
+        if (ind >= parent::size() || ind < 0) {
             throw "Out of bounds";
         }
 #endif
@@ -63,7 +63,7 @@ public:
 
     parent::const_reference operator[](size_t ind) const {
 #ifdef LOCAL
-        if (ind >= parent::size()) {
+        if (ind >= parent::size() || ind < 0) {
             throw "Out of bounds";
         }
 #endif
@@ -73,12 +73,12 @@ public:
 
     parent::reference operator[](size_t ind) {
 #ifdef LOCAL
-        if (ind >= parent::size()) {
+        if (ind >= parent::size() || ind < 0) {
             throw "Out of bounds";
         }
 #endif
         return *iterator(this->_M_impl._M_start._M_p
-                               + ind / int(_S_word_bit), ind % int(_S_word_bit));
+                         + ind / int(_S_word_bit), ind % int(_S_word_bit));
     }
 
     Vector<bool>& operator =(Vector<bool>&& __x) noexcept {
