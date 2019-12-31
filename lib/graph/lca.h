@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../general.h"
-#include "../collections/interval_tree.h"
+#include "../collections/segment_tree.h"
 #include "graph.h"
 
 template <class Edge>

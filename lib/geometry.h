@@ -6,6 +6,8 @@ double eps = 1e-9;
 
 using DoubleType = double;
 
+const DoubleType PI = atan(DoubleType(1)) * 4;
+
 class Point {
 public:
     const DoubleType x;

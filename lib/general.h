@@ -7,8 +7,6 @@
 using ll = long long;
 using pii = pair<int, int>;
 
-const double PI = atan(1) * 4;
-
 template <typename T>
 T minim(T& was, T cand) {
     return was = min(was, cand);
