@@ -6,7 +6,7 @@
 #include "../collections/queue.h"
 
 template <class Edge>
-vi topologicalSort(const Graph<Edge>& graph) {
+vi topologicalSort(Graph<Edge>& graph) {
     vi result;
     int n = graph.vertexCount;
     result.reserve(n);

@@ -31,3 +31,5 @@ public:
         return *this;
     }
 };
+
+using qi = que<int>;

@@ -2,6 +2,7 @@
 
 #include "general.h"
 #include "collections/arr.h"
+#include "range/range.h"
 
 template <typename T>
 inline void unique(vec<T>& v) {
@@ -14,6 +15,14 @@ arri createOrder(int n) {
         order[i] = i;
     }
     return order;
+}
+
+arri inverse(const arri& p) {
+    arri res(p.size());
+    for (int i : range(p.size())) {
+        res[p[i]] = i;
+    }
+    return res;
 }
 
 template <class Collection, typename Iterator>

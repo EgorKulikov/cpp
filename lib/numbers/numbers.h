@@ -98,6 +98,10 @@ public:
         return fact[n] * invFactorial[k] * invFactorial[n - k];
     }
 
+    modint operator ()(int n, int k) const {
+        return c(n, k);
+    }
+
     modint factorial(int n) const {
         return fact[n];
     }

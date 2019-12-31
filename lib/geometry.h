@@ -1,6 +1,8 @@
 #pragma once
 
 #include "general.h"
+#include "collections/arr.h"
+#include "range/range.h"
 
 double eps = 1e-9;
 
@@ -10,19 +12,20 @@ const DoubleType PI = atan(DoubleType(1)) * 4;
 
 class Point {
 public:
-    const DoubleType x;
-    const DoubleType y;
+    DoubleType x;
+    DoubleType y;
 
-    Point() : x(0), y(0) {}
+    Point() {}
     Point(const DoubleType x, const DoubleType y) : x(x), y(y) {}
 };
 
 class Line {
 public:
-    const DoubleType a;
-    const DoubleType b;
-    const DoubleType c;
+    DoubleType a;
+    DoubleType b;
+    DoubleType c;
 
+    Line() : Line(0, 0, 0) {}
     Line(const DoubleType a, const DoubleType b, const DoubleType c) : a(a), b(b), c(c) {}
 };
 
@@ -55,18 +58,26 @@ DoubleType distance(const Point& a, const Point& b) {
 }
 
 class Segment {
+    mutable Line l;
 public:
-    const Point a, b;
-    const Line l;
+    Point a, b;
 
-    Segment(const Point &a, const Point &b) : a(a), b(b), l(line(a, b)) {}
+    Segment() {}
+    Segment(const Point &a, const Point &b) : a(a), b(b) {}
 
-    bool contains(const Point& c) {
-        return distance(l, c) < eps && c.x > min(a.x, b.x) - eps && c.x < max(a.x, b.x) + eps &&
+    bool contains(const Point& c) const {
+        return distance(line(), c) < eps && c.x > min(a.x, b.x) - eps && c.x < max(a.x, b.x) + eps &&
             c.y > min(a.y, b.y) - eps && c.y < max(a.y, b.y) + eps;
     }
 
-    DoubleType length() {
+    const Line& line() const {
+        if (l.a == 0 && l.b == 0) {
+            l = ::line(a, b);
+        }
+        return l;
+    }
+
+    DoubleType length() const {
         return distance(a, b);
     }
 };
@@ -121,3 +132,64 @@ vec<Point> touchingPoints(const Circle& c, const Point& p) {
     Circle power(p, sqrt((dist - c.r) * (dist + c.r)));
     return intersect(c, power);
 }
+
+DoubleType canonicalAngle(DoubleType angle) {
+    while (angle > PI) {
+        angle -= 2 * PI;
+    }
+    while (angle < -PI) {
+        angle += 2 * PI;
+    }
+    return angle;
+}
+
+class Polygon {
+    mutable double ar = -1;
+    mutable arr<Segment> sid;
+
+public:
+    arr<Point> vert;
+
+    Polygon() {}
+    Polygon(const arr<Point> &vert) : vert(vert) {}
+    double area() const {
+        if (ar == -1) {
+            ar = 0;
+            for (int i : range(vert.size())) {
+                const Point& a = vert[i];
+                const Point& b = vert[(i + 1) % vert.size()];
+                ar += (a.x - b.x) * (a.y + b.y);
+            }
+            ar = abs(ar) / 2;
+        }
+        return ar;
+    }
+
+    bool inside(const Point& p, bool strict = false) const {
+        bool onSide = false;
+        for (const auto& s : sides()) {
+            if (s.contains(p)) {
+                onSide = true;
+                break;
+            }
+        }
+        if (onSide) {
+            return !strict;
+        }
+        double totalAngle = canonicalAngle(atan2(vert[0].y - p.y, vert[0].x - p.x) - atan2(vert[vert.size() - 1].y - p.y, vert[vert.size() - 1].x - p.x));
+        for (int i = 1; i < vert.size(); i++) {
+            totalAngle += canonicalAngle(atan2(vert[i].y - p.y, vert[i].x - p.x) - atan2(vert[i - 1].y - p.y, vert[i - 1].x - p.x));
+        }
+        return abs(totalAngle) > PI;
+    }
+
+    const arr<Segment>& sides() const {
+        if (sid.size() == 0) {
+            sid = arr<Segment>(vert.size());
+            for (int i : range(vert.size())) {
+                sid[i] = Segment(vert[i], vert[(i + 1) % vert.size()]);
+            }
+        }
+        return sid;
+    }
+};
