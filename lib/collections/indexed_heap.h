@@ -139,6 +139,7 @@ public:
         heap[0] = heap[--sz];
         pos[heap[0]] = 0;
         siftDown(0);
+        return res;
     }
 
     bool erase(int element) {

@@ -14,7 +14,7 @@
 
 using namespace std;
 
-template<typename T>
+template <typename T>
 class Vector : public vector<T> {
     using parent = vector<T>;
 public:
@@ -22,20 +22,20 @@ public:
 
     explicit Vector(size_t __n) : parent(__n) {}
 
-    Vector(size_t __n, const T &__value) : parent(__n, __value) {}
+    Vector(size_t __n, const T& __value) : parent(__n, __value) {}
 
-    explicit Vector(const parent &__x) : parent(__x) {}
+    explicit Vector(const parent& __x) : parent(__x) {}
 
-    Vector(const Vector &__x) : parent(__x) {}
+    Vector(const Vector& __x) : parent(__x) {}
 
-    Vector(Vector &&__x) noexcept : parent(move(__x)) {}
+    Vector(Vector&& __x) noexcept : parent(move(__x)) {}
 
     Vector(initializer_list<T> __l) : parent(__l) {}
 
-    template<typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
+    template <typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
     Vector(_InputIterator __first, _InputIterator __last) : parent(__first, __last) {}
 
-    const T &operator[](size_t ind) const {
+    const T& operator [](size_t ind) const {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -44,7 +44,7 @@ public:
         return *(parent::_M_impl._M_start + ind);
     }
 
-    T &operator[](size_t ind) {
+    T& operator [](size_t ind) {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -53,18 +53,18 @@ public:
         return *(parent::_M_impl._M_start + ind);
     }
 
-    Vector<T> &operator=(Vector<T> &&__x) noexcept {
-        parent::operator=(__x);
+    Vector<T>& operator =(Vector<T>&& __x) noexcept {
+        parent::operator =(__x);
         return *this;
     }
 
-    Vector<T> &operator=(const Vector<T> &__x) {
-        parent::operator=(__x);
+    Vector<T>& operator =(const Vector<T>& __x) {
+        parent::operator =(__x);
         return *this;
     }
 };
 
-template<>
+template <>
 class Vector<bool> : public vector<bool> {
     using parent = vector<bool>;
 public:
@@ -72,20 +72,20 @@ public:
 
     explicit Vector(size_t __n) : parent(__n) {}
 
-    Vector(size_t __n, const bool &__value) : parent(__n, __value) {}
+    Vector(size_t __n, const bool& __value) : parent(__n, __value) {}
 
-    explicit Vector(const parent &__x) : parent(__x) {}
+    explicit Vector(const parent& __x) : parent(__x) {}
 
-    Vector(const Vector &__x) : parent(__x) {}
+    Vector(const Vector& __x) : parent(__x) {}
 
-    Vector(Vector &&__x) noexcept : parent(move(__x)) {}
+    Vector(Vector&& __x) noexcept : parent(move(__x)) {}
 
     Vector(initializer_list<bool> __l) : parent(__l) {}
 
-    template<typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
+    template <typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
     Vector(_InputIterator __first, _InputIterator __last) : parent(__first, __last) {}
 
-    parent::const_reference operator[](size_t ind) const {
+    parent::const_reference operator [](size_t ind) const {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -95,7 +95,7 @@ public:
                                + ind / int(_S_word_bit), ind % int(_S_word_bit));
     }
 
-    parent::reference operator[](size_t ind) {
+    parent::reference operator [](size_t ind) {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -105,13 +105,13 @@ public:
                          + ind / int(_S_word_bit), ind % int(_S_word_bit));
     }
 
-    Vector<bool> &operator=(Vector<bool> &&__x) noexcept {
-        parent::operator=(__x);
+    Vector<bool>& operator =(Vector<bool>&& __x) noexcept {
+        parent::operator =(__x);
         return *this;
     }
 
-    Vector<bool> &operator=(const Vector<bool> &__x) {
-        parent::operator=(__x);
+    Vector<bool>& operator =(const Vector<bool>& __x) {
+        parent::operator =(__x);
         return *this;
     }
 };
@@ -130,20 +130,18 @@ using vi = vec<int>;
 using ll = long long;
 using pii = pair<int, int>;
 
-const double PI = atan(1) * 4;
-
-template<typename T>
-T minim(T &was, T cand) {
+template <typename T>
+T minim(T& was, T cand) {
     return was = min(was, cand);
 }
 
-template<typename T>
-T maxim(T &was, T cand) {
+template <typename T>
+T maxim(T& was, T cand) {
     return was = max(was, cand);
 }
 
 
-template<typename D>
+template <typename D>
 D dPower(D base, ll exponent) {
     if (exponent < 0) {
         return dPower(1 / base, -exponent);
@@ -160,10 +158,10 @@ D dPower(D base, ll exponent) {
 }
 
 
-template<typename T>
+template <typename T>
 class arr {
-    T *b;
-    T *e;
+    T* b;
+    T* e;
     int n;
 public:
     arr() : b(nullptr), e(nullptr), n(0) {}
@@ -182,7 +180,7 @@ public:
         }
     }
 
-    arr(int n, const T &init) : n(n) {
+    arr(int n, const T& init) : n(n) {
 #ifdef LOCAL
         if (n < 0) {
             throw "bad alloc";
@@ -207,27 +205,27 @@ public:
         }
     }
 
-    arr(T *b, int n) : b(b), e(b + n), n(n) {}
+    arr(T* b, int n) : b(b), e(b + n), n(n) {}
 
-    arr(T *b, T *e) : b(b), e(e), n(e - b) {}
+    arr(T* b, T* e) : b(b), e(e), n(e - b) {}
 
     size_t size() const {
         return n;
     }
 
-    T *begin() {
+    T* begin() {
         return b;
     }
 
-    const T *begin() const {
+    const T* begin() const {
         return b;
     }
 
-    T *end() {
+    T* end() {
         return e;
     }
 
-    const T *end() const {
+    const T* end() const {
         return e;
     }
 
@@ -237,7 +235,7 @@ public:
         return res;
     }
 
-    T &operator[](int at) {
+    T& operator [](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= n) {
             throw "Out of bounds";
@@ -246,7 +244,7 @@ public:
         return b[at];
     }
 
-    const T &operator[](int at) const {
+    const T& operator [](int at) const {
 #ifdef LOCAL
         if (at < 0 || at >= n) {
             throw "Out of bounds";
@@ -255,31 +253,10 @@ public:
         return b[at];
     }
 
-    void swap(arr<T> &arr) {
+    void swap(arr<T>& arr) {
         std::swap(b, arr.b);
         std::swap(e, arr.e);
         std::swap(n, arr.n);
-    }
-};
-
-class BoolIterator : iterator<forward_iterator_tag, bool> {
-    unsigned *at;
-    unsigned pos;
-
-public:
-    BoolIterator(unsigned int *at, unsigned int pos) : at(at), pos(pos) {}
-
-    bool operator*() {
-        return (*at >> pos & 1) == 1;
-    }
-
-    BoolIterator &operator++() {
-        pos++;
-        if (pos == 32) {
-            pos = 0;
-            at++;
-        }
-        return *this;
     }
 };
 
@@ -287,8 +264,8 @@ typedef arr<int> arri;
 
 void decreaseByOne() {}
 
-template<typename T, class...Vs>
-void decreaseByOne(arr<T> &array, Vs &...vs) {
+template <typename T, class...Vs>
+void decreaseByOne(arr<T>& array, Vs& ...vs) {
     int n = array.size();
     for (int i = 0; i < n; ++i) {
         array[i]--;
@@ -296,19 +273,19 @@ void decreaseByOne(arr<T> &array, Vs &...vs) {
     decreaseByOne(vs...);
 }
 
-template<typename T, typename U>
-void decreaseByOne(arr<pair<T, U> > &v) {
-    for (auto &p : v) {
+template <typename T, typename U>
+void decreaseByOne(arr<pair<T, U>>& v) {
+    for (auto& p : v) {
         p.first--;
         p.second--;
     }
 }
 
 
-template<typename T>
+template <typename T>
 class arr2d {
-    T *b;
-    T *e;
+    T* b;
+    T* e;
     int d1;
     int d2;
     int sz;
@@ -321,13 +298,13 @@ public:
         e = b + sz;
     }
 
-    arr2d(int d1, int d2, const T &init) : d1(d1), d2(d2), sz(d1 * d2) {
+    arr2d(int d1, int d2, const T& init) : d1(d1), d2(d2), sz(d1 * d2) {
         b = new T[sz];
         e = b + sz;
         fill(b, e, init);
     }
 
-    arr2d(T *b, int d1, int d2) : b(b), e(b + d1 * d2), d1(d1), d2(d2), sz(d1 * d2) {}
+    arr2d(T* b, int d1, int d2) : b(b), e(b + d1 * d2), d1(d1), d2(d2), sz(d1 * d2) {}
 
     size_t size() const {
         return sz;
@@ -341,15 +318,15 @@ public:
         return d2;
     }
 
-    T *begin() {
+    T* begin() {
         return b;
     }
 
-    T *end() {
+    T* end() {
         return e;
     }
 
-    T &operator()(int i1, int i2) {
+    T& operator ()(int i1, int i2) {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2) {
             throw "Out of bounds";
@@ -358,7 +335,7 @@ public:
         return b[i1 * d2 + i2];
     }
 
-    const T &operator()(int i1, int i2) const {
+    const T& operator ()(int i1, int i2) const {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2) {
             throw "Out of bounds";
@@ -367,7 +344,7 @@ public:
         return b[i1 * d2 + i2];
     }
 
-    arr<T> operator[](int at) {
+    arr<T> operator [](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
@@ -376,7 +353,7 @@ public:
         return arr<T>(b + at * d2, d2);
     }
 
-    void swap(arr2d<T> &a) {
+    void swap(arr2d<T>& a) {
         std::swap(b, a.b);
         std::swap(e, a.e);
         std::swap(d1, a.d1);
@@ -385,10 +362,10 @@ public:
     }
 };
 
-template<typename T>
+template <typename T>
 class arr3d {
-    T *b;
-    T *e;
+    T* b;
+    T* e;
     int d1;
     int d2;
     int d3;
@@ -403,13 +380,13 @@ public:
         e = b + sz;
     }
 
-    arr3d(int d1, int d2, int d3, const T &init) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
+    arr3d(int d1, int d2, int d3, const T& init) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
         b = new T[sz];
         e = b + sz;
         fill(b, e, init);
     }
 
-    arr3d(T *b, int d1, int d2, int d3) : b(b), e(b + d1 * d2 * d3), d1(d1), d2(d2), d3(d3), shift(d2 * d3),
+    arr3d(T* b, int d1, int d2, int d3) : b(b), e(b + d1 * d2 * d3), d1(d1), d2(d2), d3(d3), shift(d2 * d3),
                                           sz(d1 * d2 * d3) {}
 
     size_t size() const {
@@ -428,15 +405,15 @@ public:
         return d3;
     }
 
-    T *begin() {
+    T* begin() {
         return b;
     }
 
-    T *end() {
+    T* end() {
         return e;
     }
 
-    T &operator()(int i1, int i2, int i3) {
+    T& operator ()(int i1, int i2, int i3) {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
             throw "Out of bounds";
@@ -445,7 +422,7 @@ public:
         return b[i1 * shift + i2 * d3 + i3];
     }
 
-    const T &operator()(int i1, int i2, int i3) const {
+    const T& operator ()(int i1, int i2, int i3) const {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
             throw "Out of bounds";
@@ -454,7 +431,7 @@ public:
         return b[i1 * shift + i2 * d3 + i3];
     }
 
-    arr2d<T> operator[](int at) {
+    arr2d<T> operator [](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
@@ -464,10 +441,10 @@ public:
     }
 };
 
-template<typename T>
+template <typename T>
 class arr4d {
-    T *b;
-    T *e;
+    T* b;
+    T* e;
     int d1;
     int d2;
     int d3;
@@ -485,14 +462,14 @@ public:
         e = b + sz;
     }
 
-    arr4d(int d1, int d2, int d3, int d4, const T &init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
+    arr4d(int d1, int d2, int d3, int d4, const T& init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
                                                            shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
         b = new T[sz];
         e = b + sz;
         fill(b, e, init);
     }
 
-    arr4d(T *b, int d1, int d2, int d3, int d4) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4),
+    arr4d(T* b, int d1, int d2, int d3, int d4) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4),
                                                   sz(d1 * d2 * d3 * d4) {}
 
     size_t size() const {
@@ -515,15 +492,15 @@ public:
         return d4;
     }
 
-    T *begin() {
+    T* begin() {
         return b;
     }
 
-    T *end() {
+    T* end() {
         return e;
     }
 
-    T &operator()(int i1, int i2, int i3, int i4) {
+    T& operator ()(int i1, int i2, int i3, int i4) {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3 || i4 < 0 || i4 >= d4) {
             throw "Out of bounds";
@@ -532,7 +509,7 @@ public:
         return b[i1 * shift1 + i2 * shift2 + i3 * d4 + i4];
     }
 
-    const T &operator()(int i1, int i2, int i3, int i4) const {
+    const T& operator ()(int i1, int i2, int i3, int i4) const {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3 || i4 < 0 || i4 >= d4) {
             throw "Out of bounds";
@@ -541,7 +518,7 @@ public:
         return b[i1 * shift1 + i2 * shift2 + i3 * d4 + i4];
     }
 
-    arr2d<T> operator[](int at) {
+    arr2d<T> operator [](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
@@ -558,7 +535,7 @@ inline bool isWhitespace(int c) {
 
 class Input {
 private:
-    istream &in;
+    istream& in;
     bool exhausted = false;
 
     inline int get() {
@@ -575,7 +552,7 @@ private:
         return c;
     }
 
-    template<typename T>
+    template <typename T>
     inline T readInteger() {
         skipWhitespace();
         int c = get();
@@ -601,22 +578,22 @@ private:
 
     void initArrays(int) {}
 
-    template<typename T, class...Vs>
-    void initArrays(int n, arr<T> &array, Vs &...vs) {
+    template <typename T, class...Vs>
+    void initArrays(int n, arr<T>& array, Vs& ...vs) {
         array = arr<T>(n);
         initArrays(n, vs...);
     }
 
     void readImpl(int) {}
 
-    template<typename T, class...Vs>
-    void readImpl(int i, arr<T> &arr, Vs &...vs) {
+    template <typename T, class...Vs>
+    void readImpl(int i, arr<T>& arr, Vs& ...vs) {
         arr[i] = readType<T>();
         readImpl(i, vs...);
     }
 
 public:
-    Input(istream &in) : in(in) {};
+    Input(istream& in) : in(in) {};
 
     inline void skipWhitespace() {
         int c;
@@ -656,19 +633,19 @@ public:
         return readArray<int>(size);
     }
 
-    template<typename T>
+    template <typename T>
     T readType() {
         throw "Operation not supported";
     }
 
-    template<typename U, typename V>
+    template <typename U, typename V>
     pair<U, V> readType() {
         U first = readType<U>();
         V second = readType<V>();
         return make_pair(first, second);
     }
 
-    template<typename T>
+    template <typename T>
     arr<T> readArray(int n) {
         arr<T> res(n);
         for (int i = 0; i < n; i++) {
@@ -678,24 +655,24 @@ public:
     }
 
 
-    template<class...Vs>
-    void readArrays(int n, Vs &...vs) {
+    template <class...Vs>
+    void readArrays(int n, Vs& ...vs) {
         initArrays(n, vs...);
         for (int i = 0; i < n; i++) {
             readImpl(i, vs...);
         }
     }
 
-    template<typename U, typename V>
-    arr<pair<U, V> > readArray(int n) {
-        arr<pair<U, V> > res(n);
+    template <typename U, typename V>
+    arr<pair<U, V>> readArray(int n) {
+        arr<pair<U, V>> res(n);
         for (int i = 0; i < n; i++) {
             res[i] = readType<U, V>();
         }
         return res;
     }
 
-    template<typename T>
+    template <typename T>
     arr2d<T> readTable(int rows, int cols) {
         arr2d<T> result(rows, cols);
         for (int i = 0; i < rows; ++i) {
@@ -785,27 +762,27 @@ public:
     bool isExhausted() { return exhausted; }
 };
 
-template<>
+template <>
 double Input::readType() {
     return readDouble();
 }
 
-template<>
+template <>
 int Input::readType() {
     return readInt();
 }
 
-template<>
+template <>
 ll Input::readType() {
     return readLong();
 }
 
-template<>
+template <>
 char Input::readType() {
     return readChar();
 }
 
-template<>
+template <>
 string Input::readType() {
     return readString();
 }
@@ -813,15 +790,15 @@ string Input::readType() {
 
 class Output {
 private:
-    ostream &out;
+    ostream& out;
 
-    template<typename T>
-    void printSingle(const T &value) {
+    template <typename T>
+    void printSingle(const T& value) {
         out << value;
     }
 
-    template<typename T>
-    void printSingle(const vec<T> &array) {
+    template <typename T>
+    void printSingle(const vec<T>& array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -831,8 +808,8 @@ private:
         }
     }
 
-    template<typename T>
-    void printSingle(const arr<T> &array) {
+    template <typename T>
+    void printSingle(const arr<T>& array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -842,8 +819,8 @@ private:
         }
     }
 
-    template<typename T>
-    void printSingle(const arr2d<T> &array) {
+    template <typename T>
+    void printSingle(const arr2d<T>& array) {
         size_t n = array.dim1();
         size_t m = array.dim2();
         for (int i = 0; i < n; ++i) {
@@ -859,20 +836,20 @@ private:
         }
     }
 
-    template<typename T, typename U>
-    void printSingle(const pair<T, U> &value) {
+    template <typename T, typename U>
+    void printSingle(const pair<T, U>& value) {
         out << value.first << ' ' << value.second;
     }
 
 public:
-    Output(ostream &out) : out(out) {
+    Output(ostream& out) : out(out) {
         out << fixed << setprecision(20);
     }
 
     void print() {}
 
-    template<typename T, typename...Targs>
-    void print(const T &first, const Targs... args) {
+    template <typename T, typename...Targs>
+    void print(const T& first, const Targs... args) {
         printSingle(first);
         if (sizeof...(args) != 0) {
             out << ' ';
@@ -880,7 +857,7 @@ public:
         }
     }
 
-    template<typename...Targs>
+    template <typename...Targs>
     void printLine(const Targs... args) {
         print(args...);
         out << '\n';
@@ -898,9 +875,9 @@ public:
 
     NumberIterator(int v) : v(v) {}
 
-    operator int &() { return v; }
+    operator int&() { return v; }
 
-    int operator*() { return v; }
+    int operator *() { return v; }
 };
 
 class range : pii {
@@ -919,11 +896,372 @@ public:
 };
 
 
+template <typename W, typename C>
+class WeightedFlowEdge {
+private:
+    WeightedFlowEdge<W, C>* reverseEdge;
+
+public:
+    const int from;
+    const int to;
+    W weight;
+    C capacity;
+    int id;
+
+    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
+        reverseEdge = new WeightedFlowEdge(this);
+    }
+
+    WeightedFlowEdge<W, C>* transposed() { return nullptr; }
+
+    WeightedFlowEdge<W, C>* reverse() { return reverseEdge; }
+
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
+    }
+
+    C flow() const {
+        return reverseEdge->capacity;
+    }
+
+private:
+    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight),
+                                                        capacity(0) {
+        reverseEdge = reverse;
+    }
+};
+
+template <typename C>
+class FlowEdge {
+private:
+    FlowEdge<C>* reverseEdge;
+
+public:
+    const int from;
+    const int to;
+    C capacity;
+    int id;
+
+    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
+        reverseEdge = new FlowEdge(this);
+    }
+
+    FlowEdge<C>* transposed() { return nullptr; }
+
+    FlowEdge<C>* reverse() { return reverseEdge; }
+
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
+    }
+
+    C flow() const {
+        return reverseEdge->capacity;
+    }
+
+private:
+    FlowEdge(FlowEdge<C>* reverse) : from(reverse->to), to(reverse->from), capacity(0) {
+        reverseEdge = reverse;
+    }
+};
+
+template <typename W>
+class WeightedEdge {
+public:
+    const int from;
+    const int to;
+    W weight;
+    int id;
+
+    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+    }
+
+    WeightedEdge<W>* transposed() { return nullptr; }
+
+    WeightedEdge<W>* reverse() { return nullptr; }
+};
+
+template <typename W>
+class BiWeightedEdge {
+private:
+    BiWeightedEdge<W>* transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    W weight;
+    int id;
+
+    BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+        transposedEdge = new BiWeightedEdge(this);
+    }
+
+    BiWeightedEdge<W>* transposed() { return transposedEdge; }
+
+    BiWeightedEdge<W>* reverse() { return nullptr; }
+
+private:
+    BiWeightedEdge(BiWeightedEdge<W>* transposed) : from(transposed->to), to(transposed->from),
+                                                    weight(transposed->weight) {
+        transposedEdge = transposed;
+    }
+};
+
+class BaseEdge {
+public:
+    const int from;
+    const int to;
+    int id;
+
+    BaseEdge(int from, int to) : from(from), to(to) {
+    }
+
+    BaseEdge* transposed() { return nullptr; }
+
+    BaseEdge* reverse() { return nullptr; }
+};
+
+class BiEdge {
+private:
+    BiEdge* transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    int id;
+
+    BiEdge(int from, int to) : from(from), to(to) {
+        transposedEdge = new BiEdge(this);
+    }
+
+    BiEdge* transposed() { return transposedEdge; }
+
+    BiEdge* reverse() { return nullptr; }
+
+private:
+    BiEdge(BiEdge* transposed) : from(transposed->to), to(transposed->from) {
+        transposedEdge = transposed;
+    }
+};
+
+template <class Edge>
+class Graph {
+public:
+    int vertexCount;
+    int edgeCount = 0;
+private:
+    arr<vec<Edge*>> edges;
+
+public:
+    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vec<Edge*>()) {}
+
+    void addEdge(Edge* edge) {
+        edge->id = edgeCount;
+        edges[edge->from].push_back(edge);
+        Edge* reverse = edge->reverse();
+        if (reverse != nullptr) {
+            reverse->id = edgeCount;
+            edges[reverse->from].push_back(reverse);
+        }
+        Edge* transposed = edge->transposed();
+        if (transposed != nullptr) {
+            edges[transposed->from].push_back(transposed);
+            transposed->id = edgeCount;
+            Edge* transRev = transposed->reverse();
+            if (transRev != nullptr) {
+                edges[transRev->from].push_back(transRev);
+                transRev->id = edgeCount;
+            }
+        }
+        edgeCount++;
+    }
+
+    template <typename...Ts>
+    void addEdge(Ts...args) {
+        addEdge(new Edge(args...));
+    }
+
+    vec<Edge*>& operator [](int at) {
+        return edges[at];
+    }
+};
+
+
+class IndexedHeap {
+    arri heap;
+    arri pos;
+    int sz = 0;
+    function<bool(int, int)> cmp;
+
+    void swap(int i, int j) {
+        std::swap(heap[i], heap[j]);
+        std::swap(pos[heap[i]], pos[heap[j]]);
+    }
+
+public:
+    IndexedHeap(int capacity = 0, const function<bool(int, int)> cmp = less<>()) : heap(arri(capacity)),
+                                                                                   pos(arri(capacity, -1)), cmp(cmp) {}
+
+    int* begin() {
+        return heap.begin();
+    }
+
+    int* end() {
+        return heap.begin() + sz;
+    }
+
+    const int* begin() const {
+        return heap.begin();
+    }
+
+    const int* end() const {
+        return heap.begin() + sz;
+    }
+
+    int size() const {
+        return sz;
+    }
+
+    bool empty() const {
+        return sz == 0;
+    }
+
+    void siftUp(int index) {
+#ifdef LOCAL
+        if (index < 0 || index >= sz) {
+            throw "Out of bounds";
+        }
+#endif
+        int val = heap[index];
+        while (index) {
+            int parent = (index - 1) >> 1;
+            int parVal = heap[parent];
+            if (!cmp(val, parVal)) {
+                heap[index] = val;
+                pos[val] = index;
+                return;
+            }
+            heap[index] = parVal;
+            pos[parVal] = index;
+            index = parent;
+        }
+        heap[0] = val;
+        pos[val] = 0;
+    }
+
+    void siftDown(int index) {
+#ifdef LOCAL
+        if (index < 0 || index >= sz) {
+            throw "Out of bounds";
+        }
+#endif
+        while (true) {
+            int child = (index << 1) + 1;
+            if (child >= sz) {
+                return;
+            }
+            if (child + 1 < sz && cmp(heap[child + 1], heap[child])) {
+                child++;
+            }
+            if (!cmp(heap[child], heap[index])) {
+                return;
+            }
+            swap(index, child);
+            index = child;
+        }
+    }
+
+    int operator [](int index) const {
+#ifdef LOCAL
+        if (index < 0 || index >= sz) {
+            throw "Out of bounds";
+        }
+#endif
+        return heap[index];
+    }
+
+    void push(int element) {
+#ifdef LOCAL
+        if (element < 0 || element >= pos.size() || pos[element] != -1) {
+            throw "Out of bounds";
+        }
+#endif
+        heap[sz] = element;
+        pos[element] = sz;
+        siftUp(sz++);
+    }
+
+    int at(int element) const {
+#ifdef LOCAL
+        if (element < 0 || element >= pos.size()) {
+            throw "Out of bounds";
+        }
+#endif
+        return pos[element];
+    }
+
+    int top() const {
+#ifdef LOCAL
+        if (sz == 0) {
+            throw "Out of bounds";
+        }
+#endif
+        return heap[0];
+    }
+
+    int pop() {
+#ifdef LOCAL
+        if (sz == 0) {
+            throw "Out of bounds";
+        }
+#endif
+        int res = heap[0];
+        pos[res] = -1;
+        if (sz == 1) {
+            sz = 0;
+            return res;
+        }
+        heap[0] = heap[--sz];
+        pos[heap[0]] = 0;
+        siftDown(0);
+        return res;
+    }
+
+    bool erase(int element) {
+#ifdef LOCAL
+        if (element < 0 || element >= pos.size()) {
+            throw "Out of bounds";
+        }
+#endif
+        int index = pos[element];
+        if (index == -1) {
+            return false;
+        }
+        pos[element] = -1;
+        if (index == sz - 1) {
+            sz--;
+            return true;
+        }
+        heap[index] = heap[--sz];
+        pos[heap[index]] = index;
+        siftDown(index);
+        siftUp(index);
+        return true;
+    }
+
+    void clear() {
+        sz = 0;
+        fill(all(pos), -1);
+    }
+};
+
+
 class ReverseNumberIterator : public NumberIterator {
 public:
     ReverseNumberIterator(int v) : NumberIterator(v) {}
 
-    ReverseNumberIterator &operator++() {
+    ReverseNumberIterator& operator ++() {
         --v;
         return *this;
     }
@@ -945,145 +1283,153 @@ public:
 };
 
 
+template <class Edge>
+pair<ll, ll> minCostFlow(Graph<Edge>& orGraph, int source, int sink, bool onlyNegative = false) {
+    ll inf = numeric_limits<ll>::max() / 2;
+    ll large = 1ll << 40;
+
+    int n = orGraph.vertexCount;
+    arr<ll> p(n + 1, 0);
+    p[n] = inf;
+
+    Graph<Edge> graph(n + 1);
+    arr<Edge*> base(orGraph.edgeCount, nullptr);
+    arr<Edge*> corresponding(orGraph.edgeCount);
+    for (int i : range(n)) {
+        for (auto* e : orGraph[i]) {
+            if (e->capacity > 0) {
+                base[e->id] = e;
+                corresponding[e->id] = new Edge(e->from, e->to, e->weight, 0);
+                graph.addEdge(corresponding[e->id]);
+            }
+        }
+    }
+    Edge* back = new Edge(sink, source, onlyNegative ? 0 : -large, 0);
+    graph.addEdge(back);
+    for (int i : range(n)) {
+        graph.addEdge(n, i, 0, 1);
+    }
+
+    arr<ll> dis(n + 1);
+    IndexedHeap heap(n + 1, [&](int a, int b) -> bool {
+        return dis[a] < dis[b];
+    });
+    arr<Edge*> pre(n + 1);
+    auto c = [&](Edge* e) -> ll {
+        return p[e->from] + e->weight - p[e->to];
+    };
+    auto dijkstra = [&](int s) {
+        fill(all(dis), inf);
+        fill(all(pre), nullptr);
+        dis[s] = 0;
+        heap.push(s);
+
+        while (!heap.empty()) {
+            int u = heap.pop();
+            ll w = dis[u];
+            for (auto* e : graph[u]) {
+                int v = e->to;
+#ifdef LOCAL
+                if (e->capacity > 0 && c(e) < 0) {
+                    throw "Negative edge";
+                }
+#endif
+                if (e->capacity > 0 && dis[v] > w + c(e)) {
+                    dis[v] = w + c(e);
+                    pre[v] = e;
+                    int at = heap.at(v);
+                    if (at == -1) {
+                        heap.push(v);
+                    } else {
+                        heap.siftUp(at);
+                    }
+                }
+            }
+        }
+    };
+
+    auto addOne = [&](Edge* e) {
+        int u = e->from;
+        int v = e->to;
+        ll curLen = c(e);
+        if (e->capacity != 0) {
+            e->capacity++;
+            return;
+        }
+        dijkstra(v);
+        if (dis[u] < inf && dis[u] + c(e) < 0) {
+            e->reverse()->capacity++;
+            while (u != v) {
+                Edge* x = pre[u];
+                x->push(1);
+                u = x->from;
+            }
+        } else {
+            e->capacity++;
+        }
+        ll maxDis = 0;
+        for (int i : range(n)) {
+            if (dis[i] < inf) {
+                maxim(maxDis, dis[i]);
+            }
+        }
+        for (int i : range(n)) {
+            p[i] += dis[i] < inf ? dis[i] : maxDis + abs(curLen);
+        }
+        dijkstra(n);
+        for (int i : range(n)) {
+            p[i] += dis[i] - p[n];
+        }
+    };
+
+    addOne(back);
+    for (int i : RevRange(40)) {
+        for (int j : range(n + 1)) {
+            for (Edge* e : graph[j]) {
+                e->capacity <<= 1;
+            }
+        }
+        for (Edge* e : base) {
+            if (e != nullptr && (e->capacity >> i & 1) == 1) {
+                addOne(corresponding[e->id]);
+            }
+        }
+    }
+
+    ll minCost = 0;
+    ll minFlow = back->flow();
+    for (Edge* e : base) {
+        if (e == nullptr) {
+            continue;
+        }
+        Edge* x = corresponding[e->id];
+        minCost += x->flow() * x->weight;
+        e->push(x->flow());
+    }
+    return {minCost, minFlow};
+}
+
+
 //#pragma comment(linker, "/STACK:200000000")
 
-class TaskH {
+class mincostflow {
 public:
-    void solve(istream &inp, ostream &outp) {
+    void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
-        int BUBEN = 1000;
-
         int n = in.readInt();
-        int q = in.readInt();
+        int m = in.readInt();
+        arri from, to, cap, cost;
+        in.readArrays(m, from, to, cap, cost);
+        decreaseByOne(from, to);
 
-        auto a = in.readIntArray(n);
-
-        int parts = (n + BUBEN - 1) / BUBEN;
-        arri st(parts);
-        arri end(parts);
-        arr<vi> mn(parts);
-        arr<vi> mx(parts);
-        for (int i : range(parts)) {
-            st[i] = i * BUBEN;
-            end[i] = min((i + 1) * BUBEN, n);
-            mn[i].reserve(end[i] - st[i]);
-            mx[i].reserve(end[i] - st[i]);
+        Graph<WeightedFlowEdge<ll, ll>> graph(n);
+        for (int i : range(m)) {
+            graph.addEdge(from[i], to[i], cost[i], cap[i]);
         }
-        auto build = [&](int at) {
-            mn[at].clear();
-            mx[at].clear();
-            for (int j : RevRange(end[at], st[at])) {
-                int cMax = a[j];
-                int cMin = a[j];
-                while (!mn[at].empty() && mx[at].back() > cMin) {
-                    maxim(cMax, mx[at].back());
-                    minim(cMin, mn[at].back());
-                    mx[at].pop_back();
-                    mn[at].pop_back();
-                }
-                mx[at].push_back(cMax);
-                mn[at].push_back(cMin);
-            }
-        };
-        for (int i : range(parts)) {
-            build(i);
-        }
-        arri posTo(parts);
-        arri posFr(parts);
-        vi id;
-        id.reserve(2 * parts + 1);
-        vi cmn;
-        vi cmx;
-        cmn.reserve(2 * parts + 1);
-        cmx.reserve(2 * parts + 1);
-        for (int x : range(q)) {
-            int pp = in.readInt() - 1;
-            int nVal = in.readInt();
-            a[pp] = nVal;
-            build(pp / BUBEN);
-            id.clear();
-            cmn.clear();
-            cmx.clear();
-            for (int i : RevRange(parts)) {
-                posTo[i] = mn[i].size() - 1;
-                posFr[i] = 0;
-                if (id.empty() || cmx.back() < mn[i][0]) {
-                    id.push_back(i);
-                    cmn.push_back(mn[i][0]);
-                    cmx.push_back(mx[i].back());
-                    continue;
-                }
-                int nmn = mn[i][0];
-                int nmx = mx[i][0];
-                while (!id.empty()) {
-                    if (cmx.back() < nmn) {
-                        break;
-                    }
-                    if (id.back() == -1) {
-                        maxim(nmx, cmx.back());
-                        minim(nmn, cmn.back());
-                        id.pop_back();
-                        cmx.pop_back();
-                        cmn.pop_back();
-                        continue;
-                    }
-                    if (nmn < mx[id.back()][posFr[id.back()]]) {
-                        maxim(nmx, cmx.back());
-                        minim(nmn, cmn.back());
-                        id.pop_back();
-                        cmx.pop_back();
-                        cmn.pop_back();
-                        continue;
-                    }
-                    int l = posFr[id.back()];
-                    int r = posTo[id.back()] - 1;
-                    while (l < r) {
-                        int m = (l + r + 1) >> 1;
-                        if (mx[id.back()][m] > nmn) {
-                            r = m - 1;
-                        } else {
-                            l = m;
-                        }
-                    }
-                    maxim(nmx, cmx.back());
-                    minim(nmn, mn[id.back()][l + 1]);
-                    posTo[id.back()] = l;
-                    cmx.back() = mx[id.back()][l];
-                    break;
-                }
-                int l = 0;
-                int r = mn[i].size() - 1;
-                while (l < r) {
-                    int m = (l + r + 1) >> 1;
-                    if (mn[i][m] > nmx) {
-                        r = m - 1;
-                    } else {
-                        l = m;
-                    }
-                }
-                maxim(nmx, mx[i][l]);
-                id.push_back(-1);
-                cmx.push_back(nmx);
-                cmn.push_back(nmn);
-                if (l < mn[i].size() - 1) {
-                    posFr[i] = l + 1;
-                    id.push_back(i);
-                    cmn.push_back(mn[i][l + 1]);
-                    cmx.push_back(mx[i].back());
-                }
-            }
-            int answer = 0;
-            for (int i : id) {
-                if (i == -1) {
-                    answer++;
-                } else {
-                    answer += posTo[i] - posFr[i] + 1;
-                }
-            }
-            out.printLine(answer);
-        }
+        auto answer = minCostFlow(graph, 0, n - 1);
+        out.printLine(answer.second, answer.first);
     }
 };
 
@@ -1091,9 +1437,9 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    TaskH solver;
-    std::istream &in(std::cin);
-    std::ostream &out(std::cout);
+    mincostflow solver;
+    std::istream& in(std::cin);
+    std::ostream& out(std::cout);
     solver.solve(in, out);
     return 0;
 }
