@@ -1336,6 +1336,9 @@ pair<ll, ll> minCostFlow(Graph<Edge>& orGraph, int source, int sink, bool onlyNe
 #endif
                 if (e->capacity > 0 && dis[v] > w + c(e)) {
                     dis[v] = w + c(e);
+                    if (dis[v] > n + 1) {
+                        throw "shit";
+                    }
                     pre[v] = e;
                     int at = heap.at(v);
                     if (at == -1) {
