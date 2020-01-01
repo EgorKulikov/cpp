@@ -20,7 +20,7 @@ public:
 
     const T& operator[](size_t ind) const {
 #ifdef LOCAL
-        if (ind >= parent::size() || ind < 0) {
+        if (ind >= parent::size()) {
             throw "Out of bounds";
         }
 #endif
@@ -29,7 +29,7 @@ public:
 
     T& operator[](size_t ind) {
 #ifdef LOCAL
-        if (ind >= parent::size() || ind < 0) {
+        if (ind >= parent::size()) {
             throw "Out of bounds";
         }
 #endif
@@ -63,7 +63,7 @@ public:
 
     parent::const_reference operator[](size_t ind) const {
 #ifdef LOCAL
-        if (ind >= parent::size() || ind < 0) {
+        if (ind >= parent::size()) {
             throw "Out of bounds";
         }
 #endif
@@ -73,7 +73,7 @@ public:
 
     parent::reference operator[](size_t ind) {
 #ifdef LOCAL
-        if (ind >= parent::size() || ind < 0) {
+        if (ind >= parent::size()) {
             throw "Out of bounds";
         }
 #endif

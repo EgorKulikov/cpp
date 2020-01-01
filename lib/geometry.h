@@ -4,9 +4,9 @@
 #include "collections/arr.h"
 #include "range/range.h"
 
-double eps = 1e-9;
+using DoubleType = long double;
 
-using DoubleType = double;
+DoubleType eps = 1e-9;
 
 const DoubleType PI = atan(DoubleType(1)) * 4;
 

@@ -60,11 +60,22 @@ private:
         initArrays(n, vs...);
     }
 
+    template <typename T, class...Vs>
+    void initArrays(int n, vec<T>&, Vs&...vs) {
+        initArrays(n, vs...);
+    }
+
     void readImpl(int) {}
 
     template <typename T, class...Vs>
     void readImpl(int i, arr<T>& arr, Vs&...vs) {
         arr[i] = readType<T>();
+        readImpl(i, vs...);
+    }
+
+    template <typename T, class...Vs>
+    void readImpl(int i, vec<T>& arr, Vs&...vs) {
+        arr.push_back(readType<T>());
         readImpl(i, vs...);
     }
 

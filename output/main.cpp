@@ -35,7 +35,7 @@ public:
     template <typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
     Vector(_InputIterator __first, _InputIterator __last) : parent(__first, __last) {}
 
-    const T& operator [](size_t ind) const {
+    const T& operator[](size_t ind) const {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -44,7 +44,7 @@ public:
         return *(parent::_M_impl._M_start + ind);
     }
 
-    T& operator [](size_t ind) {
+    T& operator[](size_t ind) {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -53,13 +53,13 @@ public:
         return *(parent::_M_impl._M_start + ind);
     }
 
-    Vector<T>& operator =(Vector<T>&& __x) noexcept {
-        parent::operator =(__x);
+    Vector<T>& operator=(Vector<T>&& __x) noexcept {
+        parent::operator=(__x);
         return *this;
     }
 
-    Vector<T>& operator =(const Vector<T>& __x) {
-        parent::operator =(__x);
+    Vector<T>& operator=(const Vector<T>& __x) {
+        parent::operator=(__x);
         return *this;
     }
 };
@@ -85,7 +85,7 @@ public:
     template <typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
     Vector(_InputIterator __first, _InputIterator __last) : parent(__first, __last) {}
 
-    parent::const_reference operator [](size_t ind) const {
+    parent::const_reference operator[](size_t ind) const {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -95,7 +95,7 @@ public:
                                + ind / int(_S_word_bit), ind % int(_S_word_bit));
     }
 
-    parent::reference operator [](size_t ind) {
+    parent::reference operator[](size_t ind) {
 #ifdef LOCAL
         if (ind >= parent::size()) {
             throw "Out of bounds";
@@ -105,13 +105,13 @@ public:
                          + ind / int(_S_word_bit), ind % int(_S_word_bit));
     }
 
-    Vector<bool>& operator =(Vector<bool>&& __x) noexcept {
-        parent::operator =(__x);
+    Vector<bool>& operator=(Vector<bool>&& __x) noexcept {
+        parent::operator=(__x);
         return *this;
     }
 
-    Vector<bool>& operator =(const Vector<bool>& __x) {
-        parent::operator =(__x);
+    Vector<bool>& operator=(const Vector<bool>& __x) {
+        parent::operator=(__x);
         return *this;
     }
 };
@@ -235,7 +235,7 @@ public:
         return res;
     }
 
-    T& operator [](int at) {
+    T& operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= n) {
             throw "Out of bounds";
@@ -244,7 +244,7 @@ public:
         return b[at];
     }
 
-    const T& operator [](int at) const {
+    const T& operator[](int at) const {
 #ifdef LOCAL
         if (at < 0 || at >= n) {
             throw "Out of bounds";
@@ -326,7 +326,7 @@ public:
         return e;
     }
 
-    T& operator ()(int i1, int i2) {
+    T& operator()(int i1, int i2) {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2) {
             throw "Out of bounds";
@@ -335,7 +335,7 @@ public:
         return b[i1 * d2 + i2];
     }
 
-    const T& operator ()(int i1, int i2) const {
+    const T& operator()(int i1, int i2) const {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2) {
             throw "Out of bounds";
@@ -344,7 +344,7 @@ public:
         return b[i1 * d2 + i2];
     }
 
-    arr<T> operator [](int at) {
+    arr<T> operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
@@ -413,7 +413,7 @@ public:
         return e;
     }
 
-    T& operator ()(int i1, int i2, int i3) {
+    T& operator()(int i1, int i2, int i3) {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
             throw "Out of bounds";
@@ -422,7 +422,7 @@ public:
         return b[i1 * shift + i2 * d3 + i3];
     }
 
-    const T& operator ()(int i1, int i2, int i3) const {
+    const T& operator()(int i1, int i2, int i3) const {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
             throw "Out of bounds";
@@ -431,7 +431,7 @@ public:
         return b[i1 * shift + i2 * d3 + i3];
     }
 
-    arr2d<T> operator [](int at) {
+    arr2d<T> operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
@@ -500,7 +500,7 @@ public:
         return e;
     }
 
-    T& operator ()(int i1, int i2, int i3, int i4) {
+    T& operator()(int i1, int i2, int i3, int i4) {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3 || i4 < 0 || i4 >= d4) {
             throw "Out of bounds";
@@ -509,7 +509,7 @@ public:
         return b[i1 * shift1 + i2 * shift2 + i3 * d4 + i4];
     }
 
-    const T& operator ()(int i1, int i2, int i3, int i4) const {
+    const T& operator()(int i1, int i2, int i3, int i4) const {
 #ifdef LOCAL
         if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3 || i4 < 0 || i4 >= d4) {
             throw "Out of bounds";
@@ -518,7 +518,7 @@ public:
         return b[i1 * shift1 + i2 * shift2 + i3 * d4 + i4];
     }
 
-    arr2d<T> operator [](int at) {
+    arr2d<T> operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
@@ -584,11 +584,22 @@ private:
         initArrays(n, vs...);
     }
 
+    template <typename T, class...Vs>
+    void initArrays(int n, vec<T>&, Vs& ...vs) {
+        initArrays(n, vs...);
+    }
+
     void readImpl(int) {}
 
     template <typename T, class...Vs>
     void readImpl(int i, arr<T>& arr, Vs& ...vs) {
         arr[i] = readType<T>();
+        readImpl(i, vs...);
+    }
+
+    template <typename T, class...Vs>
+    void readImpl(int i, vec<T>& arr, Vs& ...vs) {
+        arr.push_back(readType<T>());
         readImpl(i, vs...);
     }
 
@@ -877,7 +888,7 @@ public:
 
     operator int&() { return v; }
 
-    int operator *() { return v; }
+    int operator*() { return v; }
 };
 
 class range : pii {
@@ -896,372 +907,11 @@ public:
 };
 
 
-template <typename W, typename C>
-class WeightedFlowEdge {
-private:
-    WeightedFlowEdge<W, C>* reverseEdge;
-
-public:
-    const int from;
-    const int to;
-    W weight;
-    C capacity;
-    int id;
-
-    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
-        reverseEdge = new WeightedFlowEdge(this);
-    }
-
-    WeightedFlowEdge<W, C>* transposed() { return nullptr; }
-
-    WeightedFlowEdge<W, C>* reverse() { return reverseEdge; }
-
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight),
-                                                        capacity(0) {
-        reverseEdge = reverse;
-    }
-};
-
-template <typename C>
-class FlowEdge {
-private:
-    FlowEdge<C>* reverseEdge;
-
-public:
-    const int from;
-    const int to;
-    C capacity;
-    int id;
-
-    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
-        reverseEdge = new FlowEdge(this);
-    }
-
-    FlowEdge<C>* transposed() { return nullptr; }
-
-    FlowEdge<C>* reverse() { return reverseEdge; }
-
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    FlowEdge(FlowEdge<C>* reverse) : from(reverse->to), to(reverse->from), capacity(0) {
-        reverseEdge = reverse;
-    }
-};
-
-template <typename W>
-class WeightedEdge {
-public:
-    const int from;
-    const int to;
-    W weight;
-    int id;
-
-    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-    }
-
-    WeightedEdge<W>* transposed() { return nullptr; }
-
-    WeightedEdge<W>* reverse() { return nullptr; }
-};
-
-template <typename W>
-class BiWeightedEdge {
-private:
-    BiWeightedEdge<W>* transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    W weight;
-    int id;
-
-    BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-        transposedEdge = new BiWeightedEdge(this);
-    }
-
-    BiWeightedEdge<W>* transposed() { return transposedEdge; }
-
-    BiWeightedEdge<W>* reverse() { return nullptr; }
-
-private:
-    BiWeightedEdge(BiWeightedEdge<W>* transposed) : from(transposed->to), to(transposed->from),
-                                                    weight(transposed->weight) {
-        transposedEdge = transposed;
-    }
-};
-
-class BaseEdge {
-public:
-    const int from;
-    const int to;
-    int id;
-
-    BaseEdge(int from, int to) : from(from), to(to) {
-    }
-
-    BaseEdge* transposed() { return nullptr; }
-
-    BaseEdge* reverse() { return nullptr; }
-};
-
-class BiEdge {
-private:
-    BiEdge* transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    int id;
-
-    BiEdge(int from, int to) : from(from), to(to) {
-        transposedEdge = new BiEdge(this);
-    }
-
-    BiEdge* transposed() { return transposedEdge; }
-
-    BiEdge* reverse() { return nullptr; }
-
-private:
-    BiEdge(BiEdge* transposed) : from(transposed->to), to(transposed->from) {
-        transposedEdge = transposed;
-    }
-};
-
-template <class Edge>
-class Graph {
-public:
-    int vertexCount;
-    int edgeCount = 0;
-private:
-    arr<vec<Edge*>> edges;
-
-public:
-    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vec<Edge*>()) {}
-
-    void addEdge(Edge* edge) {
-        edge->id = edgeCount;
-        edges[edge->from].push_back(edge);
-        Edge* reverse = edge->reverse();
-        if (reverse != nullptr) {
-            reverse->id = edgeCount;
-            edges[reverse->from].push_back(reverse);
-        }
-        Edge* transposed = edge->transposed();
-        if (transposed != nullptr) {
-            edges[transposed->from].push_back(transposed);
-            transposed->id = edgeCount;
-            Edge* transRev = transposed->reverse();
-            if (transRev != nullptr) {
-                edges[transRev->from].push_back(transRev);
-                transRev->id = edgeCount;
-            }
-        }
-        edgeCount++;
-    }
-
-    template <typename...Ts>
-    void addEdge(Ts...args) {
-        addEdge(new Edge(args...));
-    }
-
-    vec<Edge*>& operator [](int at) {
-        return edges[at];
-    }
-};
-
-
-class IndexedHeap {
-    arri heap;
-    arri pos;
-    int sz = 0;
-    function<bool(int, int)> cmp;
-
-    void swap(int i, int j) {
-        std::swap(heap[i], heap[j]);
-        std::swap(pos[heap[i]], pos[heap[j]]);
-    }
-
-public:
-    IndexedHeap(int capacity = 0, const function<bool(int, int)> cmp = less<>()) : heap(arri(capacity)),
-                                                                                   pos(arri(capacity, -1)), cmp(cmp) {}
-
-    int* begin() {
-        return heap.begin();
-    }
-
-    int* end() {
-        return heap.begin() + sz;
-    }
-
-    const int* begin() const {
-        return heap.begin();
-    }
-
-    const int* end() const {
-        return heap.begin() + sz;
-    }
-
-    int size() const {
-        return sz;
-    }
-
-    bool empty() const {
-        return sz == 0;
-    }
-
-    void siftUp(int index) {
-#ifdef LOCAL
-        if (index < 0 || index >= sz) {
-            throw "Out of bounds";
-        }
-#endif
-        int val = heap[index];
-        while (index) {
-            int parent = (index - 1) >> 1;
-            int parVal = heap[parent];
-            if (!cmp(val, parVal)) {
-                heap[index] = val;
-                pos[val] = index;
-                return;
-            }
-            heap[index] = parVal;
-            pos[parVal] = index;
-            index = parent;
-        }
-        heap[0] = val;
-        pos[val] = 0;
-    }
-
-    void siftDown(int index) {
-#ifdef LOCAL
-        if (index < 0 || index >= sz) {
-            throw "Out of bounds";
-        }
-#endif
-        while (true) {
-            int child = (index << 1) + 1;
-            if (child >= sz) {
-                return;
-            }
-            if (child + 1 < sz && cmp(heap[child + 1], heap[child])) {
-                child++;
-            }
-            if (!cmp(heap[child], heap[index])) {
-                return;
-            }
-            swap(index, child);
-            index = child;
-        }
-    }
-
-    int operator [](int index) const {
-#ifdef LOCAL
-        if (index < 0 || index >= sz) {
-            throw "Out of bounds";
-        }
-#endif
-        return heap[index];
-    }
-
-    void push(int element) {
-#ifdef LOCAL
-        if (element < 0 || element >= pos.size() || pos[element] != -1) {
-            throw "Out of bounds";
-        }
-#endif
-        heap[sz] = element;
-        pos[element] = sz;
-        siftUp(sz++);
-    }
-
-    int at(int element) const {
-#ifdef LOCAL
-        if (element < 0 || element >= pos.size()) {
-            throw "Out of bounds";
-        }
-#endif
-        return pos[element];
-    }
-
-    int top() const {
-#ifdef LOCAL
-        if (sz == 0) {
-            throw "Out of bounds";
-        }
-#endif
-        return heap[0];
-    }
-
-    int pop() {
-#ifdef LOCAL
-        if (sz == 0) {
-            throw "Out of bounds";
-        }
-#endif
-        int res = heap[0];
-        pos[res] = -1;
-        if (sz == 1) {
-            sz = 0;
-            return res;
-        }
-        heap[0] = heap[--sz];
-        pos[heap[0]] = 0;
-        siftDown(0);
-        return res;
-    }
-
-    bool erase(int element) {
-#ifdef LOCAL
-        if (element < 0 || element >= pos.size()) {
-            throw "Out of bounds";
-        }
-#endif
-        int index = pos[element];
-        if (index == -1) {
-            return false;
-        }
-        pos[element] = -1;
-        if (index == sz - 1) {
-            sz--;
-            return true;
-        }
-        heap[index] = heap[--sz];
-        pos[heap[index]] = index;
-        siftDown(index);
-        siftUp(index);
-        return true;
-    }
-
-    void clear() {
-        sz = 0;
-        fill(all(pos), -1);
-    }
-};
-
-
 class ReverseNumberIterator : public NumberIterator {
 public:
     ReverseNumberIterator(int v) : NumberIterator(v) {}
 
-    ReverseNumberIterator& operator ++() {
+    ReverseNumberIterator& operator++() {
         --v;
         return *this;
     }
@@ -1283,156 +933,193 @@ public:
 };
 
 
-template <class Edge>
-pair<ll, ll> minCostFlow(Graph<Edge>& orGraph, int source, int sink, bool onlyNegative = false) {
-    ll inf = numeric_limits<ll>::max() / 2;
-    ll large = 1ll << 40;
-
-    int n = orGraph.vertexCount;
-    arr<ll> p(n + 1, 0);
-    p[n] = inf;
-
-    Graph<Edge> graph(n + 1);
-    arr<Edge*> base(orGraph.edgeCount, nullptr);
-    arr<Edge*> corresponding(orGraph.edgeCount);
-    for (int i : range(n)) {
-        for (auto* e : orGraph[i]) {
-            if (e->capacity > 0) {
-                base[e->id] = e;
-                corresponding[e->id] = new Edge(e->from, e->to, e->weight, 0);
-                graph.addEdge(corresponding[e->id]);
-            }
-        }
-    }
-    Edge* back = new Edge(sink, source, onlyNegative ? 0 : -large, 0);
-    graph.addEdge(back);
-    for (int i : range(n)) {
-        graph.addEdge(n, i, 0, 1);
-    }
-
-    arr<ll> dis(n + 1);
-    IndexedHeap heap(n + 1, [&](int a, int b) -> bool {
-        return dis[a] < dis[b];
-    });
-    arr<Edge*> pre(n + 1);
-    auto c = [&](Edge* e) -> ll {
-        return p[e->from] + e->weight - p[e->to];
-    };
-    auto dijkstra = [&](int s) {
-        fill(all(dis), inf);
-        fill(all(pre), nullptr);
-        dis[s] = 0;
-        heap.push(s);
-
-        while (!heap.empty()) {
-            int u = heap.pop();
-            ll w = dis[u];
-            for (auto* e : graph[u]) {
-                int v = e->to;
-#ifdef LOCAL
-                if (e->capacity > 0 && c(e) < 0) {
-                    throw "Negative edge";
-                }
-#endif
-                if (e->capacity > 0 && dis[v] > w + c(e)) {
-                    dis[v] = w + c(e);
-                    if (dis[v] > n + 1) {
-                        throw "shit";
-                    }
-                    pre[v] = e;
-                    int at = heap.at(v);
-                    if (at == -1) {
-                        heap.push(v);
-                    } else {
-                        heap.siftUp(at);
-                    }
-                }
-            }
-        }
-    };
-
-    auto addOne = [&](Edge* e) {
-        int u = e->from;
-        int v = e->to;
-        ll curLen = c(e);
-        if (e->capacity != 0) {
-            e->capacity++;
-            return;
-        }
-        dijkstra(v);
-        if (dis[u] < inf && dis[u] + c(e) < 0) {
-            e->reverse()->capacity++;
-            while (u != v) {
-                Edge* x = pre[u];
-                x->push(1);
-                u = x->from;
-            }
-        } else {
-            e->capacity++;
-        }
-        ll maxDis = 0;
-        for (int i : range(n)) {
-            if (dis[i] < inf) {
-                maxim(maxDis, dis[i]);
-            }
-        }
-        for (int i : range(n)) {
-            p[i] += dis[i] < inf ? dis[i] : maxDis + abs(curLen);
-        }
-        dijkstra(n);
-        for (int i : range(n)) {
-            p[i] += dis[i] - p[n];
-        }
-    };
-
-    addOne(back);
-    for (int i : RevRange(40)) {
-        for (int j : range(n + 1)) {
-            for (Edge* e : graph[j]) {
-                e->capacity <<= 1;
-            }
-        }
-        for (Edge* e : base) {
-            if (e != nullptr && (e->capacity >> i & 1) == 1) {
-                addOne(corresponding[e->id]);
-            }
-        }
-    }
-
-    ll minCost = 0;
-    ll minFlow = back->flow();
-    for (Edge* e : base) {
-        if (e == nullptr) {
-            continue;
-        }
-        Edge* x = corresponding[e->id];
-        minCost += x->flow() * x->weight;
-        e->push(x->flow());
-    }
-    return {minCost, minFlow};
-}
-
-
 //#pragma comment(linker, "/STACK:200000000")
 
-class mincostflow {
+class DMOPC19Contest4P6LittlePrincesSpecialtyTeaHouse {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
-        int n = in.readInt();
-        int m = in.readInt();
-        arri from, to, cap, cost;
-        in.readArrays(m, from, to, cap, cost);
-        decreaseByOne(from, to);
+        using ld = long double;
 
-        Graph<WeightedFlowEdge<ll, ll>> graph(n);
-        for (int i : range(m)) {
-            graph.addEdge(from[i], to[i], cost[i], cap[i]);
+        int BUBEN = 100;
+        int n = in.readInt();
+        int q = in.readInt();
+        arr<ll> t = in.readArray<ll>(n);
+        int parts = (n + BUBEN - 1) / BUBEN;
+        arr<ll> op3(parts, -1);
+        arr<vec<ll>> op24(parts, vec<ll>());
+        arr<ll> mn(parts, numeric_limits<ll>::max());
+        arr<ll> mx(parts, 0);
+        for (int i : range(n)) {
+            minim(mn[i / BUBEN], t[i]);
+            maxim(mx[i / BUBEN], t[i]);
         }
-        auto answer = minCostFlow(graph, 0, n - 1);
-        out.printLine(answer.second, answer.first);
+        auto squareRoot = [](ll x) -> ll {
+            ll res = sqrt(ld(x));
+            if (res * res > x) {
+                res--;
+            } else if ((res + 1) * (res + 1) <= x) {
+                res++;
+            }
+            return res;
+        };
+        auto doPart = [&](int pt) {
+            if (op3[pt] != -1) {
+                for (int i : RevRange(min(n, (pt + 1) * BUBEN), pt * BUBEN)) {
+                    t[i] = op3[pt]--;
+                }
+                op3[pt] = -1;
+            }
+            for (int i : range(pt * BUBEN, min(n, (pt + 1) * BUBEN))) {
+                for (ll j : op24[pt]) {
+                    if (j > 0) {
+                        t[i] -= j;
+                    } else {
+                        for (int k : range(-j)) {
+                            if (t[i] <= 1) {
+                                break;
+                            }
+                            t[i] = squareRoot(t[i]);
+                        }
+                    }
+                }
+            }
+            op24[pt].clear();
+        };
+        auto recalc = [&](int pt) {
+            mn[pt] = numeric_limits<ll>::max();
+            mx[pt] = 0;
+            for (int i : range(pt * BUBEN, min(n, (pt + 1) * BUBEN))) {
+                minim(mn[pt], t[i]);
+                maxim(mx[pt], t[i]);
+            }
+        };
+        for (int x : range(q)) {
+            int type = in.readInt();
+            if (type == 1) {
+                int pos = in.readInt() - 1;
+                int pt = pos / BUBEN;
+                doPart(pt);
+                out.printLine(t[pos]);
+            } else if (type == 2) {
+                int x = in.readInt() - 1;
+                int y = in.readInt() - 1;
+                ll tt = in.readLong();
+                int xpt = x / BUBEN;
+                int ypt = y / BUBEN;
+                doPart(xpt);
+                if (xpt == ypt) {
+                    ll mVal = numeric_limits<ll>::max();
+                    for (int i : range(x, y + 1)) {
+                        minim(mVal, t[i]);
+                    }
+                    if (mVal < tt) {
+                        continue;
+                    }
+                    for (int i : range(x, y + 1)) {
+                        t[i] -= tt;
+                    }
+                    recalc(xpt);
+                    continue;
+                } else {
+                    doPart(ypt);
+                    ll mVal = numeric_limits<ll>::max();
+                    for (int i : range(x, min(n, (xpt + 1) * BUBEN))) {
+                        minim(mVal, t[i]);
+                    }
+                    for (int i : range(xpt + 1, ypt)) {
+                        minim(mVal, mn[i]);
+                    }
+                    for (int i : range(ypt * BUBEN, y + 1)) {
+                        minim(mVal, t[i]);
+                    }
+                    if (mVal < tt) {
+                        continue;
+                    }
+                    for (int i : range(x, min(n, (xpt + 1) * BUBEN))) {
+                        t[i] -= tt;
+                    }
+                    for (int i : range(xpt + 1, ypt)) {
+                        mn[i] -= tt;
+                        mx[i] -= tt;
+                        if (!op24[i].empty() && op24[i].back() > 0) {
+                            op24[i].back() += tt;
+                        } else {
+                            op24[i].push_back(tt);
+                        }
+                    }
+                    for (int i : range(ypt * BUBEN, y + 1)) {
+                        t[i] -= tt;
+                    }
+                    recalc(xpt);
+                    recalc(ypt);
+                }
+            } else if (type == 3) {
+                int x = in.readInt() - 1;
+                int y = in.readInt() - 1;
+                ll tt = in.readLong();
+                int xpt = x / BUBEN;
+                int ypt = y / BUBEN;
+                doPart(xpt);
+                if (xpt == ypt) {
+                    for (int i : RevRange(y + 1, x)) {
+                        t[i] = tt--;
+                    }
+                    recalc(xpt);
+                } else {
+                    doPart(ypt);
+                    for (int i : RevRange(y + 1, ypt * BUBEN)) {
+                        t[i] = tt--;
+                    }
+                    for (int i : RevRange(ypt, xpt + 1)) {
+                        op24[i].clear();
+                        op3[i] = tt;
+                        mx[i] = tt;
+                        mn[i] = tt - BUBEN + 1;
+                        tt -= BUBEN;
+                    }
+                    for (int i : RevRange(min(n, (xpt + 1) * BUBEN), x)) {
+                        t[i] = tt--;
+                    }
+                    recalc(xpt);
+                    recalc(ypt);
+                }
+            } else if (type == 4) {
+                int x = in.readInt() - 1;
+                int y = in.readInt() - 1;
+                int xpt = x / BUBEN;
+                int ypt = y / BUBEN;
+                doPart(xpt);
+                if (xpt == ypt) {
+                    for (int i : range(x, y + 1)) {
+                        t[i] = squareRoot(t[i]);
+                    }
+                    recalc(xpt);
+                    continue;
+                } else {
+                    doPart(ypt);
+                    for (int i : range(x, min(n, (xpt + 1) * BUBEN))) {
+                        t[i] = squareRoot(t[i]);
+                    }
+                    for (int i : range(xpt + 1, ypt)) {
+                        mn[i] = squareRoot(mn[i]);
+                        mx[i] = squareRoot(mx[i]);
+                        if (!op24[i].empty() && op24[i].back() < 0) {
+                            op24[i].back()--;
+                        } else {
+                            op24[i].push_back(-1);
+                        }
+                    }
+                    for (int i : range(ypt * BUBEN, y + 1)) {
+                        t[i] = squareRoot(t[i]);
+                    }
+                    recalc(xpt);
+                    recalc(ypt);
+                }
+            }
+        }
     }
 };
 
@@ -1440,7 +1127,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    mincostflow solver;
+    DMOPC19Contest4P6LittlePrincesSpecialtyTeaHouse solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
     solver.solve(in, out);
