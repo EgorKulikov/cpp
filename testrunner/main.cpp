@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/DMOPC19Contest4P6LittlePrincesSpecialtyTeaHouse.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/p1013.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"5 8\n1 3 1 7 6\n2 3 5 3\n4 1 3\n1 3\n3 2 4 4\n1 3\n4 1 5\n2 1 4 1\n1 3\n", "1\n3\n0\n", true, true},
+		{"2\n10\n100", "90", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -49,7 +49,7 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    DMOPC19Contest4P6LittlePrincesSpecialtyTeaHouse solver;
+			    p1013 solver;
 			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;

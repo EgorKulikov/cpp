@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../general.h"
+#include "../range/range.h"
 
 template <typename T>
 class arr {
@@ -95,10 +96,16 @@ public:
         return b[at];
     }
 
-    void swap(arr<T> &arr) {
-        std::swap(b, arr.b);
-        std::swap(e, arr.e);
-        std::swap(n, arr.n);
+    bool operator ==(const arr& other) const {
+        if (n != other.n) {
+            return false;
+        }
+        for (int i : range(n)) {
+            if (b[i] != other.b[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 };
 

@@ -42,6 +42,9 @@ public:
     }
 
     Vector<T>& operator =(const Vector<T>& __x) {
+        if (&__x == this) {
+            return *this;
+        }
         parent::operator=(__x);
         return *this;
     }
@@ -87,6 +90,9 @@ public:
     }
 
     Vector<bool>& operator =(const Vector<bool>& __x) {
+        if (&__x == this) {
+            return *this;
+        }
         parent::operator=(__x);
         return *this;
     }

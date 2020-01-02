@@ -19,7 +19,7 @@ public:
     }
 
     void dataUpdate() {
-        data.update(left == nullptr ? nullptr : &left->data, right == nullptr ? nullptr : &right->data);
+        data.update(left, right);
     }
 
     pair<TreapNode<T, Data>*, TreapNode<T, Data>*> split(T splitKey) {
@@ -67,7 +67,74 @@ class SizeData {
 public:
     int size;
 
-    void update(SizeData* left, SizeData* right) {
-        size = 1 + (left == nullptr ? 0 : left->size) + (right == nullptr ? 0 : right->size);
+    template <typename T>
+    void update(TreapNode<T, SizeData>* left, TreapNode<T, SizeData>* right) {
+        size = 1 + (left == nullptr ? 0 : left->data.size) + (right == nullptr ? 0 : right->data.size);
     }
 };
+
+template<typename Data>
+class KeylessTreapNode {
+public:
+    ll priority = gen();
+    Data data;
+    KeylessTreapNode *left;
+    KeylessTreapNode *right;
+    int size;
+
+    KeylessTreapNode(Data data, KeylessTreapNode *left = nullptr, KeylessTreapNode *right = nullptr) : data(data), left(left), right(right) {
+        dataUpdate();
+    }
+
+    void dataUpdate() {
+        size = 1 + (left == nullptr ? 0 : left->size) + (right == nullptr ? 0 : right->size);
+        data.update(left, right);
+    }
+
+    pair<KeylessTreapNode<Data>*, KeylessTreapNode<Data>*> split(int leftSize) {
+        dataUpdate();
+        int lSize = left == nullptr ? 0 : left->size;
+        if (lSize >= leftSize) {
+            auto result = left == nullptr ? make_pair(nullptr, nullptr) : left->split(leftSize);
+            left = result.second;
+            dataUpdate();
+            result.second = this;
+            return result;
+        } else {
+            leftSize -= lSize + 1;
+            auto result = right == nullptr ? make_pair(nullptr, nullptr) : right->split(leftSize);
+            right = result.first;
+            dataUpdate();
+            result.first = this;
+            return result;
+        }
+    }
+
+    KeylessTreapNode<Data>* leftmost() {
+        dataUpdate();
+        if (left == nullptr) {
+            return this;
+        }
+        return left->leftmost();
+    }
+};
+
+template<typename Data>
+KeylessTreapNode<Data> *merge(KeylessTreapNode<Data> *left, KeylessTreapNode<Data> *right) {
+    if (left == nullptr) {
+        return right;
+    }
+    if (right == nullptr) {
+        return left;
+    }
+    if (left->priority > right->priority) {
+        left->dataUpdate();
+        left->right = merge(left->right, right);
+        left->dataUpdate();
+        return left;
+    }
+    right->dataUpdate();
+    right->left = merge(left, right->left);
+    right->dataUpdate();
+    return right;
+}
