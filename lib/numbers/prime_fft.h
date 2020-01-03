@@ -77,6 +77,7 @@ namespace prime_fft {
 
 template <typename It>
 void multiply(const It fBegin, const It fEnd, const It sBegin, const It sEnd, It res) {
+    initPrimeFFT();
     unsigned long fLen = fEnd - fBegin;
     unsigned long sLen = sEnd - sBegin;
     int resLen = fLen + sLen - 1;

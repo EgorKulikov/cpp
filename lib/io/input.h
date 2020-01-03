@@ -198,7 +198,7 @@ public:
         double res = 0;
         do {
             if (tolower(c) == 'e') {
-                return sgn * res * dPower(10, readInt());
+                return sgn * res * dPower(double(10), readInt());
             }
             if (!isdigit(c)) {
 #ifdef LOCAL
@@ -216,7 +216,7 @@ public:
             c = get();
             do {
                 if (tolower(c) == 'e') {
-                    return sgn * (res + add * dPower(10, -length)) * dPower(10, readInt());
+                    return sgn * (res + add * dPower(double(10), -length)) * dPower(double(10), readInt());
                 }
                 if (!isdigit(c)) {
 #ifdef LOCAL
@@ -230,7 +230,7 @@ public:
                 length++;
                 c = get();
             } while (!isWhitespace(c));
-            res += add * dPower(10, -length);
+            res += add * dPower(double(10), -length);
         }
         return res * sgn;
     }

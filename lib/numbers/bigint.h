@@ -1,9 +1,13 @@
 #pragma once
 
 #include "../general.h"
+#include "../range/range.h"
+#include "modulo.h"
+#include "prime_fft.h"
 
 constexpr int base = 1000000000;
 constexpr int base_digits = 9;
+constexpr int FFT_MIN_SIZE = 50000;
 
 using vll = vec<ll>;
 
@@ -28,14 +32,16 @@ struct bigint {
     bigint& operator+=(const bigint& other) {
         if (sign == other.sign) {
             for (int i = 0, carry = 0; i < other.z.size() || carry; ++i) {
-                if (i == z.size())
+                if (i == z.size()) {
                     z.push_back(0);
+                }
                 z[i] += carry + (i < other.z.size() ? other.z[i] : 0);
                 carry = z[i] >= base;
-                if (carry)
+                if (carry) {
                     z[i] -= base;
+                }
             }
-        } else if (other != 0 /* prevent infinite loop */) {
+        } else if (other != 0) {
             *this -= -other;
         }
         return *this;
@@ -264,89 +270,65 @@ struct bigint {
         return stream;
     }
 
-    static vi convert_base(const vi& a, int old_digits, int new_digits) {
-        vll p(max(old_digits, new_digits) + 1);
-        p[0] = 1;
-        for (int i = 1; i < p.size(); i++)
-            p[i] = p[i - 1] * 10;
-        vi res;
-        ll cur = 0;
-        int cur_digits = 0;
-        for (int v : a) {
-            cur += v * p[cur_digits];
-            cur_digits += old_digits;
-            while (cur_digits >= new_digits) {
-                res.push_back(int(cur % p[new_digits]));
-                cur /= p[new_digits];
-                cur_digits -= new_digits;
-            }
-        }
-        res.push_back((int) cur);
-        while (!res.empty() && res.back() == 0)
-            res.pop_back();
-        return res;
-    }
-
-    static vll karatsubaMultiply(const vll& a, const vll& b) {
-        int n = a.size();
-        vll res(n + n);
-        if (n <= 32) {
-            for (int i = 0; i < n; i++)
-                for (int j = 0; j < n; j++)
-                    res[i + j] += a[i] * b[j];
-            return res;
-        }
-
-        int k = n >> 1;
-        vll a1(a.begin(), a.begin() + k);
-        vll a2(a.begin() + k, a.end());
-        vll b1(b.begin(), b.begin() + k);
-        vll b2(b.begin() + k, b.end());
-
-        vll a1b1 = karatsubaMultiply(a1, b1);
-        vll a2b2 = karatsubaMultiply(a2, b2);
-
-        for (int i = 0; i < k; i++)
-            a2[i] += a1[i];
-        for (int i = 0; i < k; i++)
-            b2[i] += b1[i];
-
-        vll r = karatsubaMultiply(a2, b2);
-        for (int i = 0; i < a1b1.size(); i++)
-            r[i] -= a1b1[i];
-        for (int i = 0; i < a2b2.size(); i++)
-            r[i] -= a2b2[i];
-
-        for (int i = 0; i < r.size(); i++)
-            res[i + k] += r[i];
-        for (int i = 0; i < a1b1.size(); i++)
-            res[i] += a1b1[i];
-        for (int i = 0; i < a2b2.size(); i++)
-            res[i + n] += a2b2[i];
-        return res;
+    static vec<modint> convert(const vi& z) {
+       vec<modint> res;
+       for (int i : z) {
+           for (int j : range(base_digits)) {
+               res.push_back(i % 10);
+               i /= 10;
+           }
+       }
+       return res;
     }
 
     bigint operator*(const bigint& v) const {
-        vi a6 = convert_base(this->z, base_digits, 6);
-        vi b6 = convert_base(v.z, base_digits, 6);
-        vll a(a6.begin(), a6.end());
-        vll b(b6.begin(), b6.end());
-        while (a.size() < b.size())
-            a.push_back(0);
-        while (b.size() < a.size())
-            b.push_back(0);
-        while (a.size() & (a.size() - 1))
-            a.push_back(0), b.push_back(0);
-        vll c = karatsubaMultiply(a, b);
-        bigint res;
-        res.sign = sign * v.sign;
-        for (int i = 0, carry = 0; i < c.size(); i++) {
-            ll cur = c[i] + carry;
-            res.z.push_back((int) (cur % 1000000));
-            carry = (int) (cur / 1000000);
+        if (z.size() == 0 || v.z.size() == 0) {
+            return 0;
         }
-        res.z = convert_base(res.z, 6, base_digits);
-        res.trim();
+        if (ll(z.size()) * v.z.size() < FFT_MIN_SIZE) {
+            ll carry = 0;
+            vi nz;
+            for (int i : range(z.size() + v.z.size() - 1)) {
+                ll cur = carry;
+                carry = 0;
+                for (int j : range(max(0, i - (int(v.z.size()) - 1)), min(i + 1, int(z.size())))) {
+                    ll term = ll(z[j]) * v.z[i - j];
+                    cur += term % base;
+                    carry += term / base;
+                }
+                carry += cur / base;
+                nz.push_back(cur % base);
+            }
+            while (carry > 0) {
+                nz.push_back(carry % base);
+                carry /= base;
+            }
+            bigint res = 0;
+            res.z = nz;
+            res.sign = sign * v.sign;
+            return res;
+        }
+        auto a = convert(z);
+        auto b = convert(v.z);
+        auto c = multiply(a, b);
+        vi nz;
+        ll carry = 0;
+        for (int i = 0; i < c.size(); i += base_digits) {
+            ll times = 1;
+            for (int j : range(min(int(c.size()) - i, base_digits))) {
+                carry += c[i + j].n * times;
+                times *= 10;
+            }
+            nz.push_back(carry % base);
+            carry /= base;
+        }
+        while (carry > 0) {
+            nz.push_back(carry % base);
+            carry /= base;
+        }
+        bigint res = 0;
+        res.z = nz;
+        res.sign = sign * v.sign;
         return res;
     }
 

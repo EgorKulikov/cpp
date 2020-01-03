@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../general.h"
+#include "../collections/arr.h"
 
 vec<bool> primalityTable(int n) {
     vec<bool> res(n, true);
@@ -14,6 +15,24 @@ vec<bool> primalityTable(int n) {
         if (res[i]) {
             for (int j = i * i; j < n; j += i) {
                 res[j] = false;
+            }
+        }
+    }
+    return res;
+}
+
+arri divisorTable(int n) {
+    arri res(n, 0);
+    if (n > 1) {
+        res[1] = 1;
+    }
+    for (int i = 2; i < n; i++) {
+        if (res[i] == 0) {
+            res[i] = i;
+            if (ll(i) * i < n) {
+                for (int j = i * i; j < n; j += i) {
+                    res[j] = i;
+                }
             }
         }
     }

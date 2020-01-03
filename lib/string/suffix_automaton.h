@@ -45,13 +45,14 @@ struct SuffixAutomaton {
     }
 };
 
-SuffixAutomaton* buildAutomaton(const string& s, char first = 'a', char last = 'z') {
+template<typename Iterator>
+SuffixAutomaton* buildAutomaton(Iterator beg, Iterator end, int first = 'a', int last = 'z') {
     int alphabetSize = last - first + 1;
     auto tail = new SuffixAutomaton(nullptr, 0, alphabetSize);
     SuffixAutomaton* head = tail;
 
-    for (size_t i = 0; i < s.length(); i++) {
-        int c = s[i] - first;
+    for (; beg != end; beg++) {
+        int c = *beg - first;
         tail = tail->addLetter(head, c, alphabetSize);
     }
     return head;

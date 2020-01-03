@@ -16,3 +16,9 @@ template <typename T>
 T maxim(T& was, T cand) {
     return was = max(was, cand);
 }
+
+#ifdef LOCAL
+void signalHandler(int) {
+    throw "Abort detected";
+}
+#endif

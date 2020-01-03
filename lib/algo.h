@@ -47,8 +47,8 @@ arri getQty(Iterator begin, Iterator end) {
 template <class Collection>
 void collect(Collection&) {}
 
-template <class Collection, class ...Vs>
-void collect(Collection& all, Collection& a, Vs&...vs) {
+template <class Collection, class Other, class ...Vs>
+void collect(Collection& all, Other& a, Vs&...vs) {
     addAll(all, all(a));
     collect(all, vs...);
 }

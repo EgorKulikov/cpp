@@ -1,4 +1,4 @@
-#include "C:/Users/kulikov/proj/cpp/tasks/p1013.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/b.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -7,6 +7,7 @@
 #include <vector>
 #include <cctype>
 #include <ctime>
+#include "../lib/general.h"
 
 namespace jhelper {
 
@@ -28,8 +29,11 @@ bool check(std::string expected, std::string actual) {
 } // namespace jhelper
 
 int main() {
+#ifdef LOCAL
+        signal(SIGABRT, &signalHandler);
+#endif
 	std::vector<jhelper::Test> tests = {
-		{"2\n10\n100", "90", true, true},
+		{"6 5\n14 25 90 14 81 12\n14 14 81 12 0\n3\n5\n2\n4", "Query 1: 2\nQuery 2: 0\nQuery 3: 3", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -49,7 +53,7 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    p1013 solver;
+			    b solver;
 			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;
