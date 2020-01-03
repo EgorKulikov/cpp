@@ -1,4 +1,4 @@
-#include "C:/Users/kulikov/proj/cpp/tasks/b.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/ChefinaAndPrefixSuffixSums.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -33,7 +33,7 @@ int main() {
         signal(SIGABRT, &signalHandler);
 #endif
 	std::vector<jhelper::Test> tests = {
-		{"6 5\n14 25 90 14 81 12\n14 14 81 12 0\n3\n5\n2\n4", "Query 1: 2\nQuery 2: 0\nQuery 3: 3", true, true},
+		{"4\n1\n-1 1\n1\n0 0\n2\n4 3 1 4\n3\n5 3 7 10 5 10\n", "0\n1\n2\n4\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -53,8 +53,13 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    b solver;
-			    solver.solve(in, out);
+			    ChefinaAndPrefixSuffixSums solver;
+			    int n;
+in >> n;
+for(int i = 0; i < n; ++i) {
+	solver.solve(in, out);
+}
+
             } catch (const char* e) {
                 std::cerr << e << std::endl;
             }

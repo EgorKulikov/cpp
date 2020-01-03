@@ -229,7 +229,25 @@ struct bigint {
     }
 
     friend bigint gcd(const bigint& a, const bigint& b) {
-        return b.isZero() ? a : gcd(b, a % b);
+        if (b.isZero()) {
+            return a;
+        }
+        if (a.isZero()) {
+            return b;
+        }
+        if (a % 2 == 0) {
+            if (b % 2 == 0) {
+                return gcd(a / 2, b / 2) * 2;
+            }
+            return gcd(a / 2, b);
+        }
+        if (b % 2 == 0) {
+            return gcd(a, b / 2);
+        }
+        if (a >= b) {
+            return gcd(a - b, b);
+        }
+        return gcd(a, b - a);
     }
 
     friend bigint lcm(const bigint& a, const bigint& b) {
@@ -310,7 +328,10 @@ struct bigint {
         }
         auto a = convert(z);
         auto b = convert(v.z);
+        int wasMod = mod;
+        mod = MODF;
         auto c = multiply(a, b);
+        mod = wasMod;
         vi nz;
         ll carry = 0;
         for (int i = 0; i < c.size(); i += base_digits) {

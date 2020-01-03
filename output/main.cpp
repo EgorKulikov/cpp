@@ -927,101 +927,303 @@ public:
 };
 
 
-struct SuffixAutomaton {
-    int length;
-    SuffixAutomaton* link;
-    arr<SuffixAutomaton*> edges;
+const int MOD7 = 1000000007;
+const int MOD9 = 1000000009;
+const int MODF = 998244353;
 
-    SuffixAutomaton(SuffixAutomaton* link, int length, int alphabetSize) : link(link), length(length) {
-        edges = arr<SuffixAutomaton*>(alphabetSize, nullptr);
+int mod = MOD7;
+
+template <typename T>
+T gcd(T a, T b, T& x, T& y) {
+    if (a == 0) {
+        x = 0;
+        y = 1;
+        return b;
     }
+    int d = gcd(b % a, a, y, x);
+    x -= (b / a) * y;
+    return d;
+}
 
-    SuffixAutomaton* addLetter(SuffixAutomaton* head, int c, int alphabetSize) {
-        auto current = new SuffixAutomaton(nullptr, length + 1, alphabetSize);
-        for (SuffixAutomaton* previous = this;; previous = previous->link) {
-            if (previous == nullptr) {
-                current->link = head;
-                break;
-            }
-            SuffixAutomaton* curLink = previous->edges[c];
-            if (curLink != nullptr) {
-                if (previous->length + 1 == curLink->length) {
-                    current->link = curLink;
-                } else {
-                    auto clone = new SuffixAutomaton(curLink->link, previous->length + 1, alphabetSize);
-                    for (int j = 0; j < alphabetSize; j++) {
-                        clone->edges[j] = curLink->edges[j];
-                    }
-                    for (; previous != nullptr; previous = previous->link) {
-                        SuffixAutomaton* to = previous->edges[c];
-                        if (to != curLink) {
-                            break;
-                        }
-                        previous->edges[c] = clone;
-                    }
-                    current->link = curLink->link = clone;
-                }
-                break;
-            }
-            previous->edges[c] = current;
+class modint {
+public:
+    int n;
+
+    modint() : n(0) {}
+
+    modint(ll n) {
+        if (n >= 0 && n < mod) {
+            this->n = n;
+            return;
         }
-        return current;
+        n %= mod;
+        if (n < 0) {
+            n += mod;
+        }
+        this->n = n;
     }
+
+    modint& operator+=(const modint& other) {
+        n += other.n;
+        if (n >= mod) {
+            n -= mod;
+        }
+        return *this;
+    }
+
+    modint& operator-=(const modint& other) {
+        n -= other.n;
+        if (n < 0) {
+            n += mod;
+        }
+        return *this;
+    }
+
+    modint& operator*=(const modint& other) {
+        n = ll(n) * other.n % mod;
+        return *this;
+    }
+
+    modint operator-() {
+        if (n == 0) {
+            return 0;
+        }
+        return modint(mod - n);
+    }
+
+    modint inverse() {
+        ll x, y;
+        ll g = gcd(ll(n), ll(mod), x, y);
+#ifdef LOCAL
+        if (g != 1) {
+            throw "not inversable";
+        }
+#endif
+        return x;
+    }
+
+    int log(modint alpha);
 };
 
-template <typename Iterator, typename T = char>
-SuffixAutomaton* buildAutomaton(Iterator beg, Iterator end, T first = 'a', T last = 'z') {
-    int alphabetSize = last - first + 1;
-    auto tail = new SuffixAutomaton(nullptr, 0, alphabetSize);
-    SuffixAutomaton* head = tail;
-
-    for (; beg != end; beg++) {
-        int c = *beg - first;
-        tail = tail->addLetter(head, c, alphabetSize);
-    }
-    return head;
+modint operator+(const modint& a, const modint& b) {
+    return modint(a) += b;
 }
+
+modint operator-(const modint& a, const modint& b) {
+    return modint(a) -= b;
+}
+
+modint operator*(const modint& a, const modint& b) {
+    return modint(a) *= b;
+}
+
+ostream& operator<<(ostream& out, const modint& val) {
+    return out << val.n;
+}
+
+bool operator==(const modint& a, const modint& b) {
+    return a.n == b.n;
+}
+
+bool operator!=(const modint& a, const modint& b) {
+    return a.n != b.n;
+}
+
+namespace std {
+    template <>
+    struct hash<modint> {
+        size_t operator()(const modint& n) const {
+            return n.n;
+        }
+    };
+}
+
+int modint::log(modint alpha) {
+    unordered_map<modint, int> base;
+    int exp = 0;
+    modint pow = 1;
+    modint inv = *this;
+    modint alInv = alpha.inverse();
+    while (exp * exp < mod) {
+        if (inv == 1) {
+            return exp;
+        }
+        base[inv] = exp++;
+        pow *= alpha;
+        inv *= alInv;
+    }
+    modint step = pow;
+    for (int i = 1;; i++) {
+        if (base.count(pow)) {
+            return exp * i + base[pow];
+        }
+        pow *= step;
+    }
+}
+
+
+template <typename T>
+T gcd(T a, T b) {
+    a = abs(a);
+    b = abs(b);
+    while (b != 0) {
+        a = a % b;
+        swap(a, b);
+    }
+    return a;
+}
+
+template <typename T>
+T lcm(T a, T b) {
+    return a / gcd(a, b) * b;
+}
+
+template <typename T>
+T power(const T& a, ll b) {
+    if (b == 0) {
+        return 1;
+    }
+    if ((b & 1) == 0) {
+        T res = power(a, b >> 1);
+        return res * res;
+    } else {
+        return power(a, b - 1) * a;
+    }
+}
+
+template <typename T>
+arr<T> generateFactorial(int length) {
+    arr<T> result(length);
+    if (length > 0) {
+        result[0] = 1;
+    }
+    for (int i = 1; i < length; i++) {
+        result[i] = result[i - 1] * i;
+    }
+    return result;
+}
+
+arr<modint> generateInverse(int length) {
+    arr<modint> result(length);
+    if (length > 1) {
+        result[1] = 1;
+    }
+    for (int i = 2; i < length; i++) {
+        result[i] = -(mod / i) * result[mod % i];
+    }
+    return result;
+}
+
+template <typename T>
+arr<T> generatePowers(T base, int length) {
+    arr<T> result(length);
+    if (length > 0) {
+        result[0] = 1;
+    }
+    for (int i = 1; i < length; i++) {
+        result[i] = result[i - 1] * base;
+    }
+    return result;
+}
+
+arr<modint> generateInverseFactorial(int length) {
+    auto result = generateInverse(length);
+    if (length > 0) {
+        result[0] = 1;
+    }
+    for (int i = 1; i < length; i++) {
+        result[i] *= result[i - 1];
+    }
+    return result;
+}
+
+class Combinations {
+private:
+    arr<modint> fact;
+    arr<modint> invFactorial;
+
+public:
+    Combinations(int length) {
+        fact = generateFactorial<modint>(length);
+        invFactorial = generateInverseFactorial(length);
+    }
+
+public:
+    modint c(int n, int k) const {
+        if (k < 0 || k > n) {
+            return 0;
+        }
+        return fact[n] * invFactorial[k] * invFactorial[n - k];
+    }
+
+    modint operator()(int n, int k) const {
+        return c(n, k);
+    }
+
+    modint factorial(int n) const {
+        return fact[n];
+    }
+
+    modint inverseFactorial(int n) const {
+        return invFactorial[n];
+    }
+};
 
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class b {
+class ChefinaAndPrefixSuffixSums {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        int m = in.readInt();
-        auto b = in.readIntArray(n);
-        auto s = in.readIntArray(m);
+        auto x = in.readIntArray(n * 2);
 
-        auto* root = buildAutomaton(all(s), 0, 255);
-        int q = in.readInt();
-        arri answer(n);
-        auto* node = root;
-        int at = 0;
-        for (int i : range(n)) {
-            if (at < i) {
-                at++;
-                node = root;
+        ll sum = accumulate(all(x), 0ll);
+        if (sum % (n + 1) != 0) {
+            out.printLine(0);
+            return;
+        }
+        sum /= n + 1;
+        unordered_map<int, int> q;
+        for (int i : x) {
+            q[i]++;
+        }
+        if (q[sum] < 2) {
+            out.printLine(0);
+            return;
+        }
+        q[sum] -= 2;
+        Combinations c(n);
+        modint answer = 1;
+        int rem = n - 1;
+        for (int a : x) {
+            int x = q[a];
+            int y = q[sum - a];
+            if (x != y) {
+                out.printLine(0);
+                return;
             }
-            int res = at - i;
-            while (node->link != nullptr && node->link->length >= res) {
-                node = node->link;
-            }
-            while (at < n) {
-                if (node->edges[b[at]] == nullptr) {
-                    break;
+            q[a] = 0;
+            q[sum - a] = 0;
+            if (sum == 2 * a) {
+                if (x % 2 != 0) {
+                    out.printLine(0);
+                    return;
                 }
-                node = node->edges[b[at++]];
-                res++;
+                answer *= c(rem, x / 2);
+                rem -= x / 2;
+            } else {
+                for (int i : range(x)) {
+                    answer *= 2;
+                }
+                answer *= c(rem, x);
+                rem -= x;
             }
-            answer[i] = res;
         }
-        for (int i : range(q)) {
-            out.printLine("Query", to_string(i + 1) + ":", answer[in.readInt() - 1]);
-        }
+        out.printLine(answer);
     }
 };
 
@@ -1032,9 +1234,14 @@ int main() {
 #endif
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    b solver;
+    ChefinaAndPrefixSuffixSums solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
-    solver.solve(in, out);
+    int n;
+    in >> n;
+    for (int i = 0; i < n; ++i) {
+        solver.solve(in, out);
+    }
+
     return 0;
 }
