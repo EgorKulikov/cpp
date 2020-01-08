@@ -2,8 +2,6 @@
 #include "../lib/io/output.h"
 #include "../lib/range/range.h"
 
-//#pragma comment(linker, "/STACK:200000000")
-
 class %ClassName% {
 public:
 	void solve(istream& inp, ostream& outp) {

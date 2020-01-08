@@ -12,16 +12,24 @@ class arr2d {
     int sz;
 
 public:
-    arr2d() : b(nullptr), e(nullptr), d1(0), d2(0), sz(0) {}
+    arr2d() : arr2d(0, 0) {}
 
     arr2d(int d1, int d2) : d1(d1), d2(d2), sz(d1 * d2) {
-        b = new T[sz];
-        e = b + sz;
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0) {
+            throw "bad alloc";
+        }
+        view();
+#endif
+        if (sz == 0) {
+            b = e = nullptr;
+        } else {
+            b = new T[sz];
+            e = b + sz;
+        }
     }
 
-    arr2d(int d1, int d2, const T& init) : d1(d1), d2(d2), sz(d1 * d2) {
-        b = new T[sz];
-        e = b + sz;
+    arr2d(int d1, int d2, const T& init) : arr2d(d1, d2) {
         fill(b, e, init);
     }
 
@@ -74,12 +82,12 @@ public:
         return arr<T>(b + at * d2, d2);
     }
 
-    void swap(arr2d<T>& a) {
-        std::swap(b, a.b);
-        std::swap(e, a.e);
-        std::swap(d1, a.d1);
-        std::swap(d2, a.d2);
-        std::swap(sz, a.sz);
+    vector<vector<T>> view() {
+        vector<vector<T>> res(min(d1, 50));
+        for (int i = 0; i < res.size(); ++i) {
+            res[i] = (*this)[i].view();
+        }
+        return res;
     }
 };
 
@@ -94,16 +102,24 @@ class arr3d {
     int sz;
 
 public:
-    arr3d() : b(nullptr), e(nullptr), d1(0), d2(0), d3(0), shift(0), sz(0) {}
+    arr3d() : arr3d(0, 0, 0) {}
 
     arr3d(int d1, int d2, int d3) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
-        b = new T[sz];
-        e = b + sz;
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0 || d3 < 0) {
+            throw "bad alloc";
+        }
+        view();
+#endif
+        if (sz == 0) {
+            b = e = nullptr;
+        } else {
+            b = new T[sz];
+            e = b + sz;
+        }
     }
 
-    arr3d(int d1, int d2, int d3, const T& init) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
-        b = new T[sz];
-        e = b + sz;
+    arr3d(int d1, int d2, int d3, const T& init) : arr3d(d1, d2, d3) {
         fill(b, e, init);
     }
 
@@ -159,6 +175,14 @@ public:
 #endif
         return arr2d<T>(b + at * shift, d2, d3);
     }
+
+    vector<vector<vector<T>>> view() {
+        vector<vector<vector<T>>> res(min(d1, 50));
+        for (int i = 0; i < res.size(); ++i) {
+            res[i] = (*this)[i].view();
+        }
+        return res;
+    }
 };
 
 template <typename T>
@@ -174,11 +198,21 @@ class arr4d {
     int sz;
 
 public:
-    arr4d() : b(nullptr), e(nullptr), d1(0), d2(0), d3(0), d4(0), shift1(0), shift2(0), sz(0) {}
+    arr4d() : arr4d(0, 0, 0, 0) {}
 
     arr4d(int d1, int d2, int d3, int d4) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
-        b = new T[sz];
-        e = b + sz;
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0 || d3 < 0) {
+            throw "bad alloc";
+        }
+        view();
+#endif
+        if (sz == 0) {
+            b = e = nullptr;
+        } else {
+            b = new T[sz];
+            e = b + sz;
+        }
     }
 
     arr4d(int d1, int d2, int d3, int d4, const T& init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
@@ -187,7 +221,9 @@ public:
         fill(b, e, init);
     }
 
-    arr4d(T* b, int d1, int d2, int d3, int d4) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {}
+    arr4d(T* b, int d1, int d2, int d3, int d4) : b(b), d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
+        e = b + sz;
+    }
 
     size_t size() const {
         return sz;
@@ -235,12 +271,20 @@ public:
         return b[i1 * shift1 + i2 * shift2 + i3 * d4 + i4];
     }
 
-    arr2d<T> operator[](int at) {
+    arr3d<T> operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
         }
 #endif
         return arr3d<T>(b + at * shift1, d2, d3, d4);
+    }
+
+    vector<vector<vector<vector<T>>>> view() {
+        vector<vector<vector<vector<T>>>> res(min(d1, 50));
+        for (int i = 0; i < res.size(); ++i) {
+            res[i] = (*this)[i].view();
+        }
+        return res;
     }
 };

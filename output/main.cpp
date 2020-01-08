@@ -41,7 +41,7 @@ public:
             throw "Out of bounds";
         }
 #endif
-        return *(parent::_M_impl._M_start + ind);
+        return parent::operator[](ind);
     }
 
     T& operator[](size_t ind) {
@@ -50,7 +50,7 @@ public:
             throw "Out of bounds";
         }
 #endif
-        return *(parent::_M_impl._M_start + ind);
+        return parent::operator[](ind);
     }
 
     Vector<T>& operator=(Vector<T>&& __x) noexcept {
@@ -94,8 +94,7 @@ public:
             throw "Out of bounds";
         }
 #endif
-        return *const_iterator(this->_M_impl._M_start._M_p
-                               + ind / int(_S_word_bit), ind % int(_S_word_bit));
+        return parent::operator[](ind);
     }
 
     parent::reference operator[](size_t ind) {
@@ -104,8 +103,7 @@ public:
             throw "Out of bounds";
         }
 #endif
-        return *iterator(this->_M_impl._M_start._M_p
-                         + ind / int(_S_word_bit), ind % int(_S_word_bit));
+        return parent::operator[](ind);
     }
 
     Vector<bool>& operator=(Vector<bool>&& __x) noexcept {
@@ -134,6 +132,7 @@ using vi = vec<int>;
 #define all(v) (v).begin(), (v).end()
 
 using ll = long long;
+using ld = long double;
 using pii = pair<int, int>;
 
 template <typename T>
@@ -145,14 +144,6 @@ template <typename T>
 T maxim(T& was, T cand) {
     return was = max(was, cand);
 }
-
-#ifdef LOCAL
-
-void signalHandler(int) {
-    throw "Abort detected";
-}
-
-#endif
 
 
 template <typename D>
@@ -205,13 +196,14 @@ class arr {
     T* e;
     int n;
 public:
-    arr() : b(nullptr), e(nullptr), n(0) {}
+    arr() : arr(0) {}
 
     arr(int n) : n(n) {
 #ifdef LOCAL
         if (n < 0) {
             throw "bad alloc";
         }
+        view();
 #endif
         if (n > 0) {
             b = new T[n];
@@ -221,32 +213,19 @@ public:
         }
     }
 
-    arr(int n, const T& init) : n(n) {
-#ifdef LOCAL
-        if (n < 0) {
-            throw "bad alloc";
-        }
-#endif
+    arr(int n, const T& init) : arr(n) {
         if (n > 0) {
-            b = new T[n];
-            e = b + n;
             fill(b, e, init);
-        } else {
-            b = e = nullptr;
         }
     }
 
-    arr(initializer_list<T> l) : n(l.size()) {
-        if (n == 0) {
-            b = e = nullptr;
-        } else {
-            b = new T[l.size()];
-            e = b + n;
+    arr(initializer_list<T> l) : arr(l.size()) {
+        if (n > 0) {
             copy(all(l), b);
         }
     }
 
-    arr(T* b, int n) : b(b), e(b + n), n(n) {}
+    arr(T* b, int n) : arr(b, b + n) {}
 
     arr(T* b, T* e) : b(b), e(e), n(e - b) {}
 
@@ -305,6 +284,10 @@ public:
         }
         return true;
     }
+
+    vector<T> view() {
+        return vector<T>(b, b + min(n, 50));
+    }
 };
 
 typedef arr<int> arri;
@@ -321,7 +304,7 @@ void decreaseByOne(arr<T>& array, Vs& ...vs) {
 }
 
 template <typename T, typename U>
-void decreaseByOne(arr<pair<T, U> >& v) {
+void decreaseByOne(arr<pair<T, U>>& v) {
     for (auto& p : v) {
         p.first--;
         p.second--;
@@ -338,16 +321,24 @@ class arr2d {
     int sz;
 
 public:
-    arr2d() : b(nullptr), e(nullptr), d1(0), d2(0), sz(0) {}
+    arr2d() : arr2d(0, 0) {}
 
     arr2d(int d1, int d2) : d1(d1), d2(d2), sz(d1 * d2) {
-        b = new T[sz];
-        e = b + sz;
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0) {
+            throw "bad alloc";
+        }
+        view();
+#endif
+        if (sz == 0) {
+            b = e = nullptr;
+        } else {
+            b = new T[sz];
+            e = b + sz;
+        }
     }
 
-    arr2d(int d1, int d2, const T& init) : d1(d1), d2(d2), sz(d1 * d2) {
-        b = new T[sz];
-        e = b + sz;
+    arr2d(int d1, int d2, const T& init) : arr2d(d1, d2) {
         fill(b, e, init);
     }
 
@@ -400,12 +391,12 @@ public:
         return arr<T>(b + at * d2, d2);
     }
 
-    void swap(arr2d<T>& a) {
-        std::swap(b, a.b);
-        std::swap(e, a.e);
-        std::swap(d1, a.d1);
-        std::swap(d2, a.d2);
-        std::swap(sz, a.sz);
+    vector<vector<T>> view() {
+        vector<vector<T>> res(min(d1, 50));
+        for (int i = 0; i < res.size(); ++i) {
+            res[i] = (*this)[i].view();
+        }
+        return res;
     }
 };
 
@@ -420,16 +411,24 @@ class arr3d {
     int sz;
 
 public:
-    arr3d() : b(nullptr), e(nullptr), d1(0), d2(0), d3(0), shift(0), sz(0) {}
+    arr3d() : arr3d(0, 0, 0) {}
 
     arr3d(int d1, int d2, int d3) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
-        b = new T[sz];
-        e = b + sz;
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0 || d3 < 0) {
+            throw "bad alloc";
+        }
+        view();
+#endif
+        if (sz == 0) {
+            b = e = nullptr;
+        } else {
+            b = new T[sz];
+            e = b + sz;
+        }
     }
 
-    arr3d(int d1, int d2, int d3, const T& init) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
-        b = new T[sz];
-        e = b + sz;
+    arr3d(int d1, int d2, int d3, const T& init) : arr3d(d1, d2, d3) {
         fill(b, e, init);
     }
 
@@ -486,6 +485,14 @@ public:
 #endif
         return arr2d<T>(b + at * shift, d2, d3);
     }
+
+    vector<vector<vector<T>>> view() {
+        vector<vector<vector<T>>> res(min(d1, 50));
+        for (int i = 0; i < res.size(); ++i) {
+            res[i] = (*this)[i].view();
+        }
+        return res;
+    }
 };
 
 template <typename T>
@@ -501,12 +508,22 @@ class arr4d {
     int sz;
 
 public:
-    arr4d() : b(nullptr), e(nullptr), d1(0), d2(0), d3(0), d4(0), shift1(0), shift2(0), sz(0) {}
+    arr4d() : arr4d(0, 0, 0, 0) {}
 
     arr4d(int d1, int d2, int d3, int d4) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4),
                                             sz(d1 * d2 * d3 * d4) {
-        b = new T[sz];
-        e = b + sz;
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0 || d3 < 0) {
+            throw "bad alloc";
+        }
+        view();
+#endif
+        if (sz == 0) {
+            b = e = nullptr;
+        } else {
+            b = new T[sz];
+            e = b + sz;
+        }
     }
 
     arr4d(int d1, int d2, int d3, int d4, const T& init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
@@ -516,8 +533,10 @@ public:
         fill(b, e, init);
     }
 
-    arr4d(T* b, int d1, int d2, int d3, int d4) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4),
-                                                  sz(d1 * d2 * d3 * d4) {}
+    arr4d(T* b, int d1, int d2, int d3, int d4) : b(b), d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
+                                                  shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
+        e = b + sz;
+    }
 
     size_t size() const {
         return sz;
@@ -565,13 +584,21 @@ public:
         return b[i1 * shift1 + i2 * shift2 + i3 * d4 + i4];
     }
 
-    arr2d<T> operator[](int at) {
+    arr3d<T> operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
         }
 #endif
         return arr3d<T>(b + at * shift1, d2, d3, d4);
+    }
+
+    vector<vector<vector<vector<T>>>> view() {
+        vector<vector<vector<vector<T>>>> res(min(d1, 50));
+        for (int i = 0; i < res.size(); ++i) {
+            res[i] = (*this)[i].view();
+        }
+        return res;
     }
 };
 
@@ -722,8 +749,8 @@ public:
     }
 
     template <typename U, typename V>
-    arr<pair<U, V> > readArray(int n) {
-        arr<pair<U, V> > res(n);
+    arr<pair<U, V>> readArray(int n) {
+        arr<pair<U, V>> res(n);
         for (int i = 0; i < n; i++) {
             res[i] = readType<U, V>();
         }
@@ -927,321 +954,48 @@ public:
 };
 
 
-const int MOD7 = 1000000007;
-const int MOD9 = 1000000009;
-const int MODF = 998244353;
-
-int mod = MOD7;
-
-template <typename T>
-T gcd(T a, T b, T& x, T& y) {
-    if (a == 0) {
-        x = 0;
-        y = 1;
-        return b;
-    }
-    int d = gcd(b % a, a, y, x);
-    x -= (b / a) * y;
-    return d;
-}
-
-class modint {
-public:
-    int n;
-
-    modint() : n(0) {}
-
-    modint(ll n) {
-        if (n >= 0 && n < mod) {
-            this->n = n;
-            return;
-        }
-        n %= mod;
-        if (n < 0) {
-            n += mod;
-        }
-        this->n = n;
-    }
-
-    modint& operator+=(const modint& other) {
-        n += other.n;
-        if (n >= mod) {
-            n -= mod;
-        }
-        return *this;
-    }
-
-    modint& operator-=(const modint& other) {
-        n -= other.n;
-        if (n < 0) {
-            n += mod;
-        }
-        return *this;
-    }
-
-    modint& operator*=(const modint& other) {
-        n = ll(n) * other.n % mod;
-        return *this;
-    }
-
-    modint operator-() {
-        if (n == 0) {
-            return 0;
-        }
-        return modint(mod - n);
-    }
-
-    modint inverse() {
-        ll x, y;
-        ll g = gcd(ll(n), ll(mod), x, y);
-#ifdef LOCAL
-        if (g != 1) {
-            throw "not inversable";
-        }
-#endif
-        return x;
-    }
-
-    int log(modint alpha);
-};
-
-modint operator+(const modint& a, const modint& b) {
-    return modint(a) += b;
-}
-
-modint operator-(const modint& a, const modint& b) {
-    return modint(a) -= b;
-}
-
-modint operator*(const modint& a, const modint& b) {
-    return modint(a) *= b;
-}
-
-ostream& operator<<(ostream& out, const modint& val) {
-    return out << val.n;
-}
-
-bool operator==(const modint& a, const modint& b) {
-    return a.n == b.n;
-}
-
-bool operator!=(const modint& a, const modint& b) {
-    return a.n != b.n;
-}
-
-namespace std {
-    template <>
-    struct hash<modint> {
-        size_t operator()(const modint& n) const {
-            return n.n;
-        }
-    };
-}
-
-int modint::log(modint alpha) {
-    unordered_map<modint, int> base;
-    int exp = 0;
-    modint pow = 1;
-    modint inv = *this;
-    modint alInv = alpha.inverse();
-    while (exp * exp < mod) {
-        if (inv == 1) {
-            return exp;
-        }
-        base[inv] = exp++;
-        pow *= alpha;
-        inv *= alInv;
-    }
-    modint step = pow;
-    for (int i = 1;; i++) {
-        if (base.count(pow)) {
-            return exp * i + base[pow];
-        }
-        pow *= step;
-    }
-}
-
-
-template <typename T>
-T gcd(T a, T b) {
-    a = abs(a);
-    b = abs(b);
-    while (b != 0) {
-        a = a % b;
-        swap(a, b);
-    }
-    return a;
-}
-
-template <typename T>
-T lcm(T a, T b) {
-    return a / gcd(a, b) * b;
-}
-
-template <typename T>
-T power(const T& a, ll b) {
-    if (b == 0) {
-        return 1;
-    }
-    if ((b & 1) == 0) {
-        T res = power(a, b >> 1);
-        return res * res;
-    } else {
-        return power(a, b - 1) * a;
-    }
-}
-
-template <typename T>
-arr<T> generateFactorial(int length) {
-    arr<T> result(length);
-    if (length > 0) {
-        result[0] = 1;
-    }
-    for (int i = 1; i < length; i++) {
-        result[i] = result[i - 1] * i;
-    }
-    return result;
-}
-
-arr<modint> generateInverse(int length) {
-    arr<modint> result(length);
-    if (length > 1) {
-        result[1] = 1;
-    }
-    for (int i = 2; i < length; i++) {
-        result[i] = -(mod / i) * result[mod % i];
-    }
-    return result;
-}
-
-template <typename T>
-arr<T> generatePowers(T base, int length) {
-    arr<T> result(length);
-    if (length > 0) {
-        result[0] = 1;
-    }
-    for (int i = 1; i < length; i++) {
-        result[i] = result[i - 1] * base;
-    }
-    return result;
-}
-
-arr<modint> generateInverseFactorial(int length) {
-    auto result = generateInverse(length);
-    if (length > 0) {
-        result[0] = 1;
-    }
-    for (int i = 1; i < length; i++) {
-        result[i] *= result[i - 1];
-    }
-    return result;
-}
-
-class Combinations {
-private:
-    arr<modint> fact;
-    arr<modint> invFactorial;
-
-public:
-    Combinations(int length) {
-        fact = generateFactorial<modint>(length);
-        invFactorial = generateInverseFactorial(length);
-    }
-
-public:
-    modint c(int n, int k) const {
-        if (k < 0 || k > n) {
-            return 0;
-        }
-        return fact[n] * invFactorial[k] * invFactorial[n - k];
-    }
-
-    modint operator()(int n, int k) const {
-        return c(n, k);
-    }
-
-    modint factorial(int n) const {
-        return fact[n];
-    }
-
-    modint inverseFactorial(int n) const {
-        return invFactorial[n];
-    }
-};
-
 
 //#pragma comment(linker, "/STACK:200000000")
 
-class ChefinaAndPrefixSuffixSums {
+class TaskA {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
-        int n = in.readInt();
-        auto x = in.readIntArray(n * 2);
-
-        ll sum = accumulate(all(x), 0ll);
-        if (sum % (n + 1) != 0) {
-            out.printLine(0);
-            return;
-        }
-        sum /= n + 1;
-        unordered_map<int, int> q;
-        for (int i : x) {
-            q[i]++;
-        }
-        if (q[sum] < 2) {
-            out.printLine(0);
-            return;
-        }
-        q[sum] -= 2;
-        Combinations c(n);
-        modint answer = 1;
-        int rem = n - 1;
-        for (int a : x) {
-            int x = q[a];
-            int y = q[sum - a];
-            if (x != y) {
-                out.printLine(0);
-                return;
-            }
-            q[a] = 0;
-            q[sum - a] = 0;
-            if (sum == 2 * a) {
-                if (x % 2 != 0) {
-                    out.printLine(0);
-                    return;
-                }
-                answer *= c(rem, x / 2);
-                rem -= x / 2;
-            } else {
-                for (int i : range(x)) {
-                    answer *= 2;
-                }
-                answer *= c(rem, x);
-                rem -= x;
-            }
-        }
-        out.printLine(answer);
+        vi a(3);
+        a[0] = 1;
+        a[1] = 2;
+        a[2] = 3;
+        arri b(3);
+        b[0] = 1;
+        b[1] = 2;
+        b[2] = 3;
+        arr2d<int> c(2, 2);
+        c(0, 0) = 1;
+        c(0, 1) = 2;
+        c(1, 0) = 3;
+        c(1, 1) = 4;
+        arr3d<double> d(2, 2, 2);
+        d(1, 0, 1) = 0.5;
+        arr4d<ll> e(2, 2, 2, 2);
+        e(1, 0, 1, 0) = 2;
+        auto sqr = [&](int x) -> int {
+            return x * x;
+        };
+        out.printLine(a);
+        out.printLine(b);
+        out.printLine(sqr(1000000000));
     }
 };
 
 
 int main() {
-#ifdef LOCAL
-    signal(SIGABRT, &signalHandler);
-#endif
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    ChefinaAndPrefixSuffixSums solver;
+    TaskA solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
-    int n;
-    in >> n;
-    for (int i = 0; i < n; ++i) {
-        solver.solve(in, out);
-    }
-
+    solver.solve(in, out);
     return 0;
 }

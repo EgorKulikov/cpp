@@ -53,13 +53,21 @@ public:
         n = ll(n) * other.n % mod;
         return *this;
     }
+    modint& operator /=(const modint& other) {
+#ifdef LOCAL
+        if (other.n == 0) {
+            throw "Division by zero";
+        }
+#endif
+        return *this *= other.inverse();
+    }
     modint operator -() {
         if (n == 0) {
             return 0;
         }
         return modint(mod - n);
     }
-    modint inverse() {
+    modint inverse() const {
         ll x, y;
         ll g = gcd(ll(n), ll(mod), x, y);
 #ifdef LOCAL
@@ -82,6 +90,10 @@ modint operator -(const modint& a, const modint& b) {
 
 modint operator *(const modint& a, const modint& b) {
     return modint(a) *= b;
+}
+
+modint operator /(const modint& a, const modint& b) {
+    return modint(a) /= b;
 }
 
 ostream& operator <<(ostream& out, const modint& val) {

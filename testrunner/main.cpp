@@ -1,4 +1,4 @@
-#include "C:/Users/kulikov/proj/cpp/tasks/ChefinaAndPrefixSuffixSums.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/TaskA.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,11 +29,8 @@ bool check(std::string expected, std::string actual) {
 } // namespace jhelper
 
 int main() {
-#ifdef LOCAL
-        signal(SIGABRT, &signalHandler);
-#endif
 	std::vector<jhelper::Test> tests = {
-		{"4\n1\n-1 1\n1\n0 0\n2\n4 3 1 4\n3\n5 3 7 10 5 10\n", "0\n1\n2\n4\n", true, true},
+		{"5\n0 5 0 2 3\n", "2\n", true, true},{"7\n1 0 0 5 0 0 2\n", "1\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -53,13 +50,8 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    ChefinaAndPrefixSuffixSums solver;
-			    int n;
-in >> n;
-for(int i = 0; i < n; ++i) {
-	solver.solve(in, out);
-}
-
+			    TaskA solver;
+			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;
             }

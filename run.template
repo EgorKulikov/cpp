@@ -29,9 +29,6 @@ bool check(std::string expected, std::string actual) {
 } // namespace jhelper
 
 int main() {
-#ifdef LOCAL
-        signal(SIGABRT, &signalHandler);
-#endif
 	std::vector<jhelper::Test> tests = {
 		%Tests%
 	};

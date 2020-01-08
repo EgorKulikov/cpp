@@ -9,13 +9,14 @@ class arr {
     T* e;
     int n;
 public:
-    arr() : b(nullptr), e(nullptr), n(0) {}
+    arr() : arr(0) {}
 
     arr(int n) : n(n) {
 #ifdef LOCAL
         if (n < 0) {
             throw "bad alloc";
         }
+        view();
 #endif
         if (n > 0) {
             b = new T[n];
@@ -25,31 +26,18 @@ public:
         }
     }
 
-    arr(int n, const T& init) : n(n) {
-#ifdef LOCAL
-        if (n < 0) {
-            throw "bad alloc";
-        }
-#endif
+    arr(int n, const T& init) : arr(n) {
         if (n > 0) {
-            b = new T[n];
-            e = b + n;
             fill(b, e, init);
-        } else {
-            b = e = nullptr;
         }
     }
-    arr(initializer_list<T> l) : n(l.size()) {
-        if (n == 0) {
-            b = e = nullptr;
-        } else {
-            b = new T[l.size()];
-            e = b + n;
+    arr(initializer_list<T> l) : arr(l.size()) {
+        if (n > 0) {
             copy(all(l), b);
         }
     }
 
-    arr(T* b, int n) : b(b), e(b + n), n(n) {}
+    arr(T* b, int n) : arr(b, b + n) {}
     arr(T* b, T* e) : b(b), e(e), n(e - b) {}
 
     size_t size() const {
@@ -106,6 +94,10 @@ public:
             }
         }
         return true;
+    }
+
+    vector<T> view() {
+        return vector<T>(b, b + min(n, 50));
     }
 };
 

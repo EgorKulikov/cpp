@@ -1,9 +1,6 @@
 %Code%
 
 int main() {
-#ifdef LOCAL
-    signal(SIGABRT, &signalHandler);
-#endif
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 	%ClassName% solver;

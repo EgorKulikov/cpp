@@ -24,7 +24,7 @@ public:
             throw "Out of bounds";
         }
 #endif
-        return *(parent::_M_impl._M_start + ind);
+        return parent::operator[](ind);
     }
 
     T& operator[](size_t ind) {
@@ -33,7 +33,7 @@ public:
             throw "Out of bounds";
         }
 #endif
-        return *(parent::_M_impl._M_start + ind);
+        return parent::operator[](ind);
     }
 
     Vector<T>& operator =(Vector<T>&& __x) noexcept {
@@ -70,8 +70,7 @@ public:
             throw "Out of bounds";
         }
 #endif
-        return *const_iterator(this->_M_impl._M_start._M_p
-                               + ind / int(_S_word_bit), ind % int(_S_word_bit));
+        return parent::operator[](ind);
     }
 
     parent::reference operator[](size_t ind) {
@@ -80,8 +79,7 @@ public:
             throw "Out of bounds";
         }
 #endif
-        return *iterator(this->_M_impl._M_start._M_p
-                         + ind / int(_S_word_bit), ind % int(_S_word_bit));
+        return parent::operator[](ind);
     }
 
     Vector<bool>& operator =(Vector<bool>&& __x) noexcept {
