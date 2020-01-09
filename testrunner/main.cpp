@@ -1,4 +1,4 @@
-#include "C:/Users/kulikov/proj/cpp/tasks/TaskA.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/CumulativePalindromeCount.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +30,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"snws\n5 5\n2 2 4\n1 1 5 snws\n2 3 5\n1 3 3 s\n2 1 5\n", "0\n3\n4\n", true, true},{"exe\n1337 5\n2 234 567\n1 12 543 exe\n2 321 567\n1 3 45 xe\n2 1 345\n", "0\n223\n334\n", true, true},
+		{"1\n3\n", "7\n", true, true},{"1\n8", "58", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -50,8 +50,13 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    TaskA solver;
-			    solver.solve(in, out);
+			    CumulativePalindromeCount solver;
+			    int n;
+in >> n;
+for(int i = 0; i < n; ++i) {
+	solver.solve(in, out);
+}
+
             } catch (const char* e) {
                 std::cerr << e << std::endl;
             }

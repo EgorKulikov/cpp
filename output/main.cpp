@@ -962,106 +962,197 @@ public:
 };
 
 
+const int MOD7 = 1000000007;
+const int MOD9 = 1000000009;
+const int MODF = 998244353;
 
-//#pragma comment(linker, "/STACK:200000000")
+int mod = MOD7;
 
-class TaskA {
+template <typename T>
+T gcd(T a, T b, T& x, T& y) {
+    if (a == 0) {
+        x = 0;
+        y = 1;
+        return b;
+    }
+    int d = gcd(b % a, a, y, x);
+    x -= (b / a) * y;
+    return d;
+}
+
+class modint {
+public:
+    int n;
+
+    modint() : n(0) {}
+
+    modint(ll n) {
+        if (n >= 0 && n < mod) {
+            this->n = n;
+            return;
+        }
+        n %= mod;
+        if (n < 0) {
+            n += mod;
+        }
+        this->n = n;
+    }
+
+    modint& operator+=(const modint& other) {
+        n += other.n;
+        if (n >= mod) {
+            n -= mod;
+        }
+        return *this;
+    }
+
+    modint& operator-=(const modint& other) {
+        n -= other.n;
+        if (n < 0) {
+            n += mod;
+        }
+        return *this;
+    }
+
+    modint& operator*=(const modint& other) {
+        n = ll(n) * other.n % mod;
+        return *this;
+    }
+
+    modint& operator/=(const modint& other) {
+#ifdef LOCAL
+        if (other.n == 0) {
+            throw "Division by zero";
+        }
+#endif
+        return *this *= other.inverse();
+    }
+
+    modint operator-() {
+        if (n == 0) {
+            return 0;
+        }
+        return modint(mod - n);
+    }
+
+    modint inverse() const {
+        ll x, y;
+        ll g = gcd(ll(n), ll(mod), x, y);
+#ifdef LOCAL
+        if (g != 1) {
+            throw "not inversable";
+        }
+#endif
+        return x;
+    }
+
+    int log(modint alpha);
+};
+
+modint operator+(const modint& a, const modint& b) {
+    return modint(a) += b;
+}
+
+modint operator-(const modint& a, const modint& b) {
+    return modint(a) -= b;
+}
+
+modint operator*(const modint& a, const modint& b) {
+    return modint(a) *= b;
+}
+
+modint operator/(const modint& a, const modint& b) {
+    return modint(a) /= b;
+}
+
+ostream& operator<<(ostream& out, const modint& val) {
+    return out << val.n;
+}
+
+bool operator==(const modint& a, const modint& b) {
+    return a.n == b.n;
+}
+
+bool operator!=(const modint& a, const modint& b) {
+    return a.n != b.n;
+}
+
+namespace std {
+    template <>
+    struct hash<modint> {
+        size_t operator()(const modint& n) const {
+            return n.n;
+        }
+    };
+}
+
+int modint::log(modint alpha) {
+    unordered_map<modint, int> base;
+    int exp = 0;
+    modint pow = 1;
+    modint inv = *this;
+    modint alInv = alpha.inverse();
+    while (exp * exp < mod) {
+        if (inv == 1) {
+            return exp;
+        }
+        base[inv] = exp++;
+        pow *= alpha;
+        inv *= alInv;
+    }
+    modint step = pow;
+    for (int i = 1;; i++) {
+        if (base.count(pow)) {
+            return exp * i + base[pow];
+        }
+        pow *= step;
+    }
+}
+
+
+class CumulativePalindromeCount {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
-        string s = in.readString();
-        int n = in.readInt();
-        int q = in.readInt();
-        arr2d<int> links(s.size() + 1, 26);
-        for (int i : range(s.size() + 1)) {
-            for (int j : range(26)) {
-                string ss = s.substr(0, i) + char('a' + j);
-                while (ss.size() > s.size() || ss != s.substr(0, ss.size())) {
-                    ss = ss.substr(1);
-                }
-                links(i, j) = ss.size();
-            }
+        ll n = in.readLong();
+
+        modint answer = doSolve(n);
+        out.printLine(answer);
+    }
+
+    modint doSolve(ll n) const {
+        modint answer = 0;
+        if (n > 0) {
+            answer += n;
+            n--;
         }
-        arr2d<int> value(4 * n, s.size() + 1, 0);
-        arr2d<int> delta(4 * n, s.size() + 1);
-        arri temp(s.size() + 1);
-        function<void(int, int, int)> init = [&](int root, int left, int right) {
-            value[root][0] = right - left;
-            for (int i : range(s.size() + 1)) {
-                delta[root][i] = i;
-            }
-            if (left + 1 != right) {
-                int mid = (left + right) / 2;
-                init(2 * root + 1, left, mid);
-                init(2 * root + 2, mid, right);
-            }
-        };
-        init(0, 0, n);
-        arri change(s.size() + 1);
-        auto apply = [&](int root, const arri& change) {
-            fill(all(temp), 0);
-            for (int i : range(s.size() + 1)) {
-                temp[change[i]] += value(root, i);
-                delta(root, i) = change[delta(root, i)];
-            }
-            copy(all(temp), value.begin() + (root * (s.size() + 1)));
-        };
-        auto pushDown = [&](int root) {
-            apply(2 * root + 1, delta[root]);
-            apply(2 * root + 2, delta[root]);
-            for (int i : range(s.size() + 1)) {
-                delta(root, i) = i;
-            }
-        };
-        function<void(int, int, int, int, int)> update = [&](int root, int left, int right, int from, int to) {
-            if (left >= to || right <= from) {
-                return;
-            }
-            if (left >= from && right <= to) {
-                apply(root, change);
-                return;
-            }
-            pushDown(root);
-            int mid = (left + right) / 2;
-            update(2 * root + 1, left, mid, from, to);
-            update(2 * root + 2, mid, right, from, to);
-            for (int i : range(s.size() + 1)) {
-                value(root, i) = value(2 * root + 1, i) + value(2 * root + 2, i);
-            }
-        };
-        function<int(int, int, int, int, int)> query = [&](int root, int left, int right, int from, int to) -> int {
-            if (left >= to || right <= from) {
-                return 0;
-            }
-            if (left >= from && right <= to) {
-                return value(root, s.size());
-            }
-            pushDown(root);
-            int mid = (left + right) / 2;
-            return query(2 * root + 1, left, mid, from, to) +
-                   query(2 * root + 2, mid, right, from, to);
-        };
-        for (int x : range(q)) {
-            int t = in.readInt();
-            int l = in.readInt() - 1;
-            int r = in.readInt();
-            if (t == 1) {
-                string ss = in.readString();
-                for (int i : range(s.size() + 1)) {
-                    change[i] = i;
-                }
-                for (char c : ss) {
-                    for (int i : range(s.size() + 1)) {
-                        change[i] = links(change[i], c - 'a');
-                    }
-                }
-                update(0, 0, n, l, r);
-            } else {
-                out.printLine(query(0, 0, n, l, r));
-            }
+        if (n > 0) {
+            answer += n;
+            n--;
         }
+        ll sz = 1;
+        auto step = [&](modint f1, modint f2, modint len) -> modint {
+            modint f1st = f1 - (len - 1);
+            return f2 * (f1 + f1st) * len / 2 + f1st * len * (len - 1) / 2 + (len - 2) * (len - 1) * len / 6;
+        };
+        while (n > 0) {
+            ll cur = min(n, sz);
+            answer += step(n, 2, cur);
+            n -= cur;
+            cur = min(n, sz);
+            answer += step(n, sz + 1, cur);
+            n -= cur;
+            cur = min(n, sz);
+            answer += step(n, 2, cur);
+            n -= cur;
+            cur = min(n, sz);
+            answer += step(n, sz + 1, cur);
+            n -= cur;
+            sz *= 2;
+        }
+        return answer;
     }
 };
 
@@ -1069,9 +1160,14 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    TaskA solver;
+    CumulativePalindromeCount solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
-    solver.solve(in, out);
+    int n;
+    in >> n;
+    for (int i = 0; i < n; ++i) {
+        solver.solve(in, out);
+    }
+
     return 0;
 }
