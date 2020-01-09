@@ -16,7 +16,6 @@ public:
         if (n < 0) {
             throw "bad alloc";
         }
-        view();
 #endif
         if (n > 0) {
             b = new T[n];
@@ -24,6 +23,9 @@ public:
         } else {
             b = e = nullptr;
         }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr(int n, const T& init) : arr(n) {

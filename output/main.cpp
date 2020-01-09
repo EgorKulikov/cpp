@@ -203,7 +203,6 @@ public:
         if (n < 0) {
             throw "bad alloc";
         }
-        view();
 #endif
         if (n > 0) {
             b = new T[n];
@@ -211,6 +210,9 @@ public:
         } else {
             b = e = nullptr;
         }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr(int n, const T& init) : arr(n) {
@@ -328,7 +330,6 @@ public:
         if (d1 < 0 || d2 < 0) {
             throw "bad alloc";
         }
-        view();
 #endif
         if (sz == 0) {
             b = e = nullptr;
@@ -336,6 +337,9 @@ public:
             b = new T[sz];
             e = b + sz;
         }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr2d(int d1, int d2, const T& init) : arr2d(d1, d2) {
@@ -418,7 +422,6 @@ public:
         if (d1 < 0 || d2 < 0 || d3 < 0) {
             throw "bad alloc";
         }
-        view();
 #endif
         if (sz == 0) {
             b = e = nullptr;
@@ -426,6 +429,9 @@ public:
             b = new T[sz];
             e = b + sz;
         }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr3d(int d1, int d2, int d3, const T& init) : arr3d(d1, d2, d3) {
@@ -516,7 +522,6 @@ public:
         if (d1 < 0 || d2 < 0 || d3 < 0) {
             throw "bad alloc";
         }
-        view();
 #endif
         if (sz == 0) {
             b = e = nullptr;
@@ -524,6 +529,9 @@ public:
             b = new T[sz];
             e = b + sz;
         }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr4d(int d1, int d2, int d3, int d4, const T& init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
@@ -963,29 +971,97 @@ public:
         Input in(inp);
         Output out(outp);
 
-        vi a(3);
-        a[0] = 1;
-        a[1] = 2;
-        a[2] = 3;
-        arri b(3);
-        b[0] = 1;
-        b[1] = 2;
-        b[2] = 3;
-        arr2d<int> c(2, 2);
-        c(0, 0) = 1;
-        c(0, 1) = 2;
-        c(1, 0) = 3;
-        c(1, 1) = 4;
-        arr3d<double> d(2, 2, 2);
-        d(1, 0, 1) = 0.5;
-        arr4d<ll> e(2, 2, 2, 2);
-        e(1, 0, 1, 0) = 2;
-        auto sqr = [&](int x) -> int {
-            return x * x;
+        string s = in.readString();
+        int n = in.readInt();
+        int q = in.readInt();
+        arr2d<int> links(s.size() + 1, 26);
+        for (int i : range(s.size() + 1)) {
+            for (int j : range(26)) {
+                string ss = s.substr(0, i) + char('a' + j);
+                while (ss.size() > s.size() || ss != s.substr(0, ss.size())) {
+                    ss = ss.substr(1);
+                }
+                links(i, j) = ss.size();
+            }
+        }
+        arr2d<int> value(4 * n, s.size() + 1, 0);
+        arr2d<int> delta(4 * n, s.size() + 1);
+        arri temp(s.size() + 1);
+        function<void(int, int, int)> init = [&](int root, int left, int right) {
+            value[root][0] = right - left;
+            for (int i : range(s.size() + 1)) {
+                delta[root][i] = i;
+            }
+            if (left + 1 != right) {
+                int mid = (left + right) / 2;
+                init(2 * root + 1, left, mid);
+                init(2 * root + 2, mid, right);
+            }
         };
-        out.printLine(a);
-        out.printLine(b);
-        out.printLine(sqr(1000000000));
+        init(0, 0, n);
+        arri change(s.size() + 1);
+        auto apply = [&](int root, const arri& change) {
+            fill(all(temp), 0);
+            for (int i : range(s.size() + 1)) {
+                temp[change[i]] += value(root, i);
+                delta(root, i) = change[delta(root, i)];
+            }
+            copy(all(temp), value.begin() + (root * (s.size() + 1)));
+        };
+        auto pushDown = [&](int root) {
+            apply(2 * root + 1, delta[root]);
+            apply(2 * root + 2, delta[root]);
+            for (int i : range(s.size() + 1)) {
+                delta(root, i) = i;
+            }
+        };
+        function<void(int, int, int, int, int)> update = [&](int root, int left, int right, int from, int to) {
+            if (left >= to || right <= from) {
+                return;
+            }
+            if (left >= from && right <= to) {
+                apply(root, change);
+                return;
+            }
+            pushDown(root);
+            int mid = (left + right) / 2;
+            update(2 * root + 1, left, mid, from, to);
+            update(2 * root + 2, mid, right, from, to);
+            for (int i : range(s.size() + 1)) {
+                value(root, i) = value(2 * root + 1, i) + value(2 * root + 2, i);
+            }
+        };
+        function<int(int, int, int, int, int)> query = [&](int root, int left, int right, int from, int to) -> int {
+            if (left >= to || right <= from) {
+                return 0;
+            }
+            if (left >= from && right <= to) {
+                return value(root, s.size());
+            }
+            pushDown(root);
+            int mid = (left + right) / 2;
+            return query(2 * root + 1, left, mid, from, to) +
+                   query(2 * root + 2, mid, right, from, to);
+        };
+        for (int x : range(q)) {
+            int t = in.readInt();
+            int l = in.readInt() - 1;
+            int r = in.readInt();
+            if (t == 1) {
+                string ss = in.readString();
+                for (int i : range(s.size() + 1)) {
+                    change[i] = i;
+                }
+                for (char c : ss) {
+                    for (int i : range(s.size() + 1)) {
+                        change[i] = links(change[i], c - 'a');
+                    }
+                }
+                update(0, 0, n, l, r);
+            } else {
+                out.printLine(query(0, 0, n, l, r));
+            }
+        }
     }
 };
 

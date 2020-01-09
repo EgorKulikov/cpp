@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/TaskA.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/TaskA.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +30,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"5\n0 5 0 2 3\n", "2\n", true, true},{"7\n1 0 0 5 0 0 2\n", "1\n", true, true},
+		{"snws\n5 5\n2 2 4\n1 1 5 snws\n2 3 5\n1 3 3 s\n2 1 5\n", "0\n3\n4\n", true, true},{"exe\n1337 5\n2 234 567\n1 12 543 exe\n2 321 567\n1 3 45 xe\n2 1 345\n", "0\n223\n334\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;

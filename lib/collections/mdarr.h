@@ -19,7 +19,6 @@ public:
         if (d1 < 0 || d2 < 0) {
             throw "bad alloc";
         }
-        view();
 #endif
         if (sz == 0) {
             b = e = nullptr;
@@ -27,6 +26,9 @@ public:
             b = new T[sz];
             e = b + sz;
         }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr2d(int d1, int d2, const T& init) : arr2d(d1, d2) {
@@ -109,7 +111,6 @@ public:
         if (d1 < 0 || d2 < 0 || d3 < 0) {
             throw "bad alloc";
         }
-        view();
 #endif
         if (sz == 0) {
             b = e = nullptr;
@@ -117,6 +118,9 @@ public:
             b = new T[sz];
             e = b + sz;
         }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr3d(int d1, int d2, int d3, const T& init) : arr3d(d1, d2, d3) {
@@ -205,7 +209,6 @@ public:
         if (d1 < 0 || d2 < 0 || d3 < 0) {
             throw "bad alloc";
         }
-        view();
 #endif
         if (sz == 0) {
             b = e = nullptr;
@@ -213,6 +216,9 @@ public:
             b = new T[sz];
             e = b + sz;
         }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr4d(int d1, int d2, int d3, int d4, const T& init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
