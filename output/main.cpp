@@ -1110,49 +1110,200 @@ int modint::log(modint alpha) {
 }
 
 
-class CumulativePalindromeCount {
+vec<bool> primalityTable(int n) {
+    vec<bool> res(n, true);
+    if (n > 0) {
+        res[0] = false;
+    }
+    if (n > 1) {
+        res[1] = false;
+    }
+    for (int i = 2; i * i < n; i++) {
+        if (res[i]) {
+            for (int j = i * i; j < n; j += i) {
+                res[j] = false;
+            }
+        }
+    }
+    return res;
+}
+
+arri divisorTable(int n) {
+    arri res(n, 0);
+    if (n > 1) {
+        res[1] = 1;
+    }
+    for (int i = 2; i < n; i++) {
+        if (res[i] == 0) {
+            res[i] = i;
+            if (ll(i) * i < n) {
+                for (int j = i * i; j < n; j += i) {
+                    res[j] = i;
+                }
+            }
+        }
+    }
+    return res;
+}
+
+vi primes(int n) {
+    auto isPrime = primalityTable(n);
+    vi res;
+    for (int i = 0; i < n; ++i) {
+        if (isPrime[i]) {
+            res.push_back(i);
+        }
+    }
+    return res;
+}
+
+bool isPrime(long n) {
+    if (n < 2) {
+        return false;
+    }
+    for (long i = 2; i * i <= n; i++) {
+        if (n % i == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+ll nextPrime(ll n) {
+    if (n <= 2) {
+        return 2;
+    }
+    n += 1 - (n & 1);
+    while (!isPrime(n)) {
+        n += 2;
+    }
+    return n;
+}
+
+namespace string_hash {
+    bool initDone = false;
+    int firstMod;
+    int secondMod;
+    modint multiplier;
+    modint firstRevMultiplier;
+    modint secondRevMultiplier;
+
+    void stringHashInit() {
+        int wasMod = mod;
+        random_device rd;
+        mt19937_64 gen(rd());
+        firstMod = nextPrime(500000000 + gen() % 500000000);
+        secondMod = nextPrime(500000000 + gen() % 500000000);
+        mod = firstMod;
+        multiplier = 257 + gen() % (500000000 - 257);
+        firstRevMultiplier = multiplier.inverse();
+        mod = secondMod;
+        secondRevMultiplier = multiplier.inverse();
+        mod = wasMod;
+        initDone = true;
+    }
+
+
+    vec<modint> firstRevPow;
+    vec<modint> secondRevPow;
+
+    void ensureCapacity(int n) {
+        int wasMod = mod;
+        mod = firstMod;
+        while (firstRevPow.size() < n) {
+            if (firstRevPow.empty()) {
+                firstRevPow.push_back(1);
+            } else {
+                firstRevPow.push_back(firstRevPow.back() * firstRevMultiplier);
+            }
+        }
+        mod = secondMod;
+        while (secondRevPow.size() < n) {
+            if (secondRevPow.empty()) {
+                secondRevPow.push_back(1);
+            } else {
+                secondRevPow.push_back(secondRevPow.back() * secondRevMultiplier);
+            }
+        }
+        mod = wasMod;
+    }
+}
+
+class StringHash {
+    arr<modint> firstHash;
+    arr<modint> secondHash;
+
+    template <typename Collection>
+    void doPower(arr<modint>& hash, int cMod, const Collection& str) {
+        using namespace string_hash;
+        int wasMod = mod;
+        mod = cMod;
+        hash = arr<modint>(str.size() + 1);
+        hash[0] = 0;
+        modint power = 1;
+        for (int i : range(str.size())) {
+            hash[i + 1] = hash[i] + str[i] * power;
+            power *= multiplier;
+        }
+        mod = wasMod;
+    }
+
+public:
+    template <typename Collection>
+    explicit StringHash(const Collection& str) {
+        using namespace string_hash;
+        if (!initDone) {
+            stringHashInit();
+        }
+        ensureCapacity(str.size() + 1);
+        doPower(firstHash, firstMod, str);
+        doPower(secondHash, secondMod, str);
+    }
+
+    ll hash(int from, int to) const {
+        using namespace string_hash;
+        int wasMod = mod;
+        mod = firstMod;
+        ll first = ((firstHash[to] - firstHash[from]) * firstRevPow[from]).n;
+        mod = secondMod;
+        ll second = ((secondHash[to] - secondHash[from]) * secondRevPow[from]).n;
+        mod = wasMod;
+        return (first << 32) + second;
+    }
+
+    int length() const {
+        return firstHash.size() - 1;
+    }
+
+    ll hash(int from) const {
+        return hash(from, length());
+    }
+};
+
+
+class FXorShift {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
-        ll n = in.readLong();
+        int n = in.readInt();
+        auto a = in.readIntArray(n);
+        auto b = in.readIntArray(n);
 
-        modint answer = doSolve(n);
-        out.printLine(answer);
-    }
-
-    modint doSolve(ll n) const {
-        modint answer = 0;
-        if (n > 0) {
-            answer += n;
-            n--;
+        arri c(n);
+        arri d(n);
+        for (int i : range(n)) {
+            c[i] = a[i] ^ a[(i + 1) % n];
+            d[i] = b[i] ^ b[(i + 1) % n];
         }
-        if (n > 0) {
-            answer += n;
-            n--;
+        StringHash cHash(c);
+        StringHash dHash(d);
+        for (int i : range(n)) {
+            if (dHash.hash(0, n - i) == cHash.hash(i) && dHash.hash(n - i) == cHash.hash(0, i)) {
+                out.printLine(i, b[0] ^ a[i]);
+            }
         }
-        ll sz = 1;
-        auto step = [&](modint f1, modint f2, modint len) -> modint {
-            modint f1st = f1 - (len - 1);
-            return f2 * (f1 + f1st) * len / 2 + f1st * len * (len - 1) / 2 + (len - 2) * (len - 1) * len / 6;
-        };
-        while (n > 0) {
-            ll cur = min(n, sz);
-            answer += step(n, 2, cur);
-            n -= cur;
-            cur = min(n, sz);
-            answer += step(n, sz + 1, cur);
-            n -= cur;
-            cur = min(n, sz);
-            answer += step(n, 2, cur);
-            n -= cur;
-            cur = min(n, sz);
-            answer += step(n, sz + 1, cur);
-            n -= cur;
-            sz *= 2;
-        }
-        return answer;
     }
 };
 
@@ -1160,14 +1311,9 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    CumulativePalindromeCount solver;
+    FXorShift solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
-    int n;
-    in >> n;
-    for (int i = 0; i < n; ++i) {
-        solver.solve(in, out);
-    }
-
+    solver.solve(in, out);
     return 0;
 }

@@ -34,7 +34,7 @@ T power(const T& a, ll b) {
 }
 
 template <typename T>
-arr<T> generateFactorial(int length) {
+arr<T> factorials(int length) {
     arr<T> result(length);
     if (length > 0) {
         result[0] = 1;
@@ -45,7 +45,7 @@ arr<T> generateFactorial(int length) {
     return result;
 }
 
-arr<modint> generateInverse(int length) {
+arr<modint> inverses(int length) {
     arr<modint> result(length);
     if (length > 1) {
         result[1] = 1;
@@ -57,7 +57,7 @@ arr<modint> generateInverse(int length) {
 }
 
 template <typename T>
-arr<T> generatePowers(T base, int length) {
+arr<T> powers(T base, int length) {
     arr<T> result(length);
     if (length > 0) {
         result[0] = 1;
@@ -68,8 +68,8 @@ arr<T> generatePowers(T base, int length) {
     return result;
 }
 
-arr<modint> generateInverseFactorial(int length) {
-    auto result = generateInverse(length);
+arr<modint> inverseFactorials(int length) {
+    auto result = inverses(length);
     if (length > 0) {
         result[0] = 1;
     }
@@ -86,8 +86,8 @@ private:
 
 public:
     Combinations(int length) {
-        fact = generateFactorial<modint>(length);
-        invFactorial = generateInverseFactorial(length);
+        fact = factorials<modint>(length);
+        invFactorial = inverseFactorials(length);
     }
 
 public:

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "general.h"
+
 const int DX_KNIGHT[] = {2, 1, -1, -2, -2, -1, 1, 2};
 const int DY_KNIGHT[] = {1, 2, 2, 1, -1, -2, -2, -1};
 const int DX4[] = {1, 0, -1, 0};

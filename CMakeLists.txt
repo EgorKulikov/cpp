@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(cpp)
 
-add_executable(output output/main.cpp lib/graph/lca.h lib/collections/segment_tree.h lib/numbers/matrix.h lib/numbers/rational.h lib/string/suffix_automaton.h lib/collections/id.h lib/graph/misc_algo.h lib/numbers/primes.h lib/geometry.h lib/numbers/number_iterator.h lib/numbers/bigint.h lib/collections/fenwick.h lib/numbers/doubles.h lib/misc.h lib/range/range.h lib/range/rev_range.h lib/collections/vector.h lib/numbers/prime_fft.h lib/graph/dfs_order.h lib/collections/arr.h lib/collections/mdarr.h lib/collections/queue.h lib/collections/treap.h lib/collections/treap_set.h lib/collections/indexed_heap.h lib/graph/mincost_flow.h)
+add_executable(output output/main.cpp lib/graph/lca.h lib/collections/segment_tree.h lib/numbers/matrix.h lib/numbers/rational.h lib/string/suffix_automaton.h lib/collections/id.h lib/graph/misc_algo.h lib/numbers/primes.h lib/geometry.h lib/numbers/number_iterator.h lib/numbers/bigint.h lib/collections/fenwick.h lib/numbers/doubles.h lib/misc.h lib/range/range.h lib/range/rev_range.h lib/collections/vector.h lib/numbers/prime_fft.h lib/graph/dfs_order.h lib/collections/arr.h lib/collections/mdarr.h lib/collections/queue.h lib/collections/treap.h lib/collections/treap_set.h lib/collections/indexed_heap.h lib/graph/mincost_flow.h lib/string/string_hash.h)
 add_executable(testrunner testrunner/main.cpp)
 file(GLOB TASKS "tasks/*.cpp")
 file(GLOB_RECURSE HEADERS "lib/*.h" )
