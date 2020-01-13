@@ -962,6 +962,32 @@ public:
 };
 
 
+class ReverseNumberIterator : public NumberIterator {
+public:
+    ReverseNumberIterator(int v) : NumberIterator(v) {}
+
+    ReverseNumberIterator& operator++() {
+        --v;
+        return *this;
+    }
+};
+
+class RevRange : pii {
+public:
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
+
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
+
+    ReverseNumberIterator begin() {
+        return first;
+    }
+
+    ReverseNumberIterator end() {
+        return second;
+    }
+};
+
+
 const int MOD7 = 1000000007;
 const int MOD9 = 1000000009;
 const int MODF = 998244353;
@@ -1110,200 +1136,134 @@ int modint::log(modint alpha) {
 }
 
 
-vec<bool> primalityTable(int n) {
-    vec<bool> res(n, true);
-    if (n > 0) {
-        res[0] = false;
-    }
-    if (n > 1) {
-        res[1] = false;
-    }
-    for (int i = 2; i * i < n; i++) {
-        if (res[i]) {
-            for (int j = i * i; j < n; j += i) {
-                res[j] = false;
-            }
-        }
-    }
-    return res;
-}
-
-arri divisorTable(int n) {
-    arri res(n, 0);
-    if (n > 1) {
-        res[1] = 1;
-    }
-    for (int i = 2; i < n; i++) {
-        if (res[i] == 0) {
-            res[i] = i;
-            if (ll(i) * i < n) {
-                for (int j = i * i; j < n; j += i) {
-                    res[j] = i;
-                }
-            }
-        }
-    }
-    return res;
-}
-
-vi primes(int n) {
-    auto isPrime = primalityTable(n);
-    vi res;
-    for (int i = 0; i < n; ++i) {
-        if (isPrime[i]) {
-            res.push_back(i);
-        }
-    }
-    return res;
-}
-
-bool isPrime(long n) {
-    if (n < 2) {
-        return false;
-    }
-    for (long i = 2; i * i <= n; i++) {
-        if (n % i == 0) {
-            return false;
-        }
-    }
-    return true;
-}
-
-ll nextPrime(ll n) {
-    if (n <= 2) {
-        return 2;
-    }
-    n += 1 - (n & 1);
-    while (!isPrime(n)) {
-        n += 2;
-    }
-    return n;
-}
-
-namespace string_hash {
-    bool initDone = false;
-    int firstMod;
-    int secondMod;
-    modint multiplier;
-    modint firstRevMultiplier;
-    modint secondRevMultiplier;
-
-    void stringHashInit() {
-        int wasMod = mod;
-        random_device rd;
-        mt19937_64 gen(rd());
-        firstMod = nextPrime(500000000 + gen() % 500000000);
-        secondMod = nextPrime(500000000 + gen() % 500000000);
-        mod = firstMod;
-        multiplier = 257 + gen() % (500000000 - 257);
-        firstRevMultiplier = multiplier.inverse();
-        mod = secondMod;
-        secondRevMultiplier = multiplier.inverse();
-        mod = wasMod;
-        initDone = true;
-    }
-
-
-    vec<modint> firstRevPow;
-    vec<modint> secondRevPow;
-
-    void ensureCapacity(int n) {
-        int wasMod = mod;
-        mod = firstMod;
-        while (firstRevPow.size() < n) {
-            if (firstRevPow.empty()) {
-                firstRevPow.push_back(1);
-            } else {
-                firstRevPow.push_back(firstRevPow.back() * firstRevMultiplier);
-            }
-        }
-        mod = secondMod;
-        while (secondRevPow.size() < n) {
-            if (secondRevPow.empty()) {
-                secondRevPow.push_back(1);
-            } else {
-                secondRevPow.push_back(secondRevPow.back() * secondRevMultiplier);
-            }
-        }
-        mod = wasMod;
-    }
-}
-
-class StringHash {
-    arr<modint> firstHash;
-    arr<modint> secondHash;
-
-    template <typename Collection>
-    void doPower(arr<modint>& hash, int cMod, const Collection& str) {
-        using namespace string_hash;
-        int wasMod = mod;
-        mod = cMod;
-        hash = arr<modint>(str.size() + 1);
-        hash[0] = 0;
-        modint power = 1;
-        for (int i : range(str.size())) {
-            hash[i + 1] = hash[i] + str[i] * power;
-            power *= multiplier;
-        }
-        mod = wasMod;
-    }
-
-public:
-    template <typename Collection>
-    explicit StringHash(const Collection& str) {
-        using namespace string_hash;
-        if (!initDone) {
-            stringHashInit();
-        }
-        ensureCapacity(str.size() + 1);
-        doPower(firstHash, firstMod, str);
-        doPower(secondHash, secondMod, str);
-    }
-
-    ll hash(int from, int to) const {
-        using namespace string_hash;
-        int wasMod = mod;
-        mod = firstMod;
-        ll first = ((firstHash[to] - firstHash[from]) * firstRevPow[from]).n;
-        mod = secondMod;
-        ll second = ((secondHash[to] - secondHash[from]) * secondRevPow[from]).n;
-        mod = wasMod;
-        return (first << 32) + second;
-    }
-
-    int length() const {
-        return firstHash.size() - 1;
-    }
-
-    ll hash(int from) const {
-        return hash(from, length());
-    }
-};
-
-
-class FXorShift {
+class ESpanCovering {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        auto a = in.readIntArray(n);
-        auto b = in.readIntArray(n);
+        int x = in.readInt();
+        auto l = in.readIntArray(n);
 
-        arri c(n);
-        arri d(n);
-        for (int i : range(n)) {
-            c[i] = a[i] ^ a[(i + 1) % n];
-            d[i] = b[i] ^ b[(i + 1) % n];
-        }
-        StringHash cHash(c);
-        StringHash dHash(d);
-        for (int i : range(n)) {
-            if (dHash.hash(0, n - i) == cHash.hash(i) && dHash.hash(n - i) == cHash.hash(0, i)) {
-                out.printLine(i, b[0] ^ a[i]);
+        sort(all(l), greater<>());
+
+        struct state {
+            int level;
+            int left;
+            int right;
+            arri mid;
+
+            state(int lev, int l, int r, const arri& m, int at, int add1 = 0, int add2 = 0) {
+                level = lev;
+                left = min(l, r);
+                right = max(l, r);
+                int nSize = m.size();
+                if (at != -1) {
+                    nSize--;
+                }
+                if (add1 != 0) {
+                    nSize++;
+                }
+                if (add2 != 0) {
+                    nSize++;
+                }
+                int c = 0;
+                mid = arri(nSize);
+                for (int i : range(m.size())) {
+                    if (i != at) {
+                        mid[c++] = m[i];
+                    }
+                }
+                if (add1 != 0) {
+                    mid[c++] = add1;
+                    for (int j : RevRange(c - 1)) {
+                        if (mid[j] > mid[j + 1]) {
+                            swap(mid[j], mid[j + 1]);
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                if (add2 != 0) {
+                    mid[c++] = add2;
+                    for (int j : RevRange(c - 1)) {
+                        if (mid[j] > mid[j + 1]) {
+                            swap(mid[j], mid[j + 1]);
+                        } else {
+                            break;
+                        }
+                    }
+                }
             }
+
+            bool operator<(const state& o) const {
+                if (level != o.level) {
+                    return level < o.level;
+                }
+                if (left != o.left) {
+                    return left < o.left;
+                }
+                if (right != o.right) {
+                    return right < o.right;
+                }
+                if (mid.size() != o.mid.size()) {
+                    return mid.size() < o.mid.size();
+                }
+                for (int i : range(mid.size())) {
+                    if (mid[i] != o.mid[i]) {
+                        return mid[i] < o.mid[i];
+                    }
+                }
+                return false;
+            }
+        };
+        arr<modint> from(n + 1);
+        from[n] = 1;
+        for (int i : RevRange(n)) {
+            from[i] = from[i + 1] * (x - l[i] + 1);
         }
+        map<state, modint> result;
+        function<modint(const state&)> go = [&](const state& s) -> modint {
+            if (result.count(s)) {
+                return result[s];
+            }
+            modint& res = result[s];
+            if (s.left == 0 && s.right == 0 && s.mid.size() == 0) {
+                return res = from[s.level];
+            }
+            if (s.level == n) {
+                return res = 0;
+            }
+            int len = l[s.level];
+            int rem = x;
+            rem -= s.left;
+            rem -= s.right;
+            rem -= accumulate(all(s.mid), 0);
+            int pieces = 1 + s.mid.size();
+            rem -= pieces * (len - 1);
+            res = 0;
+            if (rem > 0) {
+                res += go(state(s.level + 1, s.left, s.right, s.mid, -1)) * rem;
+            }
+            for (int i : range(s.left)) {
+                res += go(state(s.level + 1, i, s.right, s.mid, -1, max(0, s.left - i - len)));
+            }
+            for (int i : range(s.right)) {
+                res += go(state(s.level + 1, s.left, i, s.mid, -1, max(0, s.right - i - len)));
+            }
+            for (int i : range(s.mid.size())) {
+                for (int j : range(-len + 1, s.mid[i])) {
+                    res += go(state(s.level + 1, s.left, i, s.mid, i, max(0, j), max(0, s.mid[i] - j - len)));
+                }
+            }
+            return res;
+        };
+        modint answer = 0;
+        for (int i : range(x - l[0] + 1)) {
+            answer += go(state(1, i, x - l[0] - i, arri(), -1));
+        }
+        out.printLine(answer);
     }
 };
 
@@ -1311,7 +1271,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    FXorShift solver;
+    ESpanCovering solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
     solver.solve(in, out);

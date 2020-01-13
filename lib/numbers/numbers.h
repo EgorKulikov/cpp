@@ -34,6 +34,15 @@ T power(const T& a, ll b) {
 }
 
 template <typename T>
+T factorial(int n) {
+    T result = 1;
+    for (int i = 2; i <= n; i++) {
+        result *= i;
+    }
+    return result;
+}
+
+template <typename T>
 arr<T> factorials(int length) {
     arr<T> result(length);
     if (length > 0) {

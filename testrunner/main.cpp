@@ -1,4 +1,4 @@
-#include "C:/Users/kulikov/proj/cpp/tasks/FXorShift.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/ESpanCovering.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +30,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"3\n0 2 1\n1 2 3\n", "1 3\n", true, true},{"5\n0 0 0 0 0\n2 2 2 2 2\n", "0 2\n1 2\n2 2\n3 2\n4 2\n", true, true},{"6\n0 1 3 7 6 4\n1 5 4 6 2 3\n", "2 2\n5 5\n", true, true},{"2\n1 2\n0 0\n", "\n", true, true},
+		{"3 3\n1 1 2\n", "10\n", true, true},{"18 477\n324 31 27 227 9 21 41 29 50 34 2 362 92 11 13 17 183 119\n", "134796357\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -50,7 +50,7 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    FXorShift solver;
+			    ESpanCovering solver;
 			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;

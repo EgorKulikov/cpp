@@ -14,11 +14,9 @@ public:
     ll num;
     ll den;
 
-    Rational(ll num, ll den) : num(num), den(den) {
+    Rational(ll num = 0, ll den = 1) : num(num), den(den) {
         normalize();
     }
-
-    Rational(ll n) : num(n), den(1) {}
 
     Rational(const Rational& other) : num(other.num), den(other.den) {}
 
@@ -84,3 +82,20 @@ Rational operator /(const Rational& a, const Rational& b) {
 Rational operator -(const Rational& a) {
     return Rational(-a.num, a.den);
 }
+
+bool operator <(const Rational& a, const Rational& b) {
+    return a.num * b.den < a.den * b.num;
+}
+
+bool operator >(const Rational& a, const Rational& b) {
+    return b < a;
+}
+
+bool operator >=(const Rational& a, const Rational& b) {
+    return !(a < b);
+}
+
+bool operator <=(const Rational& a, const Rational& b) {
+    return !(b < a);
+}
+
