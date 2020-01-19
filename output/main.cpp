@@ -145,6 +145,33 @@ T maxim(T& was, T cand) {
     return was = max(was, cand);
 }
 
+void doReplace() {
+}
+
+template <typename T, typename U, typename...Vs>
+void doReplace(T& t, const U& u, Vs&& ...vs) {
+    t = u;
+    doReplace(vs...);
+}
+
+template <typename T, typename...Us>
+T minim(T& was, const T& cand, Us&& ...us) {
+    if (was > cand) {
+        was = cand;
+        doReplace(us...);
+    }
+    return was;
+}
+
+template <typename T, typename...Us>
+T maxim(T& was, const T& cand, Us&& ...us) {
+    if (was < cand) {
+        was = cand;
+        doReplace(us...);
+    }
+    return was;
+}
+
 
 template <typename D>
 D dPower(D base, ll exponent) {
@@ -231,7 +258,7 @@ public:
 
     arr(T* b, T* e) : b(b), e(e), n(e - b) {}
 
-    size_t size() const {
+    int size() const {
         return n;
     }
 
@@ -962,307 +989,439 @@ public:
 };
 
 
-class ReverseNumberIterator : public NumberIterator {
-public:
-    ReverseNumberIterator(int v) : NumberIterator(v) {}
+template <typename W, typename C>
+class WeightedFlowEdge {
+private:
+    WeightedFlowEdge<W, C>* reverseEdge;
 
-    ReverseNumberIterator& operator++() {
-        --v;
-        return *this;
+public:
+    const int from;
+    const int to;
+    W weight;
+    C capacity;
+    int id;
+
+    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
+        reverseEdge = new WeightedFlowEdge(this);
+    }
+
+    WeightedFlowEdge<W, C>* transposed() { return nullptr; }
+
+    WeightedFlowEdge<W, C>* reverse() { return reverseEdge; }
+
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
+    }
+
+    C flow() const {
+        return reverseEdge->capacity;
+    }
+
+private:
+    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight),
+                                                        capacity(0) {
+        reverseEdge = reverse;
     }
 };
 
-class RevRange : pii {
+template <typename C>
+class FlowEdge {
+private:
+    FlowEdge<C>* reverseEdge;
+
 public:
-    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
+    const int from;
+    const int to;
+    C capacity;
+    int id;
 
-    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
-
-    ReverseNumberIterator begin() {
-        return first;
+    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
+        reverseEdge = new FlowEdge(this);
     }
 
-    ReverseNumberIterator end() {
-        return second;
+    FlowEdge<C>* transposed() { return nullptr; }
+
+    FlowEdge<C>* reverse() { return reverseEdge; }
+
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
+    }
+
+    C flow() const {
+        return reverseEdge->capacity;
+    }
+
+private:
+    FlowEdge(FlowEdge<C>* reverse) : from(reverse->to), to(reverse->from), capacity(0) {
+        reverseEdge = reverse;
     }
 };
 
+template <typename W>
+class WeightedEdge {
+public:
+    const int from;
+    const int to;
+    W weight;
+    int id;
 
-const int MOD7 = 1000000007;
-const int MOD9 = 1000000009;
-const int MODF = 998244353;
+    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+    }
 
-int mod = MOD7;
+    WeightedEdge<W>* transposed() { return nullptr; }
+
+    WeightedEdge<W>* reverse() { return nullptr; }
+};
+
+template <typename W>
+class BiWeightedEdge {
+private:
+    BiWeightedEdge<W>* transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    W weight;
+    int id;
+
+    BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+        transposedEdge = new BiWeightedEdge(this);
+    }
+
+    BiWeightedEdge<W>* transposed() { return transposedEdge; }
+
+    BiWeightedEdge<W>* reverse() { return nullptr; }
+
+private:
+    BiWeightedEdge(BiWeightedEdge<W>* transposed) : from(transposed->to), to(transposed->from),
+                                                    weight(transposed->weight) {
+        transposedEdge = transposed;
+    }
+};
+
+class BaseEdge {
+public:
+    const int from;
+    const int to;
+    int id;
+
+    BaseEdge(int from, int to) : from(from), to(to) {
+    }
+
+    BaseEdge* transposed() { return nullptr; }
+
+    BaseEdge* reverse() { return nullptr; }
+};
+
+class BiEdge {
+private:
+    BiEdge* transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    int id;
+
+    BiEdge(int from, int to) : from(from), to(to) {
+        transposedEdge = new BiEdge(this);
+    }
+
+    BiEdge* transposed() { return transposedEdge; }
+
+    BiEdge* reverse() { return nullptr; }
+
+private:
+    BiEdge(BiEdge* transposed) : from(transposed->to), to(transposed->from) {
+        transposedEdge = transposed;
+    }
+};
+
+template <class Edge>
+class Graph {
+public:
+    int vertexCount;
+    int edgeCount = 0;
+private:
+    arr<vec<Edge*>> edges;
+
+public:
+    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vec<Edge*>()) {}
+
+    void addEdge(Edge* edge) {
+#ifdef LOCAL
+        if (edge->from < 0 || edge->to < 0 || edge->from >= vertexCount || edge->to >= vertexCount) {
+            throw "Out of bounds";
+        }
+#endif
+        edge->id = edgeCount;
+        edges[edge->from].push_back(edge);
+        Edge* reverse = edge->reverse();
+        if (reverse != nullptr) {
+            reverse->id = edgeCount;
+            edges[reverse->from].push_back(reverse);
+        }
+        Edge* transposed = edge->transposed();
+        if (transposed != nullptr) {
+            edges[transposed->from].push_back(transposed);
+            transposed->id = edgeCount;
+            Edge* transRev = transposed->reverse();
+            if (transRev != nullptr) {
+                edges[transRev->from].push_back(transRev);
+                transRev->id = edgeCount;
+            }
+        }
+        edgeCount++;
+    }
+
+    template <typename...Ts>
+    void addEdge(Ts...args) {
+        addEdge(new Edge(args...));
+    }
+
+    vec<Edge*>& operator[](int at) {
+        return edges[at];
+    }
+};
+
 
 template <typename T>
-T gcd(T a, T b, T& x, T& y) {
-    if (a == 0) {
-        x = 0;
-        y = 1;
-        return b;
-    }
-    int d = gcd(b % a, a, y, x);
-    x -= (b / a) * y;
-    return d;
-}
-
-class modint {
+class que : public queue<T> {
+    using parent = queue<T>;
 public:
-    int n;
+    que() : parent() {}
 
-    modint() : n(0) {}
+    que(const que<T>& q) : parent(q) {}
 
-    modint(ll n) {
-        if (n >= 0 && n < mod) {
-            this->n = n;
-            return;
-        }
-        n %= mod;
-        if (n < 0) {
-            n += mod;
-        }
-        this->n = n;
-    }
+    que(que<T>&& q) noexcept : parent(move(q)) {}
 
-    modint& operator+=(const modint& other) {
-        n += other.n;
-        if (n >= mod) {
-            n -= mod;
-        }
-        return *this;
-    }
-
-    modint& operator-=(const modint& other) {
-        n -= other.n;
-        if (n < 0) {
-            n += mod;
-        }
-        return *this;
-    }
-
-    modint& operator*=(const modint& other) {
-        n = ll(n) * other.n % mod;
-        return *this;
-    }
-
-    modint& operator/=(const modint& other) {
+    T pop() {
 #ifdef LOCAL
-        if (other.n == 0) {
-            throw "Division by zero";
+        if (parent::empty()) {
+            throw "Pop on empty queue";
         }
 #endif
-        return *this *= other.inverse();
+        T res = parent::front();
+        parent::pop();
+        return res;
     }
 
-    modint operator-() {
-        if (n == 0) {
-            return 0;
-        }
-        return modint(mod - n);
+    que<T>& operator=(que<T>&& __x) noexcept {
+        parent::operator=(__x);
+        return *this;
     }
 
-    modint inverse() const {
-        ll x, y;
-        ll g = gcd(ll(n), ll(mod), x, y);
-#ifdef LOCAL
-        if (g != 1) {
-            throw "not inversable";
-        }
-#endif
-        return x;
+    que<T>& operator=(const que<T>& __x) {
+        parent::operator=(__x);
+        return *this;
     }
-
-    int log(modint alpha);
 };
 
-modint operator+(const modint& a, const modint& b) {
-    return modint(a) += b;
+using qi = que<int>;
+
+
+template <typename T>
+class FenwickTree {
+    arr<T> value;
+
+    T get(int to) const {
+        minim(to, int(value.size()) - 1);
+        T result = 0;
+        while (to >= 0) {
+            result += value[to];
+            to = (to & (to + 1)) - 1;
+        }
+        return result;
+    }
+
+public:
+    FenwickTree(int size) {
+        value = arr<T>(size, 0);
+    }
+
+    void add(int at, T val) {
+        while (at < value.size()) {
+            value[at] += val;
+            at = at | (at + 1);
+        }
+    }
+
+    T get(int from, int to) const {
+        if (from >= to) {
+            return 0;
+        }
+        return get(to - 1) - get(from - 1);
+    }
+};
+
+
+template <class Edge>
+vi topologicalSort(Graph<Edge>& graph) {
+    vi result;
+    int n = graph.vertexCount;
+    result.reserve(n);
+    arri degree(n, 0);
+    for (int i = 0; i < n; ++i) {
+        for (auto edge : graph[i]) {
+            degree[edge->to]++;
+        }
+    }
+    que<int> q;
+    for (int i = 0; i < n; ++i) {
+        if (degree[i] == 0) {
+            q.push(i);
+        }
+    }
+    while (!q.empty()) {
+        int cur = q.pop();
+        result.push_back(cur);
+        for (auto edge : graph[cur]) {
+            if (--degree[edge->to] == 0) {
+                q.push(edge->to);
+            }
+        }
+    }
+    if (result.size() != n) {
+        return vi(0);
+    }
+    return result;
 }
 
-modint operator-(const modint& a, const modint& b) {
-    return modint(a) -= b;
-}
+template <class Edge>
+void centroidDecomposition(Graph<Edge>& graph, const function<void(int, const arr<bool>&, const vi&)>& callback) {
+    int n = graph.vertexCount;
+    arr<bool> forb(n, false);
+    arri size(n);
+    function<void(int)> doWork = [&](int vert) {
+        vi part;
+        function<void(int, int)> dfs2 = [&](int vert, int last) {
+            size[vert] = 1;
+            part.push_back(vert);
+            for (auto* e : graph[vert]) {
+                int next = e->to;
+                if (next == last || forb[next]) {
+                    continue;
+                }
+                dfs2(next, vert);
+                size[vert] += size[next];
+            }
+        };
+        dfs2(vert, -1);
+        int end = -1;
+        for (int i : part) {
+            if (2 * size[i] >= part.size()) {
+                bool good = true;
+                for (auto* e : graph[i]) {
+                    int to = e->to;
+                    if (!forb[to] && size[to] * 2 > part.size() && size[to] < size[i]) {
+                        good = false;
+                        break;
+                    }
+                }
+                if (good) {
+                    end = i;
+                    break;
+                }
+            }
+        }
 
-modint operator*(const modint& a, const modint& b) {
-    return modint(a) *= b;
-}
+        callback(end, forb, part);
 
-modint operator/(const modint& a, const modint& b) {
-    return modint(a) /= b;
-}
-
-ostream& operator<<(ostream& out, const modint& val) {
-    return out << val.n;
-}
-
-bool operator==(const modint& a, const modint& b) {
-    return a.n == b.n;
-}
-
-bool operator!=(const modint& a, const modint& b) {
-    return a.n != b.n;
-}
-
-namespace std {
-    template <>
-    struct hash<modint> {
-        size_t operator()(const modint& n) const {
-            return n.n;
+        forb[end] = true;
+        for (auto* e : graph[end]) {
+            int to = e->to;
+            if (!forb[to]) {
+                doWork(to);
+            }
         }
     };
-}
-
-int modint::log(modint alpha) {
-    unordered_map<modint, int> base;
-    int exp = 0;
-    modint pow = 1;
-    modint inv = *this;
-    modint alInv = alpha.inverse();
-    while (exp * exp < mod) {
-        if (inv == 1) {
-            return exp;
-        }
-        base[inv] = exp++;
-        pow *= alpha;
-        inv *= alInv;
-    }
-    modint step = pow;
-    for (int i = 1;; i++) {
-        if (base.count(pow)) {
-            return exp * i + base[pow];
-        }
-        pow *= step;
-    }
+    doWork(0);
 }
 
 
-class ESpanCovering {
+class CountIt {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        int x = in.readInt();
-        auto l = in.readIntArray(n);
+        int k = in.readInt();
+        arri u, v, c;
+        in.readArrays(n - 1, u, v, c);
+        decreaseByOne(u, v, c);
 
-        sort(all(l), greater<>());
-
-        struct state {
-            int level;
-            int left;
-            int right;
-            arri mid;
-
-            state(int lev, int l, int r, const arri& m, int at, int add1 = 0, int add2 = 0) {
-                level = lev;
-                left = min(l, r);
-                right = max(l, r);
-                int nSize = m.size();
-                if (at != -1) {
-                    nSize--;
-                }
-                if (add1 != 0) {
-                    nSize++;
-                }
-                if (add2 != 0) {
-                    nSize++;
-                }
-                int c = 0;
-                mid = arri(nSize);
-                for (int i : range(m.size())) {
-                    if (i != at) {
-                        mid[c++] = m[i];
-                    }
-                }
-                if (add1 != 0) {
-                    mid[c++] = add1;
-                    for (int j : RevRange(c - 1)) {
-                        if (mid[j] > mid[j + 1]) {
-                            swap(mid[j], mid[j + 1]);
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                if (add2 != 0) {
-                    mid[c++] = add2;
-                    for (int j : RevRange(c - 1)) {
-                        if (mid[j] > mid[j + 1]) {
-                            swap(mid[j], mid[j + 1]);
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            }
-
-            bool operator<(const state& o) const {
-                if (level != o.level) {
-                    return level < o.level;
-                }
-                if (left != o.left) {
-                    return left < o.left;
-                }
-                if (right != o.right) {
-                    return right < o.right;
-                }
-                if (mid.size() != o.mid.size()) {
-                    return mid.size() < o.mid.size();
-                }
-                for (int i : range(mid.size())) {
-                    if (mid[i] != o.mid[i]) {
-                        return mid[i] < o.mid[i];
-                    }
-                }
-                return false;
+        Graph<BiEdge> graph(n);
+        for (int i : range(n - 1)) {
+            graph.addEdge(u[i], v[i]);
+        }
+        ll answer = ll(n) * (n - 1) / 2;
+        arr<bool> forb(n, false);
+        arri dist(n);
+        arri cid(n, 0);
+        int id = 1;
+        arri last(n);
+        arri ft(2 * n - 1);
+        int ftsz = 0;
+        auto add = [&](int at) {
+            while (at < ftsz) {
+                ft[at]++;
+                at = at | (at + 1);
             }
         };
-        arr<modint> from(n + 1);
-        from[n] = 1;
-        for (int i : RevRange(n)) {
-            from[i] = from[i + 1] * (x - l[i] + 1);
-        }
-        map<state, modint> result;
-        function<modint(const state&)> go = [&](const state& s) -> modint {
-            if (result.count(s)) {
-                return result[s];
+        auto getImpl = [&](int to) -> int {
+            minim(to, ftsz - 1);
+            int result = 0;
+            while (to >= 0) {
+                result += ft[to];
+                to = (to & (to + 1)) - 1;
             }
-            modint& res = result[s];
-            if (s.left == 0 && s.right == 0 && s.mid.size() == 0) {
-                return res = from[s.level];
-            }
-            if (s.level == n) {
-                return res = 0;
-            }
-            int len = l[s.level];
-            int rem = x;
-            rem -= s.left;
-            rem -= s.right;
-            rem -= accumulate(all(s.mid), 0);
-            int pieces = 1 + s.mid.size();
-            rem -= pieces * (len - 1);
-            res = 0;
-            if (rem > 0) {
-                res += go(state(s.level + 1, s.left, s.right, s.mid, -1)) * rem;
-            }
-            for (int i : range(s.left)) {
-                res += go(state(s.level + 1, i, s.right, s.mid, -1, max(0, s.left - i - len)));
-            }
-            for (int i : range(s.right)) {
-                res += go(state(s.level + 1, s.left, i, s.mid, -1, max(0, s.right - i - len)));
-            }
-            for (int i : range(s.mid.size())) {
-                for (int j : range(-len + 1, s.mid[i])) {
-                    res += go(state(s.level + 1, s.left, i, s.mid, i, max(0, j), max(0, s.mid[i] - j - len)));
+            return result;
+        };
+        auto get = [&](int from) {
+            return getImpl(ftsz - 1) - getImpl(from - 1);
+        };
+
+        centroidDecomposition(graph, [&](int end, const arr<bool>& forb, const vi&) {
+            vec<vi> bal(graph[end].size());
+            for (int i : range(k)) {
+                int minBal = 0;
+                int maxBal = 0;
+                int pos = 0;
+                for (auto* e : graph[end]) {
+                    bal[pos].clear();
+                    function<void(int, int, int)> dfs = [&](int vert, int last, int cbal) {
+                        if (forb[vert]) {
+                            return;
+                        }
+                        bal[pos].push_back(cbal);
+                        minim(minBal, cbal);
+                        maxim(maxBal, cbal);
+                        for (auto* e : graph[vert]) {
+                            int next = e->to;
+                            if (next == last) {
+                                continue;
+                            }
+                            dfs(next, vert, cbal + (c[e->id] == i ? 1 : -1));
+                        }
+                    };
+                    dfs(e->to, end, c[e->id] == i ? 1 : -1);
+                    pos++;
+                }
+                ftsz = maxBal - minBal + 1;
+                fill(ft.begin(), ft.begin() + ftsz, 0);
+                add(-minBal);
+                for (const vi& b : bal) {
+                    for (int j : b) {
+                        answer -= get(-j - minBal + 1);
+                    }
+                    for (int j : b) {
+                        add(j - minBal);
+                    }
                 }
             }
-            return res;
-        };
-        modint answer = 0;
-        for (int i : range(x - l[0] + 1)) {
-            answer += go(state(1, i, x - l[0] - i, arri(), -1));
-        }
+        });
         out.printLine(answer);
     }
 };
@@ -1271,9 +1430,14 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    ESpanCovering solver;
+    CountIt solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
-    solver.solve(in, out);
+    int n;
+    in >> n;
+    for (int i = 0; i < n; ++i) {
+        solver.solve(in, out);
+    }
+
     return 0;
 }

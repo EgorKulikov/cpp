@@ -151,6 +151,11 @@ public:
     Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vec<Edge*>()) {}
 
     void addEdge(Edge* edge) {
+#ifdef LOCAL
+        if (edge->from < 0 || edge->to < 0 || edge->from >= vertexCount || edge->to >= vertexCount) {
+            throw "Out of bounds";
+        }
+#endif
         edge->id = edgeCount;
         edges[edge->from].push_back(edge);
         Edge* reverse = edge->reverse();

@@ -4,12 +4,12 @@
 #include "graph.h"
 #include "../collections/arr.h"
 
-template <class Edge>
 class DFSOrder {
 public:
     arri position;
     arri end;
 
+    template <class Edge>
     DFSOrder(Graph<Edge>& graph, int root = 0) {
         int count = graph.vertexCount;
         position = arri(count);
@@ -26,7 +26,7 @@ public:
             int current = stack[size - 1];
             int& cEdge = edge[current];
             if (cEdge == graph[current].size()) {
-                end[current] = index;
+                end[current] = index + 1;
                 size--;
             } else {
                 int next = graph[current][cEdge]->to;

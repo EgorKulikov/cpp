@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/ESpanCovering.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/CountIt.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +30,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"3 3\n1 1 2\n", "10\n", true, true},{"18 477\n324 31 27 227 9 21 41 29 50 34 2 362 92 11 13 17 183 119\n", "134796357\n", true, true},
+		{"2\n5 3\n1 2 1\n1 3 2\n2 4 3\n2 5 2\n6 2\n1 2 1\n2 3 1\n3 4 2\n4 5 1\n5 6 2\n", "5\n4\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -50,8 +50,13 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    ESpanCovering solver;
-			    solver.solve(in, out);
+			    CountIt solver;
+			    int n;
+in >> n;
+for(int i = 0; i < n; ++i) {
+	solver.solve(in, out);
+}
+
             } catch (const char* e) {
                 std::cerr << e << std::endl;
             }

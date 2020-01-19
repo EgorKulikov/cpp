@@ -42,7 +42,7 @@ public:
     arr(T* b, int n) : arr(b, b + n) {}
     arr(T* b, T* e) : b(b), e(e), n(e - b) {}
 
-    size_t size() const {
+    int size() const {
         return n;
     }
 
