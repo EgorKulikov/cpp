@@ -2,6 +2,7 @@
 
 #include "../general.h"
 #include "numbers.h"
+#include "bigint.h"
 
 class Rational {
     void normalize() {
@@ -84,7 +85,7 @@ Rational operator -(const Rational& a) {
 }
 
 bool operator <(const Rational& a, const Rational& b) {
-    return a.num * b.den < a.den * b.num;
+    return bigint(a.num) * b.den < bigint(a.den) * b.num;
 }
 
 bool operator >(const Rational& a, const Rational& b) {
@@ -99,3 +100,6 @@ bool operator <=(const Rational& a, const Rational& b) {
     return !(b < a);
 }
 
+ostream& operator <<(ostream& out, const Rational& val) {
+    return out << val.num << '/' << val.den;
+}

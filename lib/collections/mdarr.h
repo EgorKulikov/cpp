@@ -91,6 +91,12 @@ public:
         }
         return res;
     }
+
+    arr2d<T> clone() {
+        arr2d<T> res(d1, d2);
+        copy(b, e, res.b);
+        return res;
+    }
 };
 
 template <typename T>

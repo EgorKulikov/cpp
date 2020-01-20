@@ -4,10 +4,7 @@
  * @author Egor Kulikov
  */
 
-
-
-
-
+#include <utility>
 
 
 #include <bits/stdc++.h>
@@ -134,16 +131,6 @@ using vi = vec<int>;
 using ll = long long;
 using ld = long double;
 using pii = pair<int, int>;
-
-template <typename T>
-T minim(T& was, T cand) {
-    return was = min(was, cand);
-}
-
-template <typename T>
-T maxim(T& was, T cand) {
-    return was = max(was, cand);
-}
 
 void doReplace() {
 }
@@ -427,6 +414,12 @@ public:
         for (int i = 0; i < res.size(); ++i) {
             res[i] = (*this)[i].view();
         }
+        return res;
+    }
+
+    arr2d<T> clone() {
+        arr2d<T> res(d1, d2);
+        copy(b, e, res.b);
         return res;
     }
 };
@@ -989,455 +982,1020 @@ public:
 };
 
 
-template <typename W, typename C>
-class WeightedFlowEdge {
-private:
-    WeightedFlowEdge<W, C>* reverseEdge;
-
+class ReverseNumberIterator : public NumberIterator {
 public:
-    const int from;
-    const int to;
-    W weight;
-    C capacity;
-    int id;
+    ReverseNumberIterator(int v) : NumberIterator(v) {}
 
-    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
-        reverseEdge = new WeightedFlowEdge(this);
-    }
-
-    WeightedFlowEdge<W, C>* transposed() { return nullptr; }
-
-    WeightedFlowEdge<W, C>* reverse() { return reverseEdge; }
-
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight),
-                                                        capacity(0) {
-        reverseEdge = reverse;
-    }
-};
-
-template <typename C>
-class FlowEdge {
-private:
-    FlowEdge<C>* reverseEdge;
-
-public:
-    const int from;
-    const int to;
-    C capacity;
-    int id;
-
-    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
-        reverseEdge = new FlowEdge(this);
-    }
-
-    FlowEdge<C>* transposed() { return nullptr; }
-
-    FlowEdge<C>* reverse() { return reverseEdge; }
-
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    FlowEdge(FlowEdge<C>* reverse) : from(reverse->to), to(reverse->from), capacity(0) {
-        reverseEdge = reverse;
-    }
-};
-
-template <typename W>
-class WeightedEdge {
-public:
-    const int from;
-    const int to;
-    W weight;
-    int id;
-
-    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-    }
-
-    WeightedEdge<W>* transposed() { return nullptr; }
-
-    WeightedEdge<W>* reverse() { return nullptr; }
-};
-
-template <typename W>
-class BiWeightedEdge {
-private:
-    BiWeightedEdge<W>* transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    W weight;
-    int id;
-
-    BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-        transposedEdge = new BiWeightedEdge(this);
-    }
-
-    BiWeightedEdge<W>* transposed() { return transposedEdge; }
-
-    BiWeightedEdge<W>* reverse() { return nullptr; }
-
-private:
-    BiWeightedEdge(BiWeightedEdge<W>* transposed) : from(transposed->to), to(transposed->from),
-                                                    weight(transposed->weight) {
-        transposedEdge = transposed;
-    }
-};
-
-class BaseEdge {
-public:
-    const int from;
-    const int to;
-    int id;
-
-    BaseEdge(int from, int to) : from(from), to(to) {
-    }
-
-    BaseEdge* transposed() { return nullptr; }
-
-    BaseEdge* reverse() { return nullptr; }
-};
-
-class BiEdge {
-private:
-    BiEdge* transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    int id;
-
-    BiEdge(int from, int to) : from(from), to(to) {
-        transposedEdge = new BiEdge(this);
-    }
-
-    BiEdge* transposed() { return transposedEdge; }
-
-    BiEdge* reverse() { return nullptr; }
-
-private:
-    BiEdge(BiEdge* transposed) : from(transposed->to), to(transposed->from) {
-        transposedEdge = transposed;
-    }
-};
-
-template <class Edge>
-class Graph {
-public:
-    int vertexCount;
-    int edgeCount = 0;
-private:
-    arr<vec<Edge*>> edges;
-
-public:
-    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vec<Edge*>()) {}
-
-    void addEdge(Edge* edge) {
-#ifdef LOCAL
-        if (edge->from < 0 || edge->to < 0 || edge->from >= vertexCount || edge->to >= vertexCount) {
-            throw "Out of bounds";
-        }
-#endif
-        edge->id = edgeCount;
-        edges[edge->from].push_back(edge);
-        Edge* reverse = edge->reverse();
-        if (reverse != nullptr) {
-            reverse->id = edgeCount;
-            edges[reverse->from].push_back(reverse);
-        }
-        Edge* transposed = edge->transposed();
-        if (transposed != nullptr) {
-            edges[transposed->from].push_back(transposed);
-            transposed->id = edgeCount;
-            Edge* transRev = transposed->reverse();
-            if (transRev != nullptr) {
-                edges[transRev->from].push_back(transRev);
-                transRev->id = edgeCount;
-            }
-        }
-        edgeCount++;
-    }
-
-    template <typename...Ts>
-    void addEdge(Ts...args) {
-        addEdge(new Edge(args...));
-    }
-
-    vec<Edge*>& operator[](int at) {
-        return edges[at];
-    }
-};
-
-
-template <typename T>
-class que : public queue<T> {
-    using parent = queue<T>;
-public:
-    que() : parent() {}
-
-    que(const que<T>& q) : parent(q) {}
-
-    que(que<T>&& q) noexcept : parent(move(q)) {}
-
-    T pop() {
-#ifdef LOCAL
-        if (parent::empty()) {
-            throw "Pop on empty queue";
-        }
-#endif
-        T res = parent::front();
-        parent::pop();
-        return res;
-    }
-
-    que<T>& operator=(que<T>&& __x) noexcept {
-        parent::operator=(__x);
-        return *this;
-    }
-
-    que<T>& operator=(const que<T>& __x) {
-        parent::operator=(__x);
+    ReverseNumberIterator& operator++() {
+        --v;
         return *this;
     }
 };
 
-using qi = que<int>;
+class RevRange : pii {
+public:
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
 
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
+
+    ReverseNumberIterator begin() {
+        return first;
+    }
+
+    ReverseNumberIterator end() {
+        return second;
+    }
+};
+
+
+const int MOD7 = 1000000007;
+const int MOD9 = 1000000009;
+const int MODF = 998244353;
+
+int mod = MOD7;
 
 template <typename T>
-class FenwickTree {
-    arr<T> value;
-
-    T get(int to) const {
-        minim(to, int(value.size()) - 1);
-        T result = 0;
-        while (to >= 0) {
-            result += value[to];
-            to = (to & (to + 1)) - 1;
-        }
-        return result;
+T gcd(T a, T b, T& x, T& y) {
+    if (a == 0) {
+        x = 0;
+        y = 1;
+        return b;
     }
+    int d = gcd(b % a, a, y, x);
+    x -= (b / a) * y;
+    return d;
+}
 
+class modint {
 public:
-    FenwickTree(int size) {
-        value = arr<T>(size, 0);
-    }
+    int n;
 
-    void add(int at, T val) {
-        while (at < value.size()) {
-            value[at] += val;
-            at = at | (at + 1);
+    modint() : n(0) {}
+
+    modint(ll n) {
+        if (n >= 0 && n < mod) {
+            this->n = n;
+            return;
         }
+        n %= mod;
+        if (n < 0) {
+            n += mod;
+        }
+        this->n = n;
     }
 
-    T get(int from, int to) const {
-        if (from >= to) {
+    modint& operator+=(const modint& other) {
+        n += other.n;
+        if (n >= mod) {
+            n -= mod;
+        }
+        return *this;
+    }
+
+    modint& operator-=(const modint& other) {
+        n -= other.n;
+        if (n < 0) {
+            n += mod;
+        }
+        return *this;
+    }
+
+    modint& operator*=(const modint& other) {
+        n = ll(n) * other.n % mod;
+        return *this;
+    }
+
+    modint& operator/=(const modint& other) {
+#ifdef LOCAL
+        if (other.n == 0) {
+            throw "Division by zero";
+        }
+#endif
+        return *this *= other.inverse();
+    }
+
+    modint operator-() {
+        if (n == 0) {
             return 0;
         }
-        return get(to - 1) - get(from - 1);
+        return modint(mod - n);
     }
+
+    modint inverse() const {
+        ll x, y;
+        ll g = gcd(ll(n), ll(mod), x, y);
+#ifdef LOCAL
+        if (g != 1) {
+            throw "not inversable";
+        }
+#endif
+        return x;
+    }
+
+    int log(modint alpha);
 };
 
+modint operator+(const modint& a, const modint& b) {
+    return modint(a) += b;
+}
 
-template <class Edge>
-vi topologicalSort(Graph<Edge>& graph) {
-    vi result;
-    int n = graph.vertexCount;
-    result.reserve(n);
-    arri degree(n, 0);
-    for (int i = 0; i < n; ++i) {
-        for (auto edge : graph[i]) {
-            degree[edge->to]++;
+modint operator-(const modint& a, const modint& b) {
+    return modint(a) -= b;
+}
+
+modint operator*(const modint& a, const modint& b) {
+    return modint(a) *= b;
+}
+
+modint operator/(const modint& a, const modint& b) {
+    return modint(a) /= b;
+}
+
+ostream& operator<<(ostream& out, const modint& val) {
+    return out << val.n;
+}
+
+bool operator==(const modint& a, const modint& b) {
+    return a.n == b.n;
+}
+
+bool operator!=(const modint& a, const modint& b) {
+    return a.n != b.n;
+}
+
+namespace std {
+    template <>
+    struct hash<modint> {
+        size_t operator()(const modint& n) const {
+            return n.n;
         }
-    }
-    que<int> q;
-    for (int i = 0; i < n; ++i) {
-        if (degree[i] == 0) {
-            q.push(i);
+    };
+}
+
+int modint::log(modint alpha) {
+    unordered_map<modint, int> base;
+    int exp = 0;
+    modint pow = 1;
+    modint inv = *this;
+    modint alInv = alpha.inverse();
+    while (exp * exp < mod) {
+        if (inv == 1) {
+            return exp;
         }
+        base[inv] = exp++;
+        pow *= alpha;
+        inv *= alInv;
     }
-    while (!q.empty()) {
-        int cur = q.pop();
-        result.push_back(cur);
-        for (auto edge : graph[cur]) {
-            if (--degree[edge->to] == 0) {
-                q.push(edge->to);
-            }
+    modint step = pow;
+    for (int i = 1;; i++) {
+        if (base.count(pow)) {
+            return exp * i + base[pow];
         }
+        pow *= step;
     }
-    if (result.size() != n) {
-        return vi(0);
+}
+
+
+template <typename T>
+T gcd(T a, T b) {
+    a = abs(a);
+    b = abs(b);
+    while (b != 0) {
+        a = a % b;
+        swap(a, b);
+    }
+    return a;
+}
+
+template <typename T>
+T lcm(T a, T b) {
+    return a / gcd(a, b) * b;
+}
+
+template <typename T>
+T power(const T& a, ll b) {
+    if (b == 0) {
+        return 1;
+    }
+    if ((b & 1) == 0) {
+        T res = power(a, b >> 1);
+        return res * res;
+    } else {
+        return power(a, b - 1) * a;
+    }
+}
+
+template <typename T>
+T factorial(int n) {
+    T result = 1;
+    for (int i = 2; i <= n; i++) {
+        result *= i;
     }
     return result;
 }
 
-template <class Edge>
-void centroidDecomposition(Graph<Edge>& graph, const function<void(int, const arr<bool>&, const vi&)>& callback) {
-    int n = graph.vertexCount;
-    arr<bool> forb(n, false);
-    arri size(n);
-    function<void(int)> doWork = [&](int vert) {
-        vi part;
-        function<void(int, int)> dfs2 = [&](int vert, int last) {
-            size[vert] = 1;
-            part.push_back(vert);
-            for (auto* e : graph[vert]) {
-                int next = e->to;
-                if (next == last || forb[next]) {
-                    continue;
-                }
-                dfs2(next, vert);
-                size[vert] += size[next];
+template <typename T>
+arr<T> factorials(int length) {
+    arr<T> result(length);
+    if (length > 0) {
+        result[0] = 1;
+    }
+    for (int i = 1; i < length; i++) {
+        result[i] = result[i - 1] * i;
+    }
+    return result;
+}
+
+arr<modint> inverses(int length) {
+    arr<modint> result(length);
+    if (length > 1) {
+        result[1] = 1;
+    }
+    for (int i = 2; i < length; i++) {
+        result[i] = -(mod / i) * result[mod % i];
+    }
+    return result;
+}
+
+template <typename T>
+arr<T> powers(T base, int length) {
+    arr<T> result(length);
+    if (length > 0) {
+        result[0] = 1;
+    }
+    for (int i = 1; i < length; i++) {
+        result[i] = result[i - 1] * base;
+    }
+    return result;
+}
+
+arr<modint> inverseFactorials(int length) {
+    auto result = inverses(length);
+    if (length > 0) {
+        result[0] = 1;
+    }
+    for (int i = 1; i < length; i++) {
+        result[i] *= result[i - 1];
+    }
+    return result;
+}
+
+class Combinations {
+private:
+    arr<modint> fact;
+    arr<modint> invFactorial;
+
+public:
+    Combinations(int length) {
+        fact = factorials<modint>(length);
+        invFactorial = inverseFactorials(length);
+    }
+
+public:
+    modint c(int n, int k) const {
+        if (k < 0 || k > n) {
+            return 0;
+        }
+        return fact[n] * invFactorial[k] * invFactorial[n - k];
+    }
+
+    modint operator()(int n, int k) const {
+        return c(n, k);
+    }
+
+    modint factorial(int n) const {
+        return fact[n];
+    }
+
+    modint inverseFactorial(int n) const {
+        return invFactorial[n];
+    }
+};
+
+
+namespace prime_fft {
+    bool init = false;
+    modint root;
+    modint reverseRoot;
+    int rootPower;
+    vec<modint> aa;
+    vec<modint> bb;
+}
+
+void initPrimeFFT() {
+    if (prime_fft::init) {
+        return;
+    }
+    prime_fft::init = true;
+    prime_fft::rootPower = 1;
+    int pw = 0;
+    while ((mod - 1) % (2 * prime_fft::rootPower) == 0) {
+        prime_fft::rootPower *= 2;
+        pw++;
+    }
+    for (int i = 2;; i++) {
+        mod--;
+        int exp = power(modint(2), pw - 1).n;
+        int next = (exp * 2) % mod;
+        mod++;
+        if (power(modint(i), exp).n != 1 && power(modint(i), next).n == 1) {
+            prime_fft::root = i;
+            prime_fft::reverseRoot = prime_fft::root.inverse();
+            break;
+        }
+    }
+}
+
+namespace prime_fft {
+    void primeFFT(vec<modint>& array, bool invert, int n) {
+        for (int i = 1, j = 0; i < n; ++i) {
+            int bit = n >> 1;
+            for (; j >= bit; bit >>= 1) {
+                j -= bit;
             }
-        };
-        dfs2(vert, -1);
-        int end = -1;
-        for (int i : part) {
-            if (2 * size[i] >= part.size()) {
-                bool good = true;
-                for (auto* e : graph[i]) {
-                    int to = e->to;
-                    if (!forb[to] && size[to] * 2 > part.size() && size[to] < size[i]) {
-                        good = false;
-                        break;
-                    }
-                }
-                if (good) {
-                    end = i;
-                    break;
-                }
+            j += bit;
+            if (i < j) {
+                swap(array[i], array[j]);
             }
         }
 
-        callback(end, forb, part);
-
-        forb[end] = true;
-        for (auto* e : graph[end]) {
-            int to = e->to;
-            if (!forb[to]) {
-                doWork(to);
+        for (int len = 2; len <= n; len <<= 1) {
+            modint wlen = invert ? reverseRoot : root;
+            for (int i = len; i < rootPower; i <<= 1) {
+                wlen *= wlen;
+            }
+            int half = len >> 1;
+            for (int i = 0; i < n; i += len) {
+                modint w = 1;
+                for (int j = 0; j < half; ++j) {
+                    modint u = array[i + j], v = array[i + j + half] * w;
+                    array[i + j] = u + v;
+                    array[i + j + half] = u - v;
+                    w *= wlen;
+                }
             }
         }
-    };
-    doWork(0);
+        if (invert) {
+            modint reverseSize = modint(n).inverse();
+            for (int i = 0; i < n; ++i) {
+                array[i] *= reverseSize;
+            }
+        }
+    }
+
+}
+
+template <typename It>
+void multiply(const It fBegin, const It fEnd, const It sBegin, const It sEnd, It res) {
+    initPrimeFFT();
+    unsigned long fLen = fEnd - fBegin;
+    unsigned long sLen = sEnd - sBegin;
+    int resLen = fLen + sLen - 1;
+    if (resLen <= 100) {
+        fill(res, res + resLen, 0);
+        for (int i = 0; i < fLen; i++) {
+            for (int j = 0; j < sLen; j++) {
+                res[i + j] += fBegin[i] * sBegin[j];
+            }
+        }
+        return;
+    }
+    int resultSize = 1;
+    while (resultSize < resLen) {
+        resultSize *= 2;
+    }
+    vec<modint>& aa = prime_fft::aa;
+    vec<modint>& bb = prime_fft::bb;
+    if (aa.size() < resultSize) {
+        aa.resize(resultSize);
+        bb.resize(resultSize);
+    }
+    fill(aa.begin() + fLen, aa.begin() + resultSize, modint(0));
+    fill(bb.begin() + sLen, bb.begin() + resultSize, modint(0));
+    copy(fBegin, fEnd, aa.begin());
+    copy(sBegin, sEnd, bb.begin());
+    prime_fft::primeFFT(aa, false, resultSize);
+    if (equal(fBegin, fEnd, sBegin, sEnd)) {
+        copy(all(aa), bb.begin());
+    } else {
+        prime_fft::primeFFT(bb, false, resultSize);
+    }
+    for (int i = 0; i < resultSize; i++) {
+        aa[i] *= bb[i];
+    }
+    prime_fft::primeFFT(aa, true, resultSize);
+    for (int i = 0; i < resLen; i++) {
+        res[i] = aa[i];
+    }
+}
+
+vec<modint> multiply(vec<modint>& first, vec<modint>& second) {
+    auto len = first.size() + second.size() - 1;
+    vec<modint> res(len);
+    multiply(all(first), all(second), res.begin());
+    return res;
 }
 
 
-class CountIt {
+constexpr int base = 1000000000;
+constexpr int base_digits = 9;
+constexpr int FFT_MIN_SIZE = 50000;
+
+using vll = vec<ll>;
+
+struct bigint {
+    vi z;
+    int sign;
+
+    bigint() : sign(1) {}
+
+    bigint(ll v) { *this = v; }
+
+    bigint& operator=(ll v) {
+        sign = v < 0 ? -1 : 1;
+        v *= sign;
+        z.clear();
+        for (; v > 0; v = v / base) z.push_back((int) (v % base));
+        return *this;
+    }
+
+    bigint(const string& s) { read(s); }
+
+    bigint& operator+=(const bigint& other) {
+        if (sign == other.sign) {
+            for (int i = 0, carry = 0; i < other.z.size() || carry; ++i) {
+                if (i == z.size()) {
+                    z.push_back(0);
+                }
+                z[i] += carry + (i < other.z.size() ? other.z[i] : 0);
+                carry = z[i] >= base;
+                if (carry) {
+                    z[i] -= base;
+                }
+            }
+        } else if (other != 0) {
+            *this -= -other;
+        }
+        return *this;
+    }
+
+    friend bigint operator+(bigint a, const bigint& b) { return a += b; }
+
+    bigint& operator-=(const bigint& other) {
+        if (sign == other.sign) {
+            if (sign == 1 && *this >= other || sign == -1 && *this <= other) {
+                for (int i = 0, carry = 0; i < other.z.size() || carry; ++i) {
+                    z[i] -= carry + (i < other.z.size() ? other.z[i] : 0);
+                    carry = z[i] < 0;
+                    if (carry)
+                        z[i] += base;
+                }
+                trim();
+            } else {
+                *this = other - *this;
+                this->sign = -this->sign;
+            }
+        } else {
+            *this += -other;
+        }
+        return *this;
+    }
+
+    friend bigint operator-(bigint a, const bigint& b) { return a -= b; }
+
+    bigint& operator*=(int v) {
+        if (v < 0) sign = -sign, v = -v;
+        for (int i = 0, carry = 0; i < z.size() || carry; ++i) {
+            if (i == z.size())
+                z.push_back(0);
+            ll cur = (ll) z[i] * v + carry;
+            carry = (int) (cur / base);
+            z[i] = (int) (cur % base);
+        }
+        trim();
+        return *this;
+    }
+
+    bigint operator*(int v) const { return bigint(*this) *= v; }
+
+    friend pair<bigint, bigint> divmod(const bigint& a1, const bigint& b1) {
+        int norm = base / (b1.z.back() + 1);
+        bigint a = a1.abs() * norm;
+        bigint b = b1.abs() * norm;
+        bigint q, r;
+        q.z.resize(a.z.size());
+
+        for (int i = (int) a.z.size() - 1; i >= 0; i--) {
+            r *= base;
+            r += a.z[i];
+            int s1 = b.z.size() < r.z.size() ? r.z[b.z.size()] : 0;
+            int s2 = b.z.size() - 1 < r.z.size() ? r.z[b.z.size() - 1] : 0;
+            int d = (int) (((ll) s1 * base + s2) / b.z.back());
+            r -= b * d;
+            while (r < 0)
+                r += b, --d;
+            q.z[i] = d;
+        }
+
+        q.sign = a1.sign * b1.sign;
+        r.sign = a1.sign;
+        q.trim();
+        r.trim();
+        return {q, r / norm};
+    }
+
+    friend bigint sqrt(const bigint& a1) {
+        bigint a = a1;
+        while (a.z.empty() || a.z.size() % 2 == 1)
+            a.z.push_back(0);
+
+        int n = a.z.size();
+
+        int firstDigit = (int) ::sqrt((double) a.z[n - 1] * base + a.z[n - 2]);
+        int norm = base / (firstDigit + 1);
+        a *= norm;
+        a *= norm;
+        while (a.z.empty() || a.z.size() % 2 == 1)
+            a.z.push_back(0);
+
+        bigint r = (ll) a.z[n - 1] * base + a.z[n - 2];
+        firstDigit = (int) ::sqrt((double) a.z[n - 1] * base + a.z[n - 2]);
+        int q = firstDigit;
+        bigint res;
+
+        for (int j = n / 2 - 1; j >= 0; j--) {
+            for (;; --q) {
+                bigint r1 = (r - (res * 2 * base + q) * q) * base * base +
+                            (j > 0 ? (ll) a.z[2 * j - 1] * base + a.z[2 * j - 2] : 0);
+                if (r1 >= 0) {
+                    r = r1;
+                    break;
+                }
+            }
+            res *= base;
+            res += q;
+
+            if (j > 0) {
+                int d1 = res.z.size() + 2 < r.z.size() ? r.z[res.z.size() + 2] : 0;
+                int d2 = res.z.size() + 1 < r.z.size() ? r.z[res.z.size() + 1] : 0;
+                int d3 = res.z.size() < r.z.size() ? r.z[res.z.size()] : 0;
+                q = (int) (((ll) d1 * base * base + (ll) d2 * base + d3) / (firstDigit * 2));
+            }
+        }
+
+        res.trim();
+        return res / norm;
+    }
+
+    bigint operator/(const bigint& v) const { return divmod(*this, v).first; }
+
+    bigint operator%(const bigint& v) const { return divmod(*this, v).second; }
+
+    bigint& operator/=(int v) {
+        if (v < 0) sign = -sign, v = -v;
+        for (int i = (int) z.size() - 1, rem = 0; i >= 0; --i) {
+            ll cur = z[i] + rem * (ll) base;
+            z[i] = (int) (cur / v);
+            rem = (int) (cur % v);
+        }
+        trim();
+        return *this;
+    }
+
+    bigint operator/(int v) const { return bigint(*this) /= v; }
+
+    int operator%(int v) const {
+        if (v < 0) v = -v;
+        int m = 0;
+        for (int i = (int) z.size() - 1; i >= 0; --i)
+            m = (int) ((z[i] + m * (ll) base) % v);
+        return m * sign;
+    }
+
+    bigint& operator*=(const bigint& v) { return *this = *this * v; }
+
+    bigint& operator/=(const bigint& v) { return *this = *this / v; }
+
+    bool operator<(const bigint& v) const {
+        if (sign != v.sign)
+            return sign < v.sign;
+        if (z.size() != v.z.size())
+            return z.size() * sign < v.z.size() * v.sign;
+        for (int i = (int) z.size() - 1; i >= 0; i--)
+            if (z[i] != v.z[i])
+                return z[i] * sign < v.z[i] * sign;
+        return false;
+    }
+
+    bool operator>(const bigint& v) const { return v < *this; }
+
+    bool operator<=(const bigint& v) const { return !(v < *this); }
+
+    bool operator>=(const bigint& v) const { return !(*this < v); }
+
+    bool operator==(const bigint& v) const { return !(*this < v) && !(v < *this); }
+
+    bool operator!=(const bigint& v) const { return *this < v || v < *this; }
+
+    void trim() {
+        while (!z.empty() && z.back() == 0) z.pop_back();
+        if (z.empty()) sign = 1;
+    }
+
+    bool isZero() const { return z.empty(); }
+
+    friend bigint operator-(bigint v) {
+        if (!v.z.empty()) v.sign = -v.sign;
+        return v;
+    }
+
+    bigint abs() const {
+        return sign == 1 ? *this : -*this;
+    }
+
+    ll longValue() const {
+        ll res = 0;
+        for (int i = (int) z.size() - 1; i >= 0; i--)
+            res = res * base + z[i];
+        return res * sign;
+    }
+
+    friend bigint gcd(const bigint& a, const bigint& b) {
+        if (b.isZero()) {
+            return a;
+        }
+        if (a.isZero()) {
+            return b;
+        }
+        if (a % 2 == 0) {
+            if (b % 2 == 0) {
+                return gcd(a / 2, b / 2) * 2;
+            }
+            return gcd(a / 2, b);
+        }
+        if (b % 2 == 0) {
+            return gcd(a, b / 2);
+        }
+        if (a >= b) {
+            return gcd(a - b, b);
+        }
+        return gcd(a, b - a);
+    }
+
+    friend bigint lcm(const bigint& a, const bigint& b) {
+        return a / gcd(a, b) * b;
+    }
+
+    void read(const string& s) {
+        sign = 1;
+        z.clear();
+        int pos = 0;
+        while (pos < s.size() && (s[pos] == '-' || s[pos] == '+')) {
+            if (s[pos] == '-')
+                sign = -sign;
+            ++pos;
+        }
+        for (int i = (int) s.size() - 1; i >= pos; i -= base_digits) {
+            int x = 0;
+            for (int j = max(pos, i - base_digits + 1); j <= i; j++)
+                x = x * 10 + s[j] - '0';
+            z.push_back(x);
+        }
+        trim();
+    }
+
+    friend istream& operator>>(istream& stream, bigint& v) {
+        string s;
+        stream >> s;
+        v.read(s);
+        return stream;
+    }
+
+    friend ostream& operator<<(ostream& stream, const bigint& v) {
+        if (v.sign == -1)
+            stream << '-';
+        stream << (v.z.empty() ? 0 : v.z.back());
+        for (int i = (int) v.z.size() - 2; i >= 0; --i)
+            stream << setw(base_digits) << setfill('0') << v.z[i];
+        return stream;
+    }
+
+    static vec<modint> convert(const vi& z) {
+        vec<modint> res;
+        for (int i : z) {
+            for (int j : range(base_digits)) {
+                res.push_back(i % 10);
+                i /= 10;
+            }
+        }
+        return res;
+    }
+
+    bigint operator*(const bigint& v) const {
+        if (z.size() == 0 || v.z.size() == 0) {
+            return 0;
+        }
+        if (ll(z.size()) * v.z.size() < FFT_MIN_SIZE) {
+            ll carry = 0;
+            vi nz;
+            for (int i : range(z.size() + v.z.size() - 1)) {
+                ll cur = carry;
+                carry = 0;
+                for (int j : range(max(0, i - (int(v.z.size()) - 1)), min(i + 1, int(z.size())))) {
+                    ll term = ll(z[j]) * v.z[i - j];
+                    cur += term % base;
+                    carry += term / base;
+                }
+                carry += cur / base;
+                nz.push_back(cur % base);
+            }
+            while (carry > 0) {
+                nz.push_back(carry % base);
+                carry /= base;
+            }
+            bigint res = 0;
+            res.z = nz;
+            res.sign = sign * v.sign;
+            return res;
+        }
+        auto a = convert(z);
+        auto b = convert(v.z);
+        int wasMod = mod;
+        mod = MODF;
+        auto c = multiply(a, b);
+        mod = wasMod;
+        vi nz;
+        ll carry = 0;
+        for (int i = 0; i < c.size(); i += base_digits) {
+            ll times = 1;
+            for (int j : range(min(int(c.size()) - i, base_digits))) {
+                carry += c[i + j].n * times;
+                times *= 10;
+            }
+            nz.push_back(carry % base);
+            carry /= base;
+        }
+        while (carry > 0) {
+            nz.push_back(carry % base);
+            carry /= base;
+        }
+        bigint res = 0;
+        res.z = nz;
+        res.sign = sign * v.sign;
+        return res;
+    }
+
+};
+
+
+class Rational {
+    void normalize() {
+        ll g = gcd(num, den);
+        num /= g;
+        den /= g;
+    }
+
+public:
+    ll num;
+    ll den;
+
+    Rational(ll num = 0, ll den = 1) : num(num), den(den) {
+        normalize();
+    }
+
+    Rational(const Rational& other) : num(other.num), den(other.den) {}
+
+    Rational& operator+=(const Rational& other) {
+        ll g = gcd(den, other.den);
+        num = num * (other.den / g) + (den / g) * other.num;
+        den *= other.den / g;
+        normalize();
+        return *this;
+    }
+
+    Rational& operator-=(const Rational& other) {
+        ll g = gcd(den, other.den);
+        num = num * (other.den / g) - (den / g) * other.num;
+        den *= other.den / g;
+        normalize();
+        return *this;
+    }
+
+    Rational& operator*=(const Rational& other) {
+        ll g = gcd(den, other.num);
+        num *= other.num / g;
+        den /= g;
+        den *= other.den;
+        normalize();
+        return *this;
+    }
+
+    Rational& operator/=(const Rational& other) {
+        ll g = gcd(den, other.den);
+        num *= other.den / g;
+        den /= g;
+        den *= other.num;
+        normalize();
+        return *this;
+    }
+};
+
+Rational operator+(const Rational& a, const Rational& b) {
+    Rational res = a;
+    res += b;
+    return res;
+}
+
+Rational operator-(const Rational& a, const Rational& b) {
+    Rational res = a;
+    res -= b;
+    return res;
+}
+
+Rational operator*(const Rational& a, const Rational& b) {
+    Rational res = a;
+    res *= b;
+    return res;
+}
+
+Rational operator/(const Rational& a, const Rational& b) {
+    Rational res = a;
+    res /= b;
+    return res;
+}
+
+Rational operator-(const Rational& a) {
+    return Rational(-a.num, a.den);
+}
+
+bool operator<(const Rational& a, const Rational& b) {
+    return bigint(a.num) * b.den < bigint(a.den) * b.num;
+}
+
+bool operator>(const Rational& a, const Rational& b) {
+    return b < a;
+}
+
+bool operator>=(const Rational& a, const Rational& b) {
+    return !(a < b);
+}
+
+bool operator<=(const Rational& a, const Rational& b) {
+    return !(b < a);
+}
+
+ostream& operator<<(ostream& out, const Rational& val) {
+    return out << val.num << '/' << val.den;
+}
+
+
+class AZheleznodorozhnoeKoltso {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        int k = in.readInt();
-        arri u, v, c;
-        in.readArrays(n - 1, u, v, c);
-        decreaseByOne(u, v, c);
+        int m = in.readInt();
+        int q = in.readInt();
+        auto d = in.readIntArray(n);
+        arr<char> dir;
+        arri b;
+        arri t;
+        in.readArrays(m, dir, b, t);
+        arri x, y;
+        in.readArrays(q, x, y);
+        decreaseByOne(b, x, y);
 
-        Graph<BiEdge> graph(n);
-        for (int i : range(n - 1)) {
-            graph.addEdge(u[i], v[i]);
+        struct station {
+            int dist;
+            vec<pii> queries;
+            int train;
+
+            station(int dist, vec<pii> queries, int train) : dist(dist), queries(queries), train(train) {}
+        };
+        arr<ll> answer(q, numeric_limits<ll>::max());
+
+        auto work = [&](const vec<station>& stations) {
+            vec<pii> trains;
+            int cDist = 0;
+            for (const auto& s : stations) {
+                cDist += s.dist;
+                if (s.train != -1) {
+                    while (!trains.empty() && trains.back().first >= s.train) {
+                        trains.pop_back();
+                    }
+                    while (trains.size() > 1) {
+//                        ll t2t3 = ll(cDist - trains.back().second) * (s.train - trains.back().first);
+//                        ll t1t3 = ll(cDist - trains[trains.size() - 2].second) * (s.train - trains[trains.size() - 2].first);
+                        Rational t2t3(ll(cDist - trains.back().second) * trains.back().first, s.train -
+                                                                                              trains.back().first);// = ll(cDist - trains.back().second) * (s.train - trains.back().first);
+                        Rational t1t3(ll(cDist - trains[trains.size() - 2].second) * trains[trains.size() - 2].first,
+                                      s.train - trains[trains.size() -
+                                                       2].first);//                      ll t1t3 = ll(cDist - trains[trains.size() - 2].second) * (s.train - trains[trains.size() - 2].first);
+                        if (t1t3 <= t2t3) {
+                            trains.pop_back();
+                        } else {
+                            break;
+                        }
+                    }
+                    trains.emplace_back(s.train, cDist);
+                }
+            }
+            if (trains.empty()) {
+                return;
+            }
+            for (const auto& s : stations) {
+                cDist += s.dist;
+                if (s.train != -1) {
+                    while (!trains.empty() && trains.back().first >= s.train) {
+                        trains.pop_back();
+                    }
+                    while (trains.size() > 1) {
+                        Rational t2t3(ll(cDist - trains.back().second) * trains.back().first, s.train -
+                                                                                              trains.back().first);// = ll(cDist - trains.back().second) * (s.train - trains.back().first);
+                        Rational t1t3(ll(cDist - trains[trains.size() - 2].second) * trains[trains.size() - 2].first,
+                                      s.train - trains[trains.size() -
+                                                       2].first);//                      ll t1t3 = ll(cDist - trains[trains.size() - 2].second) * (s.train - trains[trains.size() - 2].first);
+                        if (t1t3 <= t2t3) {
+                            trains.pop_back();
+                        } else {
+                            break;
+                        }
+                    }
+                    trains.emplace_back(s.train, cDist);
+                }
+                for (const auto& p : s.queries) {
+                    int dist = p.first;
+                    int left = 0;
+                    int right = trains.size() - 1;
+                    while (left < right) {
+                        int mid = (left + right) / 2;
+                        ll v1 = ll(cDist - trains[mid].second + dist) * trains[mid].first;
+                        ll v2 = ll(cDist - trains[mid + 1].second + dist) * trains[mid + 1].first;
+                        if (v1 > v2) {
+                            left = mid + 1;
+                        } else {
+                            right = mid;
+                        }
+                    }
+                    minim(answer[p.second], ll(cDist - trains[left].second + dist) * trains[left].first);
+                }
+            }
+        };
+        vec<station> left;
+        for (int i : range(n)) {
+            left.emplace_back(d[(i + n - 1) % n], vec<pii>(), -1);
         }
-        ll answer = ll(n) * (n - 1) / 2;
-        arr<bool> forb(n, false);
-        arri dist(n);
-        arri cid(n, 0);
-        int id = 1;
-        arri last(n);
-        arri ft(2 * n - 1);
-        int ftsz = 0;
-        auto add = [&](int at) {
-            while (at < ftsz) {
-                ft[at]++;
-                at = at | (at + 1);
-            }
-        };
-        auto getImpl = [&](int to) -> int {
-            minim(to, ftsz - 1);
-            int result = 0;
-            while (to >= 0) {
-                result += ft[to];
-                to = (to & (to + 1)) - 1;
-            }
-            return result;
-        };
-        auto get = [&](int from) {
-            return getImpl(ftsz - 1) - getImpl(from - 1);
-        };
-
-        centroidDecomposition(graph, [&](int end, const arr<bool>& forb, const vi&) {
-            vec<vi> bal(graph[end].size());
-            for (int i : range(k)) {
-                int minBal = 0;
-                int maxBal = 0;
-                int pos = 0;
-                for (auto* e : graph[end]) {
-                    bal[pos].clear();
-                    function<void(int, int, int)> dfs = [&](int vert, int last, int cbal) {
-                        if (forb[vert]) {
-                            return;
-                        }
-                        bal[pos].push_back(cbal);
-                        minim(minBal, cbal);
-                        maxim(maxBal, cbal);
-                        for (auto* e : graph[vert]) {
-                            int next = e->to;
-                            if (next == last) {
-                                continue;
-                            }
-                            dfs(next, vert, cbal + (c[e->id] == i ? 1 : -1));
-                        }
-                    };
-                    dfs(e->to, end, c[e->id] == i ? 1 : -1);
-                    pos++;
-                }
-                ftsz = maxBal - minBal + 1;
-                fill(ft.begin(), ft.begin() + ftsz, 0);
-                add(-minBal);
-                for (const vi& b : bal) {
-                    for (int j : b) {
-                        answer -= get(-j - minBal + 1);
-                    }
-                    for (int j : b) {
-                        add(j - minBal);
-                    }
+        for (int i : range(m)) {
+            if (dir[i] == 'R') {
+                if (left[b[i]].train == -1 || left[b[i]].train > t[i]) {
+                    left[b[i]].train = t[i];
                 }
             }
-        });
-        out.printLine(answer);
+        }
+        vi sums;
+        sums.push_back(0);
+        for (int i : d) {
+            sums.push_back(sums.back() + i);
+        }
+        for (int i : range(q)) {
+            left[x[i]].queries.emplace_back(y[i] >= x[i] ? sums[y[i]] - sums[x[i]] : sums[y[i]] - sums[x[i]] + sums[n],
+                                            i);
+        }
+        work(left);
+        for (int i : RevRange(n)) {
+            left[i].dist = d[i];
+            left[i].train = -1;
+            for (auto& p : left[i].queries) {
+                p.first = sums[n] - p.first;
+            }
+        }
+        for (int i : range(m)) {
+            if (dir[i] == 'L') {
+                if (left[b[i]].train == -1 || left[b[i]].train > t[i]) {
+                    left[b[i]].train = t[i];
+                }
+            }
+        }
+        reverse(all(left));
+        work(left);
+        for (ll i : answer) {
+            out.printLine(i);
+        }
     }
 };
 
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(0);
-    CountIt solver;
-    std::istream& in(std::cin);
-    std::ostream& out(std::cout);
-    int n;
-    in >> n;
-    for (int i = 0; i < n; ++i) {
-        solver.solve(in, out);
-    }
-
+//    std::ios::sync_with_stdio(false);
+//    std::cin.tie(0);
+//    freopen("../in.txt", "r", stdin);
+//    freopen("../out.txt", "w", stdout);
+    AZheleznodorozhnoeKoltso solver;
+    std::ifstream in("in.txt");
+    std::ofstream out("out.txt");
+    solver.solve(in, out);
+    out.close();
     return 0;
 }

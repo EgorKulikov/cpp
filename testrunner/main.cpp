@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/CountIt.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/AZheleznodorozhnoeKoltso.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +30,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"2\n5 3\n1 2 1\n1 3 2\n2 4 3\n2 5 2\n6 2\n1 2 1\n2 3 1\n3 4 2\n4 5 1\n5 6 2\n", "5\n4\n", true, true},
+		{"3 1 6\n1 2 3\nR 1 1\n1 2\n1 3\n2 1\n2 3\n3 1\n3 2\n", "1\n3\n6\n3\n6\n7\n", true, true},{"3 2 6\n1 2 3\nR 1 1\nL 1 1\n1 2\n1 3\n2 1\n2 3\n3 1\n3 2\n", "1\n3\n6\n3\n6\n5\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -50,13 +50,8 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    CountIt solver;
-			    int n;
-in >> n;
-for(int i = 0; i < n; ++i) {
-	solver.solve(in, out);
-}
-
+			    AZheleznodorozhnoeKoltso solver;
+			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;
             }
