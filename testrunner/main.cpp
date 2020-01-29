@@ -1,4 +1,4 @@
-#include "C:/Users/kulikov/proj/cpp/tasks/QualityWork.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/TaskE.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +30,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"3\n4.5 3.5 2.5\n39", "2", true, true},
+		{"3\n3 1 2\n7 1 4\n", "4\n", true, true},{"4\n2 4 1 3\n5 9 8 3\n", "3\n", true, true},{"6\n3 5 1 6 2 4\n9 1 9 9 1 9\n", "2\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -50,7 +50,7 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    QualityWork solver;
+			    TaskE solver;
 			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;

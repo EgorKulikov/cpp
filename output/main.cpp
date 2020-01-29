@@ -985,787 +985,244 @@ public:
 };
 
 
-const int MOD7 = 1000000007;
-const int MOD9 = 1000000009;
-const int MODF = 998244353;
+template <typename Value, typename Delta>
+class SegmentTree {
+    const int size;
+    const Value defaultValue;
+    const Delta defaultDelta;
+    function<Value(Value, Value)> joinValue;
+    function<Delta(Delta, Delta)> joinDelta;
+    function<Value(Value, Delta, int, int)> accumulate;
+    arr<Value> value;
+    arr<Delta> delta;
 
-int mod = MOD7;
-
-template <typename T>
-T gcd(T a, T b, T& x, T& y) {
-    if (a == 0) {
-        x = 0;
-        y = 1;
-        return b;
+    void init(int root, int left, int right) {
+        if (left + 1 == right) {
+            value[root] = defaultValue;
+        } else {
+            int mid = (left + right) >> 1;
+            init(2 * root + 1, left, mid);
+            init(2 * root + 2, mid, right);
+            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
+        }
     }
-    int d = gcd(b % a, a, y, x);
-    x -= (b / a) * y;
-    return d;
-}
 
-class modint {
-public:
-    int n;
+    void apply(int root, Delta dlt, int left, int right) {
+        value[root] = accumulate(value[root], dlt, left, right);
+        delta[root] = joinDelta(delta[root], dlt);
+    }
 
-    modint() : n(0) {}
+    void pushDown(int root, int left, int mid, int right) {
+        apply(2 * root + 1, delta[root], left, mid);
+        apply(2 * root + 2, delta[root], mid, right);
+        delta[root] = defaultDelta;
+    }
 
-    modint(ll n) {
-        if (n >= 0 && n < mod) {
-            this->n = n;
+    void update(int root, int left, int right, int from, int to, Delta dlt) {
+        if (left >= from && right <= to) {
+            apply(root, dlt, left, right);
             return;
         }
-        n %= mod;
-        if (n < 0) {
-            n += mod;
+        if (right <= from || left >= to) {
+            return;
         }
-        this->n = n;
+        int mid = (left + right) >> 1;
+        pushDown(root, left, mid, right);
+        update(2 * root + 1, left, mid, from, to, dlt);
+        update(2 * root + 2, mid, right, from, to, dlt);
+        value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
     }
 
-    modint& operator+=(const modint& other) {
-        n += other.n;
-        if (n >= mod) {
-            n -= mod;
+    Value query(int root, int left, int right, int from, int to) {
+        if (left >= from && right <= to) {
+            return value[root];
         }
-        return *this;
-    }
-
-    modint& operator-=(const modint& other) {
-        n -= other.n;
-        if (n < 0) {
-            n += mod;
+        if (right <= from || left >= to) {
+            return defaultValue;
         }
-        return *this;
+        int mid = (left + right) >> 1;
+        pushDown(root, left, mid, right);
+        return joinValue(query(2 * root + 1, left, mid, from, to), query(2 * root + 2, mid, right, from, to));
     }
 
-    modint& operator*=(const modint& other) {
-        n = ll(n) * other.n % mod;
-        return *this;
-    }
-
-    modint& operator/=(const modint& other) {
-#ifdef LOCAL
-        if (other.n == 0) {
-            throw "Division by zero";
+public:
+    SegmentTree(int size, function<Value(Value, Value)> joinValue,
+                function<Delta(Delta, Delta)> joinDelta,
+                function<Value(Value, Delta, int, int)> accumulate,
+                Value defaultValue = 0, Delta defaultDelta = 0) :
+            size(size), joinValue(joinValue), joinDelta(joinDelta), accumulate(accumulate),
+            defaultValue(defaultValue), defaultDelta(defaultDelta) {
+        int vertexSize = size * 4;
+        value = arr<Value>(vertexSize);
+        delta = arr<Delta>(vertexSize, defaultDelta);
+        if (size > 0) {
+            init(0, 0, size);
         }
-#endif
-        return *this *= other.inverse();
     }
 
-    modint operator-() {
-        if (n == 0) {
-            return 0;
-        }
-        return modint(mod - n);
+    void update(int from, int to, Delta delta) {
+        update(0, 0, size, max(0, from), to, delta);
     }
 
-    modint inverse() const {
-        ll x, y;
-        ll g = gcd(ll(n), ll(mod), x, y);
-#ifdef LOCAL
-        if (g != 1) {
-            throw "not inversable";
-        }
-#endif
-        return x;
+    Value query(int from, int to) {
+        return query(0, 0, size, max(0, from), to);
     }
-
-    int log(modint alpha);
 };
 
-modint operator+(const modint& a, const modint& b) {
-    return modint(a) += b;
-}
-
-modint operator-(const modint& a, const modint& b) {
-    return modint(a) -= b;
-}
-
-modint operator*(const modint& a, const modint& b) {
-    return modint(a) *= b;
-}
-
-modint operator/(const modint& a, const modint& b) {
-    return modint(a) /= b;
-}
-
-ostream& operator<<(ostream& out, const modint& val) {
-    return out << val.n;
-}
-
-bool operator==(const modint& a, const modint& b) {
-    return a.n == b.n;
-}
-
-bool operator!=(const modint& a, const modint& b) {
-    return a.n != b.n;
-}
-
-namespace std {
-    template <>
-    struct hash<modint> {
-        size_t operator()(const modint& n) const {
-            return n.n;
-        }
-    };
-}
-
-int modint::log(modint alpha) {
-    unordered_map<modint, int> base;
-    int exp = 0;
-    modint pow = 1;
-    modint inv = *this;
-    modint alInv = alpha.inverse();
-    while (exp * exp < mod) {
-        if (inv == 1) {
-            return exp;
-        }
-        base[inv] = exp++;
-        pow *= alpha;
-        inv *= alInv;
-    }
-    modint step = pow;
-    for (int i = 1;; i++) {
-        if (base.count(pow)) {
-            return exp * i + base[pow];
-        }
-        pow *= step;
-    }
-}
-
-
-template <typename T>
-T gcd(T a, T b) {
-    a = abs(a);
-    b = abs(b);
-    while (b != 0) {
-        a = a % b;
-        swap(a, b);
-    }
-    return a;
-}
-
-template <typename T>
-T lcm(T a, T b) {
-    return a / gcd(a, b) * b;
-}
-
-template <typename T>
-T power(const T& a, ll b) {
-    if (b == 0) {
-        return 1;
-    }
-    if ((b & 1) == 0) {
-        T res = power(a, b >> 1);
-        return res * res;
-    } else {
-        return power(a, b - 1) * a;
-    }
-}
-
-template <typename T>
-T factorial(int n) {
-    T result = 1;
-    for (int i = 2; i <= n; i++) {
-        result *= i;
-    }
-    return result;
-}
-
-template <typename T>
-arr<T> factorials(int length) {
-    arr<T> result(length);
-    if (length > 0) {
-        result[0] = 1;
-    }
-    for (int i = 1; i < length; i++) {
-        result[i] = result[i - 1] * i;
-    }
-    return result;
-}
-
-arr<modint> inverses(int length) {
-    arr<modint> result(length);
-    if (length > 1) {
-        result[1] = 1;
-    }
-    for (int i = 2; i < length; i++) {
-        result[i] = -(mod / i) * result[mod % i];
-    }
-    return result;
-}
-
-template <typename T>
-arr<T> powers(T base, int length) {
-    arr<T> result(length);
-    if (length > 0) {
-        result[0] = 1;
-    }
-    for (int i = 1; i < length; i++) {
-        result[i] = result[i - 1] * base;
-    }
-    return result;
-}
-
-arr<modint> inverseFactorials(int length) {
-    auto result = inverses(length);
-    if (length > 0) {
-        result[0] = 1;
-    }
-    for (int i = 1; i < length; i++) {
-        result[i] *= result[i - 1];
-    }
-    return result;
-}
-
-class Combinations {
+template <typename Value, Value defaultValue = 0>
+class ReadOnlySegmentTree {
 private:
-    arr<modint> fact;
-    arr<modint> invFactorial;
+    const int size;
+    function<Value(Value, Value)> joinValue;
+    arr<Value> value;
 
-public:
-    Combinations(int length) {
-        fact = factorials<modint>(length);
-        invFactorial = inverseFactorials(length);
-    }
-
-public:
-    modint c(int n, int k) const {
-        if (k < 0 || k > n) {
-            return 0;
+    void init(int root, int left, int right, const arr<Value>& array) {
+        if (left + 1 == right) {
+            value[root] = array[left];
+        } else {
+            int mid = (left + right) >> 1;
+            init(2 * root + 1, left, mid, array);
+            init(2 * root + 2, mid, right, array);
+            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
         }
-        return fact[n] * invFactorial[k] * invFactorial[n - k];
     }
 
-    modint operator()(int n, int k) const {
-        return c(n, k);
+    Value query(int root, int left, int right, int from, int to) const {
+        if (left >= from && right <= to) {
+            return value[root];
+        }
+        if (right <= from || left >= to) {
+            return defaultValue;
+        }
+        int mid = (left + right) >> 1;
+        Value lValue = query(2 * root + 1, left, mid, from, to);
+        Value rValue = query(2 * root + 2, mid, right, from, to);
+        return joinValue(lValue, rValue);
     }
 
-    modint factorial(int n) const {
-        return fact[n];
+public:
+    ReadOnlySegmentTree(const arr<Value>& array, function<Value(Value, Value)> joinValue) :
+            size(array.size()), joinValue(joinValue) {
+        int vertexSize = size * 4;
+        value = arr<Value>(vertexSize);
+        if (size > 0) {
+            init(0, 0, size, array);
+        }
     }
 
-    modint inverseFactorial(int n) const {
-        return invFactorial[n];
+    Value query(int from, int to) const {
+        return query(0, 0, size, max(0, from), to);
     }
 };
 
 
-namespace prime_fft {
-    bool init = false;
-    modint root;
-    modint reverseRoot;
-    int rootPower;
-    vec<modint> aa;
-    vec<modint> bb;
+template <typename T>
+inline void unique(vec<T>& v) {
+    v.resize(unique(all(v)) - v.begin());
 }
 
-void initPrimeFFT() {
-    if (prime_fft::init) {
-        return;
+arri createOrder(int n) {
+    arri order(n);
+    for (int i = 0; i < n; i++) {
+        order[i] = i;
     }
-    prime_fft::init = true;
-    prime_fft::rootPower = 1;
-    int pw = 0;
-    while ((mod - 1) % (2 * prime_fft::rootPower) == 0) {
-        prime_fft::rootPower *= 2;
-        pw++;
-    }
-    for (int i = 2;; i++) {
-        mod--;
-        int exp = power(modint(2), pw - 1).n;
-        int next = (exp * 2) % mod;
-        mod++;
-        if (power(modint(i), exp).n != 1 && power(modint(i), next).n == 1) {
-            prime_fft::root = i;
-            prime_fft::reverseRoot = prime_fft::root.inverse();
-            break;
-        }
-    }
+    return order;
 }
 
-namespace prime_fft {
-    void primeFFT(vec<modint>& array, bool invert, int n) {
-        for (int i = 1, j = 0; i < n; ++i) {
-            int bit = n >> 1;
-            for (; j >= bit; bit >>= 1) {
-                j -= bit;
-            }
-            j += bit;
-            if (i < j) {
-                swap(array[i], array[j]);
-            }
-        }
-
-        for (int len = 2; len <= n; len <<= 1) {
-            modint wlen = invert ? reverseRoot : root;
-            for (int i = len; i < rootPower; i <<= 1) {
-                wlen *= wlen;
-            }
-            int half = len >> 1;
-            for (int i = 0; i < n; i += len) {
-                modint w = 1;
-                for (int j = 0; j < half; ++j) {
-                    modint u = array[i + j], v = array[i + j + half] * w;
-                    array[i + j] = u + v;
-                    array[i + j + half] = u - v;
-                    w *= wlen;
-                }
-            }
-        }
-        if (invert) {
-            modint reverseSize = modint(n).inverse();
-            for (int i = 0; i < n; ++i) {
-                array[i] *= reverseSize;
-            }
-        }
+arri inverse(const arri& p) {
+    arri res(p.size());
+    for (int i : range(p.size())) {
+        res[p[i]] = i;
     }
-
-}
-
-template <typename It>
-void multiply(const It fBegin, const It fEnd, const It sBegin, const It sEnd, It res) {
-    initPrimeFFT();
-    unsigned long fLen = fEnd - fBegin;
-    unsigned long sLen = sEnd - sBegin;
-    int resLen = fLen + sLen - 1;
-    if (resLen <= 100) {
-        fill(res, res + resLen, 0);
-        for (int i = 0; i < fLen; i++) {
-            for (int j = 0; j < sLen; j++) {
-                res[i + j] += fBegin[i] * sBegin[j];
-            }
-        }
-        return;
-    }
-    int resultSize = 1;
-    while (resultSize < resLen) {
-        resultSize *= 2;
-    }
-    vec<modint>& aa = prime_fft::aa;
-    vec<modint>& bb = prime_fft::bb;
-    if (aa.size() < resultSize) {
-        aa.resize(resultSize);
-        bb.resize(resultSize);
-    }
-    fill(aa.begin() + fLen, aa.begin() + resultSize, modint(0));
-    fill(bb.begin() + sLen, bb.begin() + resultSize, modint(0));
-    copy(fBegin, fEnd, aa.begin());
-    copy(sBegin, sEnd, bb.begin());
-    prime_fft::primeFFT(aa, false, resultSize);
-    if (equal(fBegin, fEnd, sBegin, sEnd)) {
-        copy(all(aa), bb.begin());
-    } else {
-        prime_fft::primeFFT(bb, false, resultSize);
-    }
-    for (int i = 0; i < resultSize; i++) {
-        aa[i] *= bb[i];
-    }
-    prime_fft::primeFFT(aa, true, resultSize);
-    for (int i = 0; i < resLen; i++) {
-        res[i] = aa[i];
-    }
-}
-
-vec<modint> multiply(vec<modint>& first, vec<modint>& second) {
-    auto len = first.size() + second.size() - 1;
-    vec<modint> res(len);
-    multiply(all(first), all(second), res.begin());
     return res;
 }
 
+template <class Collection, typename Iterator>
+inline void addAll(Collection& v, Iterator begin, Iterator end) {
+    v.insert(v.end(), begin, end);
+}
 
-constexpr int base = 1000000000;
-constexpr int base_digits = 9;
-constexpr int FFT_MIN_SIZE = 50000;
-
-using vll = vec<ll>;
-
-struct bigint {
-    vi z;
-    int sign;
-
-    bigint() : sign(1) {}
-
-    bigint(ll v) { *this = v; }
-
-    bigint& operator=(ll v) {
-        sign = v < 0 ? -1 : 1;
-        v *= sign;
-        z.clear();
-        for (; v > 0; v = v / base) z.push_back((int) (v % base));
-        return *this;
+template <typename Iterator>
+arri getQty(Iterator begin, Iterator end, int length) {
+    arri res(length, 0);
+    for (Iterator it = begin; it != end; it++) {
+        res[*it]++;
     }
+    return res;
+}
 
-    bigint(const string& s) { read(s); }
+template <typename Iterator>
+arri getQty(Iterator begin, Iterator end) {
+    return getQty(begin, end, *max_element(begin, end) + 1);
+}
 
-    bigint& operator+=(const bigint& other) {
-        if (sign == other.sign) {
-            for (int i = 0, carry = 0; i < other.z.size() || carry; ++i) {
-                if (i == z.size()) {
-                    z.push_back(0);
-                }
-                z[i] += carry + (i < other.z.size() ? other.z[i] : 0);
-                carry = z[i] >= base;
-                if (carry) {
-                    z[i] -= base;
-                }
-            }
-        } else if (other != 0) {
-            *this -= -other;
-        }
-        return *this;
+template <class Collection>
+void collect(Collection&) {}
+
+template <class Collection, class Other, class ...Vs>
+void collect(Collection& all, Other& a, Vs& ...vs) {
+    addAll(all, all(a));
+    collect(all, vs...);
+}
+
+void replace(const vi&) {}
+
+template <class ...Vs>
+void replace(const vi& all, vi& a, Vs& ...vs) {
+    for (int& i : a) {
+        i = lower_bound(all(all), i) - all.begin();
     }
+    replace(all, vs...);
+}
 
-    friend bigint operator+(bigint a, const bigint& b) { return a += b; }
-
-    bigint& operator-=(const bigint& other) {
-        if (sign == other.sign) {
-            if (sign == 1 && *this >= other || sign == -1 && *this <= other) {
-                for (int i = 0, carry = 0; i < other.z.size() || carry; ++i) {
-                    z[i] -= carry + (i < other.z.size() ? other.z[i] : 0);
-                    carry = z[i] < 0;
-                    if (carry)
-                        z[i] += base;
-                }
-                trim();
-            } else {
-                *this = other - *this;
-                this->sign = -this->sign;
-            }
-        } else {
-            *this += -other;
-        }
-        return *this;
+template <class ...Vs>
+void replace(const vi& all, arri& a, Vs& ...vs) {
+    for (int& i : a) {
+        i = lower_bound(all(all), i) - all.begin();
     }
+    replace(all, vs...);
+}
 
-    friend bigint operator-(bigint a, const bigint& b) { return a -= b; }
-
-    bigint& operator*=(int v) {
-        if (v < 0) sign = -sign, v = -v;
-        for (int i = 0, carry = 0; i < z.size() || carry; ++i) {
-            if (i == z.size())
-                z.push_back(0);
-            ll cur = (ll) z[i] * v + carry;
-            carry = (int) (cur / base);
-            z[i] = (int) (cur % base);
-        }
-        trim();
-        return *this;
-    }
-
-    bigint operator*(int v) const { return bigint(*this) *= v; }
-
-    friend pair<bigint, bigint> divmod(const bigint& a1, const bigint& b1) {
-        int norm = base / (b1.z.back() + 1);
-        bigint a = a1.abs() * norm;
-        bigint b = b1.abs() * norm;
-        bigint q, r;
-        q.z.resize(a.z.size());
-
-        for (int i = (int) a.z.size() - 1; i >= 0; i--) {
-            r *= base;
-            r += a.z[i];
-            int s1 = b.z.size() < r.z.size() ? r.z[b.z.size()] : 0;
-            int s2 = b.z.size() - 1 < r.z.size() ? r.z[b.z.size() - 1] : 0;
-            int d = (int) (((ll) s1 * base + s2) / b.z.back());
-            r -= b * d;
-            while (r < 0)
-                r += b, --d;
-            q.z[i] = d;
-        }
-
-        q.sign = a1.sign * b1.sign;
-        r.sign = a1.sign;
-        q.trim();
-        r.trim();
-        return {q, r / norm};
-    }
-
-    friend bigint sqrt(const bigint& a1) {
-        bigint a = a1;
-        while (a.z.empty() || a.z.size() % 2 == 1)
-            a.z.push_back(0);
-
-        int n = a.z.size();
-
-        int firstDigit = (int) ::sqrt((double) a.z[n - 1] * base + a.z[n - 2]);
-        int norm = base / (firstDigit + 1);
-        a *= norm;
-        a *= norm;
-        while (a.z.empty() || a.z.size() % 2 == 1)
-            a.z.push_back(0);
-
-        bigint r = (ll) a.z[n - 1] * base + a.z[n - 2];
-        firstDigit = (int) ::sqrt((double) a.z[n - 1] * base + a.z[n - 2]);
-        int q = firstDigit;
-        bigint res;
-
-        for (int j = n / 2 - 1; j >= 0; j--) {
-            for (;; --q) {
-                bigint r1 = (r - (res * 2 * base + q) * q) * base * base +
-                            (j > 0 ? (ll) a.z[2 * j - 1] * base + a.z[2 * j - 2] : 0);
-                if (r1 >= 0) {
-                    r = r1;
-                    break;
-                }
-            }
-            res *= base;
-            res += q;
-
-            if (j > 0) {
-                int d1 = res.z.size() + 2 < r.z.size() ? r.z[res.z.size() + 2] : 0;
-                int d2 = res.z.size() + 1 < r.z.size() ? r.z[res.z.size() + 1] : 0;
-                int d3 = res.z.size() < r.z.size() ? r.z[res.z.size()] : 0;
-                q = (int) (((ll) d1 * base * base + (ll) d2 * base + d3) / (firstDigit * 2));
-            }
-        }
-
-        res.trim();
-        return res / norm;
-    }
-
-    bigint operator/(const bigint& v) const { return divmod(*this, v).first; }
-
-    bigint operator%(const bigint& v) const { return divmod(*this, v).second; }
-
-    bigint& operator/=(int v) {
-        if (v < 0) sign = -sign, v = -v;
-        for (int i = (int) z.size() - 1, rem = 0; i >= 0; --i) {
-            ll cur = z[i] + rem * (ll) base;
-            z[i] = (int) (cur / v);
-            rem = (int) (cur % v);
-        }
-        trim();
-        return *this;
-    }
-
-    bigint operator/(int v) const { return bigint(*this) /= v; }
-
-    int operator%(int v) const {
-        if (v < 0) v = -v;
-        int m = 0;
-        for (int i = (int) z.size() - 1; i >= 0; --i)
-            m = (int) ((z[i] + m * (ll) base) % v);
-        return m * sign;
-    }
-
-    bigint& operator*=(const bigint& v) { return *this = *this * v; }
-
-    bigint& operator/=(const bigint& v) { return *this = *this / v; }
-
-    bool operator<(const bigint& v) const {
-        if (sign != v.sign)
-            return sign < v.sign;
-        if (z.size() != v.z.size())
-            return z.size() * sign < v.z.size() * v.sign;
-        for (int i = (int) z.size() - 1; i >= 0; i--)
-            if (z[i] != v.z[i])
-                return z[i] * sign < v.z[i] * sign;
-        return false;
-    }
-
-    bool operator>(const bigint& v) const { return v < *this; }
-
-    bool operator<=(const bigint& v) const { return !(v < *this); }
-
-    bool operator>=(const bigint& v) const { return !(*this < v); }
-
-    bool operator==(const bigint& v) const { return !(*this < v) && !(v < *this); }
-
-    bool operator!=(const bigint& v) const { return *this < v || v < *this; }
-
-    void trim() {
-        while (!z.empty() && z.back() == 0) z.pop_back();
-        if (z.empty()) sign = 1;
-    }
-
-    bool isZero() const { return z.empty(); }
-
-    friend bigint operator-(bigint v) {
-        if (!v.z.empty()) v.sign = -v.sign;
-        return v;
-    }
-
-    bigint abs() const {
-        return sign == 1 ? *this : -*this;
-    }
-
-    ll longValue() const {
-        ll res = 0;
-        for (int i = (int) z.size() - 1; i >= 0; i--)
-            res = res * base + z[i];
-        return res * sign;
-    }
-
-    friend bigint gcd(const bigint& a, const bigint& b) {
-        if (b.isZero()) {
-            return a;
-        }
-        if (a.isZero()) {
-            return b;
-        }
-        if (a % 2 == 0) {
-            if (b % 2 == 0) {
-                return gcd(a / 2, b / 2) * 2;
-            }
-            return gcd(a / 2, b);
-        }
-        if (b % 2 == 0) {
-            return gcd(a, b / 2);
-        }
-        if (a >= b) {
-            return gcd(a - b, b);
-        }
-        return gcd(a, b - a);
-    }
-
-    friend bigint lcm(const bigint& a, const bigint& b) {
-        return a / gcd(a, b) * b;
-    }
-
-    void read(const string& s) {
-        sign = 1;
-        z.clear();
-        int pos = 0;
-        while (pos < s.size() && (s[pos] == '-' || s[pos] == '+')) {
-            if (s[pos] == '-')
-                sign = -sign;
-            ++pos;
-        }
-        for (int i = (int) s.size() - 1; i >= pos; i -= base_digits) {
-            int x = 0;
-            for (int j = max(pos, i - base_digits + 1); j <= i; j++)
-                x = x * 10 + s[j] - '0';
-            z.push_back(x);
-        }
-        trim();
-    }
-
-    friend istream& operator>>(istream& stream, bigint& v) {
-        string s;
-        stream >> s;
-        v.read(s);
-        return stream;
-    }
-
-    friend ostream& operator<<(ostream& stream, const bigint& v) {
-        if (v.sign == -1)
-            stream << '-';
-        stream << (v.z.empty() ? 0 : v.z.back());
-        for (int i = (int) v.z.size() - 2; i >= 0; --i)
-            stream << setw(base_digits) << setfill('0') << v.z[i];
-        return stream;
-    }
-
-    static vec<modint> convert(const vi& z) {
-        vec<modint> res;
-        for (int i : z) {
-            for (int j : range(base_digits)) {
-                res.push_back(i % 10);
-                i /= 10;
-            }
-        }
-        return res;
-    }
-
-    bigint operator*(const bigint& v) const {
-        if (z.size() == 0 || v.z.size() == 0) {
-            return 0;
-        }
-        if (ll(z.size()) * v.z.size() < FFT_MIN_SIZE) {
-            ll carry = 0;
-            vi nz;
-            for (int i : range(z.size() + v.z.size() - 1)) {
-                ll cur = carry;
-                carry = 0;
-                for (int j : range(max(0, i - (int(v.z.size()) - 1)), min(i + 1, int(z.size())))) {
-                    ll term = ll(z[j]) * v.z[i - j];
-                    cur += term % base;
-                    carry += term / base;
-                }
-                carry += cur / base;
-                nz.push_back(cur % base);
-            }
-            while (carry > 0) {
-                nz.push_back(carry % base);
-                carry /= base;
-            }
-            bigint res = 0;
-            res.z = nz;
-            res.sign = sign * v.sign;
-            return res;
-        }
-        auto a = convert(z);
-        auto b = convert(v.z);
-        int wasMod = mod;
-        mod = MODF;
-        auto c = multiply(a, b);
-        mod = wasMod;
-        vi nz;
-        ll carry = 0;
-        for (int i = 0; i < c.size(); i += base_digits) {
-            ll times = 1;
-            for (int j : range(min(int(c.size()) - i, base_digits))) {
-                carry += c[i + j].n * times;
-                times *= 10;
-            }
-            nz.push_back(carry % base);
-            carry /= base;
-        }
-        while (carry > 0) {
-            nz.push_back(carry % base);
-            carry /= base;
-        }
-        bigint res = 0;
-        res.z = nz;
-        res.sign = sign * v.sign;
-        return res;
-    }
-
-};
+template <class ...Vs>
+vi compress(Vs& ...vs) {
+    vi vals;
+    collect(vals, vs...);
+    sort(all(vals));
+    unique(vals);
+    replace(vals, vs...);
+    return vals;
+}
 
 
-class QualityWork {
+class TaskE {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        arr<pair<bigint, bigint>> m(n);
-        for (int i : range(n)) {
-            string s = in.readString();
-            int ind = s.find('.');
-            if (ind == -1) {
-                m[i] = {bigint(s), 1};
-            } else {
-                m[i] = {bigint(s.substr(0, ind) + s.substr(ind + 1)), power(bigint(10), s.size() - ind - 1)};
-            }
-        }
-        ll k = in.readLong();
+        auto p = in.readIntArray(n);
+        auto a = in.readIntArray(n);
+        decreaseByOne(p);
 
-        sort(all(m), greater<>());
-        ll l = 0;
-        ll r = k;
-        while (l < r) {
-            ll mid = (l + r + 1) / 2;
-            ll rem = k;
-            bool good = true;
-            for (int i : range(n)) {
-                bigint cur = (m[i].first * mid * (i + 1) + m[i].second - 1) / m[i].second;
-                if (cur > rem) {
-                    good = false;
-                    break;
-                }
-                rem -= cur.longValue();
-            }
-            if (good) {
-                l = mid;
-            } else {
-                r = mid - 1;
-            }
+        SegmentTree<ll, ll> tree(n - 1, [](ll a, ll b) -> ll {
+            return min(a, b);
+        }, [](ll a, ll b) -> ll {
+            return a + b;
+        }, [](ll was, ll delta, int, int) -> ll {
+            return was + delta;
+        });
+        auto q = inverse(p);
+        for (int i : range(n)) {
+            tree.update(i, n - 1, a[i]);
         }
-        out.printLine(l);
+        ll answer = tree.query(0, n - 1);
+        for (int i : range(n)) {
+            tree.update(q[i], n - 1, -a[q[i]]);
+            tree.update(0, q[i], a[q[i]]);
+            minim(answer, tree.query(0, n - 1));
+        }
+        out.printLine(answer);
     }
 };
 
@@ -1773,7 +1230,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    QualityWork solver;
+    TaskE solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
     solver.solve(in, out);

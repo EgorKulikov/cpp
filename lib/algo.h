@@ -25,6 +25,11 @@ arri inverse(const arri& p) {
     return res;
 }
 
+template <typename T, typename Iterator>
+inline void addAll(vec<T>& v, Iterator begin, Iterator end) {
+    v.insert(v.end(), begin, end);
+}
+
 template <class Collection, typename Iterator>
 inline void addAll(Collection& v, Iterator begin, Iterator end) {
     v.insert(begin, end);
