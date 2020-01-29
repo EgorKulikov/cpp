@@ -145,7 +145,7 @@ public:
     int vertexCount;
     int edgeCount = 0;
 private:
-    arr<vec<Edge*> > edges;
+    vec<vec<Edge*>> edges;
 
 public:
     Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vec<Edge*>()) {}
@@ -183,5 +183,10 @@ public:
 
     vec<Edge*>& operator [](int at) {
         return edges[at];
+    }
+
+    void addVertices(int count) {
+        vertexCount += count;
+        edges.resize(vertexCount);
     }
 };

@@ -4,7 +4,10 @@
  * @author Egor Kulikov
  */
 
-#include <utility>
+
+
+
+
 
 
 #include <bits/stdc++.h>
@@ -982,32 +985,6 @@ public:
 };
 
 
-class ReverseNumberIterator : public NumberIterator {
-public:
-    ReverseNumberIterator(int v) : NumberIterator(v) {}
-
-    ReverseNumberIterator& operator++() {
-        --v;
-        return *this;
-    }
-};
-
-class RevRange : pii {
-public:
-    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
-
-    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
-
-    ReverseNumberIterator begin() {
-        return first;
-    }
-
-    ReverseNumberIterator end() {
-        return second;
-    }
-};
-
-
 const int MOD7 = 1000000007;
 const int MOD9 = 1000000009;
 const int MODF = 998244353;
@@ -1748,254 +1725,57 @@ struct bigint {
 };
 
 
-class Rational {
-    void normalize() {
-        ll g = gcd(num, den);
-        num /= g;
-        den /= g;
-    }
-
-public:
-    ll num;
-    ll den;
-
-    Rational(ll num = 0, ll den = 1) : num(num), den(den) {
-        normalize();
-    }
-
-    Rational(const Rational& other) : num(other.num), den(other.den) {}
-
-    Rational& operator+=(const Rational& other) {
-        ll g = gcd(den, other.den);
-        num = num * (other.den / g) + (den / g) * other.num;
-        den *= other.den / g;
-        normalize();
-        return *this;
-    }
-
-    Rational& operator-=(const Rational& other) {
-        ll g = gcd(den, other.den);
-        num = num * (other.den / g) - (den / g) * other.num;
-        den *= other.den / g;
-        normalize();
-        return *this;
-    }
-
-    Rational& operator*=(const Rational& other) {
-        ll g = gcd(den, other.num);
-        num *= other.num / g;
-        den /= g;
-        den *= other.den;
-        normalize();
-        return *this;
-    }
-
-    Rational& operator/=(const Rational& other) {
-        ll g = gcd(den, other.den);
-        num *= other.den / g;
-        den /= g;
-        den *= other.num;
-        normalize();
-        return *this;
-    }
-};
-
-Rational operator+(const Rational& a, const Rational& b) {
-    Rational res = a;
-    res += b;
-    return res;
-}
-
-Rational operator-(const Rational& a, const Rational& b) {
-    Rational res = a;
-    res -= b;
-    return res;
-}
-
-Rational operator*(const Rational& a, const Rational& b) {
-    Rational res = a;
-    res *= b;
-    return res;
-}
-
-Rational operator/(const Rational& a, const Rational& b) {
-    Rational res = a;
-    res /= b;
-    return res;
-}
-
-Rational operator-(const Rational& a) {
-    return Rational(-a.num, a.den);
-}
-
-bool operator<(const Rational& a, const Rational& b) {
-    return bigint(a.num) * b.den < bigint(a.den) * b.num;
-}
-
-bool operator>(const Rational& a, const Rational& b) {
-    return b < a;
-}
-
-bool operator>=(const Rational& a, const Rational& b) {
-    return !(a < b);
-}
-
-bool operator<=(const Rational& a, const Rational& b) {
-    return !(b < a);
-}
-
-ostream& operator<<(ostream& out, const Rational& val) {
-    return out << val.num << '/' << val.den;
-}
-
-
-class AZheleznodorozhnoeKoltso {
+class QualityWork {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
         int n = in.readInt();
-        int m = in.readInt();
-        int q = in.readInt();
-        auto d = in.readIntArray(n);
-        arr<char> dir;
-        arri b;
-        arri t;
-        in.readArrays(m, dir, b, t);
-        arri x, y;
-        in.readArrays(q, x, y);
-        decreaseByOne(b, x, y);
-
-        struct station {
-            int dist;
-            vec<pii> queries;
-            int train;
-
-            station(int dist, vec<pii> queries, int train) : dist(dist), queries(queries), train(train) {}
-        };
-        arr<ll> answer(q, numeric_limits<ll>::max());
-
-        auto work = [&](const vec<station>& stations) {
-            vec<pii> trains;
-            int cDist = 0;
-            for (const auto& s : stations) {
-                cDist += s.dist;
-                if (s.train != -1) {
-                    while (!trains.empty() && trains.back().first >= s.train) {
-                        trains.pop_back();
-                    }
-                    while (trains.size() > 1) {
-//                        ll t2t3 = ll(cDist - trains.back().second) * (s.train - trains.back().first);
-//                        ll t1t3 = ll(cDist - trains[trains.size() - 2].second) * (s.train - trains[trains.size() - 2].first);
-                        Rational t2t3(ll(cDist - trains.back().second) * trains.back().first, s.train -
-                                                                                              trains.back().first);// = ll(cDist - trains.back().second) * (s.train - trains.back().first);
-                        Rational t1t3(ll(cDist - trains[trains.size() - 2].second) * trains[trains.size() - 2].first,
-                                      s.train - trains[trains.size() -
-                                                       2].first);//                      ll t1t3 = ll(cDist - trains[trains.size() - 2].second) * (s.train - trains[trains.size() - 2].first);
-                        if (t1t3 <= t2t3) {
-                            trains.pop_back();
-                        } else {
-                            break;
-                        }
-                    }
-                    trains.emplace_back(s.train, cDist);
-                }
-            }
-            if (trains.empty()) {
-                return;
-            }
-            for (const auto& s : stations) {
-                cDist += s.dist;
-                if (s.train != -1) {
-                    while (!trains.empty() && trains.back().first >= s.train) {
-                        trains.pop_back();
-                    }
-                    while (trains.size() > 1) {
-                        Rational t2t3(ll(cDist - trains.back().second) * trains.back().first, s.train -
-                                                                                              trains.back().first);// = ll(cDist - trains.back().second) * (s.train - trains.back().first);
-                        Rational t1t3(ll(cDist - trains[trains.size() - 2].second) * trains[trains.size() - 2].first,
-                                      s.train - trains[trains.size() -
-                                                       2].first);//                      ll t1t3 = ll(cDist - trains[trains.size() - 2].second) * (s.train - trains[trains.size() - 2].first);
-                        if (t1t3 <= t2t3) {
-                            trains.pop_back();
-                        } else {
-                            break;
-                        }
-                    }
-                    trains.emplace_back(s.train, cDist);
-                }
-                for (const auto& p : s.queries) {
-                    int dist = p.first;
-                    int left = 0;
-                    int right = trains.size() - 1;
-                    while (left < right) {
-                        int mid = (left + right) / 2;
-                        ll v1 = ll(cDist - trains[mid].second + dist) * trains[mid].first;
-                        ll v2 = ll(cDist - trains[mid + 1].second + dist) * trains[mid + 1].first;
-                        if (v1 > v2) {
-                            left = mid + 1;
-                        } else {
-                            right = mid;
-                        }
-                    }
-                    minim(answer[p.second], ll(cDist - trains[left].second + dist) * trains[left].first);
-                }
-            }
-        };
-        vec<station> left;
+        arr<pair<bigint, bigint>> m(n);
         for (int i : range(n)) {
-            left.emplace_back(d[(i + n - 1) % n], vec<pii>(), -1);
+            string s = in.readString();
+            int ind = s.find('.');
+            if (ind == -1) {
+                m[i] = {bigint(s), 1};
+            } else {
+                m[i] = {bigint(s.substr(0, ind) + s.substr(ind + 1)), power(bigint(10), s.size() - ind - 1)};
+            }
         }
-        for (int i : range(m)) {
-            if (dir[i] == 'R') {
-                if (left[b[i]].train == -1 || left[b[i]].train > t[i]) {
-                    left[b[i]].train = t[i];
+        ll k = in.readLong();
+
+        sort(all(m), greater<>());
+        ll l = 0;
+        ll r = k;
+        while (l < r) {
+            ll mid = (l + r + 1) / 2;
+            ll rem = k;
+            bool good = true;
+            for (int i : range(n)) {
+                bigint cur = (m[i].first * mid * (i + 1) + m[i].second - 1) / m[i].second;
+                if (cur > rem) {
+                    good = false;
+                    break;
                 }
+                rem -= cur.longValue();
+            }
+            if (good) {
+                l = mid;
+            } else {
+                r = mid - 1;
             }
         }
-        vi sums;
-        sums.push_back(0);
-        for (int i : d) {
-            sums.push_back(sums.back() + i);
-        }
-        for (int i : range(q)) {
-            left[x[i]].queries.emplace_back(y[i] >= x[i] ? sums[y[i]] - sums[x[i]] : sums[y[i]] - sums[x[i]] + sums[n],
-                                            i);
-        }
-        work(left);
-        for (int i : RevRange(n)) {
-            left[i].dist = d[i];
-            left[i].train = -1;
-            for (auto& p : left[i].queries) {
-                p.first = sums[n] - p.first;
-            }
-        }
-        for (int i : range(m)) {
-            if (dir[i] == 'L') {
-                if (left[b[i]].train == -1 || left[b[i]].train > t[i]) {
-                    left[b[i]].train = t[i];
-                }
-            }
-        }
-        reverse(all(left));
-        work(left);
-        for (ll i : answer) {
-            out.printLine(i);
-        }
+        out.printLine(l);
     }
 };
 
 
 int main() {
-//    std::ios::sync_with_stdio(false);
-//    std::cin.tie(0);
-//    freopen("../in.txt", "r", stdin);
-//    freopen("../out.txt", "w", stdout);
-    AZheleznodorozhnoeKoltso solver;
-    std::ifstream in("in.txt");
-    std::ofstream out("out.txt");
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(0);
+    QualityWork solver;
+    std::istream& in(std::cin);
+    std::ostream& out(std::cout);
     solver.solve(in, out);
-    out.close();
     return 0;
 }
