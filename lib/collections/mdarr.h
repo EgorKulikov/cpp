@@ -6,7 +6,6 @@
 template <typename T>
 class arr2d {
     T* b;
-    T* e;
     int d1;
     int d2;
     int sz;
@@ -21,10 +20,9 @@ public:
         }
 #endif
         if (sz == 0) {
-            b = e = nullptr;
+            b = nullptr;
         } else {
-            b = new T[sz];
-            e = b + sz;
+            b = (T*) malloc(sz * sizeof(T));
         }
 #ifdef LOCAL
         view();
@@ -32,20 +30,20 @@ public:
     }
 
     arr2d(int d1, int d2, const T& init) : arr2d(d1, d2) {
-        fill(b, e, init);
+        fill(b, b + sz, init);
     }
 
-    arr2d(T* b, int d1, int d2) : b(b), e(b + d1 * d2), d1(d1), d2(d2), sz(d1 * d2) {}
+    arr2d(T* b, int d1, int d2) : b(b), d1(d1), d2(d2), sz(d1 * d2) {}
 
-    size_t size() const {
+    int size() const {
         return sz;
     }
 
-    size_t dim1() const {
+    int dim1() const {
         return d1;
     }
 
-    size_t dim2() const {
+    int dim2() const {
         return d2;
     }
 
@@ -54,7 +52,7 @@ public:
     }
 
     T* end() {
-        return e;
+        return b + sz;
     }
 
     T& operator()(int i1, int i2) {
@@ -94,7 +92,7 @@ public:
 
     arr2d<T> clone() {
         arr2d<T> res(d1, d2);
-        copy(b, e, res.b);
+        copy(b, b + sz, res.b);
         return res;
     }
 };
@@ -102,7 +100,6 @@ public:
 template <typename T>
 class arr3d {
     T* b;
-    T* e;
     int d1;
     int d2;
     int d3;
@@ -119,10 +116,9 @@ public:
         }
 #endif
         if (sz == 0) {
-            b = e = nullptr;
+            b = nullptr;
         } else {
-            b = new T[sz];
-            e = b + sz;
+            b = (T*) malloc(sz * sizeof(T));
         }
 #ifdef LOCAL
         view();
@@ -130,24 +126,24 @@ public:
     }
 
     arr3d(int d1, int d2, int d3, const T& init) : arr3d(d1, d2, d3) {
-        fill(b, e, init);
+        fill(b, b + sz, init);
     }
 
-    arr3d(T* b, int d1, int d2, int d3) : b(b), e(b + d1 * d2 * d3), d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {}
+    arr3d(T* b, int d1, int d2, int d3) : b(b), d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {}
 
-    size_t size() const {
+    int size() const {
         return sz;
     }
 
-    size_t dim1() const {
+    int dim1() const {
         return d1;
     }
 
-    size_t dim2() const {
+    int dim2() const {
         return d2;
     }
 
-    size_t dim3() const {
+    int dim3() const {
         return d3;
     }
 
@@ -156,7 +152,7 @@ public:
     }
 
     T* end() {
-        return e;
+        return b + sz;
     }
 
     T& operator()(int i1, int i2, int i3) {
@@ -198,7 +194,6 @@ public:
 template <typename T>
 class arr4d {
     T* b;
-    T* e;
     int d1;
     int d2;
     int d3;
@@ -217,43 +212,39 @@ public:
         }
 #endif
         if (sz == 0) {
-            b = e = nullptr;
+            b = nullptr;
         } else {
-            b = new T[sz];
-            e = b + sz;
+            b = (T*) malloc(sz * sizeof(T));
         }
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr4d(int d1, int d2, int d3, int d4, const T& init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
-        b = new T[sz];
-        e = b + sz;
-        fill(b, e, init);
+    arr4d(int d1, int d2, int d3, int d4, const T& init) : arr4d(d1, d2, d3, d4) {
+        fill(b, b + sz, init);
     }
 
     arr4d(T* b, int d1, int d2, int d3, int d4) : b(b), d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
-        e = b + sz;
     }
 
-    size_t size() const {
+    int size() const {
         return sz;
     }
 
-    size_t dim1() const {
+    int dim1() const {
         return d1;
     }
 
-    size_t dim2() const {
+    int dim2() const {
         return d2;
     }
 
-    size_t dim3() const {
+    int dim3() const {
         return d3;
     }
 
-    size_t dim4() const {
+    int dim4() const {
         return d4;
     }
 
@@ -262,7 +253,7 @@ public:
     }
 
     T* end() {
-        return e;
+        return b + sz;
     }
 
     T& operator()(int i1, int i2, int i3, int i4) {

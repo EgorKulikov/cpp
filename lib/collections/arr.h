@@ -6,7 +6,6 @@
 template <typename T>
 class arr {
     T* b;
-    T* e;
     int n;
 public:
     arr() : arr(0) {}
@@ -18,10 +17,9 @@ public:
         }
 #endif
         if (n > 0) {
-            b = new T[n];
-            e = b + n;
+            b = (T*) malloc(n * sizeof(T));
         } else {
-            b = e = nullptr;
+            b = nullptr;
         }
 #ifdef LOCAL
         view();
@@ -30,7 +28,7 @@ public:
 
     arr(int n, const T& init) : arr(n) {
         if (n > 0) {
-            fill(b, e, init);
+            fill(b, b + n, init);
         }
     }
     arr(initializer_list<T> l) : arr(l.size()) {
@@ -40,7 +38,7 @@ public:
     }
 
     arr(T* b, int n) : arr(b, b + n) {}
-    arr(T* b, T* e) : b(b), e(e), n(e - b) {}
+    arr(T* b, T* e) : b(b), n(e - b) {}
 
     int size() const {
         return n;
@@ -55,16 +53,16 @@ public:
     }
 
     T* end() {
-        return e;
+        return b + n;
     }
 
     const T* end() const {
-        return e;
+        return b + n;
     }
 
     arr<T> clone() const {
         arr<T> res(n);
-        copy(b, e, res.begin());
+        copy(b, b + n, res.begin());
         return res;
     }
 

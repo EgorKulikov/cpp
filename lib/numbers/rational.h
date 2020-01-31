@@ -100,6 +100,14 @@ bool operator <=(const Rational& a, const Rational& b) {
     return !(b < a);
 }
 
+bool operator ==(const Rational& a, const Rational& b) {
+    return a.num == b.num && a.den == b.den;
+}
+
+bool operator !=(const Rational& a, const Rational& b) {
+    return !(b == a);
+}
+
 ostream& operator <<(ostream& out, const Rational& val) {
     return out << val.num << '/' << val.den;
 }

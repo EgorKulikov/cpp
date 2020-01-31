@@ -210,7 +210,6 @@ public:
 template <typename T>
 class arr {
     T* b;
-    T* e;
     int n;
 public:
     arr() : arr(0) {}
@@ -222,10 +221,9 @@ public:
         }
 #endif
         if (n > 0) {
-            b = new T[n];
-            e = b + n;
+            b = (T*) malloc(n * sizeof(T));
         } else {
-            b = e = nullptr;
+            b = nullptr;
         }
 #ifdef LOCAL
         view();
@@ -234,7 +232,7 @@ public:
 
     arr(int n, const T& init) : arr(n) {
         if (n > 0) {
-            fill(b, e, init);
+            fill(b, b + n, init);
         }
     }
 
@@ -246,7 +244,7 @@ public:
 
     arr(T* b, int n) : arr(b, b + n) {}
 
-    arr(T* b, T* e) : b(b), e(e), n(e - b) {}
+    arr(T* b, T* e) : b(b), n(e - b) {}
 
     int size() const {
         return n;
@@ -261,16 +259,16 @@ public:
     }
 
     T* end() {
-        return e;
+        return b + n;
     }
 
     const T* end() const {
-        return e;
+        return b + n;
     }
 
     arr<T> clone() const {
         arr<T> res(n);
-        copy(b, e, res.begin());
+        copy(b, b + n, res.begin());
         return res;
     }
 
@@ -334,7 +332,6 @@ void decreaseByOne(arr<pair<T, U>>& v) {
 template <typename T>
 class arr2d {
     T* b;
-    T* e;
     int d1;
     int d2;
     int sz;
@@ -349,10 +346,9 @@ public:
         }
 #endif
         if (sz == 0) {
-            b = e = nullptr;
+            b = nullptr;
         } else {
-            b = new T[sz];
-            e = b + sz;
+            b = (T*) malloc(sz * sizeof(T));
         }
 #ifdef LOCAL
         view();
@@ -360,20 +356,20 @@ public:
     }
 
     arr2d(int d1, int d2, const T& init) : arr2d(d1, d2) {
-        fill(b, e, init);
+        fill(b, b + sz, init);
     }
 
-    arr2d(T* b, int d1, int d2) : b(b), e(b + d1 * d2), d1(d1), d2(d2), sz(d1 * d2) {}
+    arr2d(T* b, int d1, int d2) : b(b), d1(d1), d2(d2), sz(d1 * d2) {}
 
-    size_t size() const {
+    int size() const {
         return sz;
     }
 
-    size_t dim1() const {
+    int dim1() const {
         return d1;
     }
 
-    size_t dim2() const {
+    int dim2() const {
         return d2;
     }
 
@@ -382,7 +378,7 @@ public:
     }
 
     T* end() {
-        return e;
+        return b + sz;
     }
 
     T& operator()(int i1, int i2) {
@@ -422,7 +418,7 @@ public:
 
     arr2d<T> clone() {
         arr2d<T> res(d1, d2);
-        copy(b, e, res.b);
+        copy(b, b + sz, res.b);
         return res;
     }
 };
@@ -430,7 +426,6 @@ public:
 template <typename T>
 class arr3d {
     T* b;
-    T* e;
     int d1;
     int d2;
     int d3;
@@ -447,10 +442,9 @@ public:
         }
 #endif
         if (sz == 0) {
-            b = e = nullptr;
+            b = nullptr;
         } else {
-            b = new T[sz];
-            e = b + sz;
+            b = (T*) malloc(sz * sizeof(T));
         }
 #ifdef LOCAL
         view();
@@ -458,25 +452,24 @@ public:
     }
 
     arr3d(int d1, int d2, int d3, const T& init) : arr3d(d1, d2, d3) {
-        fill(b, e, init);
+        fill(b, b + sz, init);
     }
 
-    arr3d(T* b, int d1, int d2, int d3) : b(b), e(b + d1 * d2 * d3), d1(d1), d2(d2), d3(d3), shift(d2 * d3),
-                                          sz(d1 * d2 * d3) {}
+    arr3d(T* b, int d1, int d2, int d3) : b(b), d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {}
 
-    size_t size() const {
+    int size() const {
         return sz;
     }
 
-    size_t dim1() const {
+    int dim1() const {
         return d1;
     }
 
-    size_t dim2() const {
+    int dim2() const {
         return d2;
     }
 
-    size_t dim3() const {
+    int dim3() const {
         return d3;
     }
 
@@ -485,7 +478,7 @@ public:
     }
 
     T* end() {
-        return e;
+        return b + sz;
     }
 
     T& operator()(int i1, int i2, int i3) {
@@ -527,7 +520,6 @@ public:
 template <typename T>
 class arr4d {
     T* b;
-    T* e;
     int d1;
     int d2;
     int d3;
@@ -547,45 +539,40 @@ public:
         }
 #endif
         if (sz == 0) {
-            b = e = nullptr;
+            b = nullptr;
         } else {
-            b = new T[sz];
-            e = b + sz;
+            b = (T*) malloc(sz * sizeof(T));
         }
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr4d(int d1, int d2, int d3, int d4, const T& init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
-                                                           shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
-        b = new T[sz];
-        e = b + sz;
-        fill(b, e, init);
+    arr4d(int d1, int d2, int d3, int d4, const T& init) : arr4d(d1, d2, d3, d4) {
+        fill(b, b + sz, init);
     }
 
     arr4d(T* b, int d1, int d2, int d3, int d4) : b(b), d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
                                                   shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
-        e = b + sz;
     }
 
-    size_t size() const {
+    int size() const {
         return sz;
     }
 
-    size_t dim1() const {
+    int dim1() const {
         return d1;
     }
 
-    size_t dim2() const {
+    int dim2() const {
         return d2;
     }
 
-    size_t dim3() const {
+    int dim3() const {
         return d3;
     }
 
-    size_t dim4() const {
+    int dim4() const {
         return d4;
     }
 
@@ -594,7 +581,7 @@ public:
     }
 
     T* end() {
-        return e;
+        return b + sz;
     }
 
     T& operator()(int i1, int i2, int i3, int i4) {
@@ -985,244 +972,69 @@ public:
 };
 
 
-template <typename Value, typename Delta>
-class SegmentTree {
-    const int size;
-    const Value defaultValue;
-    const Delta defaultDelta;
-    function<Value(Value, Value)> joinValue;
-    function<Delta(Delta, Delta)> joinDelta;
-    function<Value(Value, Delta, int, int)> accumulate;
-    arr<Value> value;
-    arr<Delta> delta;
-
-    void init(int root, int left, int right) {
-        if (left + 1 == right) {
-            value[root] = defaultValue;
-        } else {
-            int mid = (left + right) >> 1;
-            init(2 * root + 1, left, mid);
-            init(2 * root + 2, mid, right);
-            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
-        }
-    }
-
-    void apply(int root, Delta dlt, int left, int right) {
-        value[root] = accumulate(value[root], dlt, left, right);
-        delta[root] = joinDelta(delta[root], dlt);
-    }
-
-    void pushDown(int root, int left, int mid, int right) {
-        apply(2 * root + 1, delta[root], left, mid);
-        apply(2 * root + 2, delta[root], mid, right);
-        delta[root] = defaultDelta;
-    }
-
-    void update(int root, int left, int right, int from, int to, Delta dlt) {
-        if (left >= from && right <= to) {
-            apply(root, dlt, left, right);
-            return;
-        }
-        if (right <= from || left >= to) {
-            return;
-        }
-        int mid = (left + right) >> 1;
-        pushDown(root, left, mid, right);
-        update(2 * root + 1, left, mid, from, to, dlt);
-        update(2 * root + 2, mid, right, from, to, dlt);
-        value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
-    }
-
-    Value query(int root, int left, int right, int from, int to) {
-        if (left >= from && right <= to) {
-            return value[root];
-        }
-        if (right <= from || left >= to) {
-            return defaultValue;
-        }
-        int mid = (left + right) >> 1;
-        pushDown(root, left, mid, right);
-        return joinValue(query(2 * root + 1, left, mid, from, to), query(2 * root + 2, mid, right, from, to));
-    }
-
-public:
-    SegmentTree(int size, function<Value(Value, Value)> joinValue,
-                function<Delta(Delta, Delta)> joinDelta,
-                function<Value(Value, Delta, int, int)> accumulate,
-                Value defaultValue = 0, Delta defaultDelta = 0) :
-            size(size), joinValue(joinValue), joinDelta(joinDelta), accumulate(accumulate),
-            defaultValue(defaultValue), defaultDelta(defaultDelta) {
-        int vertexSize = size * 4;
-        value = arr<Value>(vertexSize);
-        delta = arr<Delta>(vertexSize, defaultDelta);
-        if (size > 0) {
-            init(0, 0, size);
-        }
-    }
-
-    void update(int from, int to, Delta delta) {
-        update(0, 0, size, max(0, from), to, delta);
-    }
-
-    Value query(int from, int to) {
-        return query(0, 0, size, max(0, from), to);
-    }
-};
-
-template <typename Value, Value defaultValue = 0>
-class ReadOnlySegmentTree {
-private:
-    const int size;
-    function<Value(Value, Value)> joinValue;
-    arr<Value> value;
-
-    void init(int root, int left, int right, const arr<Value>& array) {
-        if (left + 1 == right) {
-            value[root] = array[left];
-        } else {
-            int mid = (left + right) >> 1;
-            init(2 * root + 1, left, mid, array);
-            init(2 * root + 2, mid, right, array);
-            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
-        }
-    }
-
-    Value query(int root, int left, int right, int from, int to) const {
-        if (left >= from && right <= to) {
-            return value[root];
-        }
-        if (right <= from || left >= to) {
-            return defaultValue;
-        }
-        int mid = (left + right) >> 1;
-        Value lValue = query(2 * root + 1, left, mid, from, to);
-        Value rValue = query(2 * root + 2, mid, right, from, to);
-        return joinValue(lValue, rValue);
-    }
-
-public:
-    ReadOnlySegmentTree(const arr<Value>& array, function<Value(Value, Value)> joinValue) :
-            size(array.size()), joinValue(joinValue) {
-        int vertexSize = size * 4;
-        value = arr<Value>(vertexSize);
-        if (size > 0) {
-            init(0, 0, size, array);
-        }
-    }
-
-    Value query(int from, int to) const {
-        return query(0, 0, size, max(0, from), to);
-    }
-};
-
-
-template <typename T>
-inline void unique(vec<T>& v) {
-    v.resize(unique(all(v)) - v.begin());
-}
-
-arri createOrder(int n) {
-    arri order(n);
-    for (int i = 0; i < n; i++) {
-        order[i] = i;
-    }
-    return order;
-}
-
-arri inverse(const arri& p) {
-    arri res(p.size());
-    for (int i : range(p.size())) {
-        res[p[i]] = i;
-    }
-    return res;
-}
-
-template <class Collection, typename Iterator>
-inline void addAll(Collection& v, Iterator begin, Iterator end) {
-    v.insert(v.end(), begin, end);
-}
-
-template <typename Iterator>
-arri getQty(Iterator begin, Iterator end, int length) {
-    arri res(length, 0);
-    for (Iterator it = begin; it != end; it++) {
-        res[*it]++;
-    }
-    return res;
-}
-
-template <typename Iterator>
-arri getQty(Iterator begin, Iterator end) {
-    return getQty(begin, end, *max_element(begin, end) + 1);
-}
-
-template <class Collection>
-void collect(Collection&) {}
-
-template <class Collection, class Other, class ...Vs>
-void collect(Collection& all, Other& a, Vs& ...vs) {
-    addAll(all, all(a));
-    collect(all, vs...);
-}
-
-void replace(const vi&) {}
-
-template <class ...Vs>
-void replace(const vi& all, vi& a, Vs& ...vs) {
-    for (int& i : a) {
-        i = lower_bound(all(all), i) - all.begin();
-    }
-    replace(all, vs...);
-}
-
-template <class ...Vs>
-void replace(const vi& all, arri& a, Vs& ...vs) {
-    for (int& i : a) {
-        i = lower_bound(all(all), i) - all.begin();
-    }
-    replace(all, vs...);
-}
-
-template <class ...Vs>
-vi compress(Vs& ...vs) {
-    vi vals;
-    collect(vals, vs...);
-    sort(all(vals));
-    unique(vals);
-    replace(vals, vs...);
-    return vals;
-}
-
-
-class TaskE {
+class TheSortingCeremony {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
-        int n = in.readInt();
-        auto p = in.readIntArray(n);
-        auto a = in.readIntArray(n);
-        decreaseByOne(p);
+        int l = in.readInt();
+        int m = in.readInt();
+        auto a = in.readIntArray(l);
+        auto b = in.readIntArray(m);
 
-        SegmentTree<ll, ll> tree(n - 1, [](ll a, ll b) -> ll {
-            return min(a, b);
-        }, [](ll a, ll b) -> ll {
-            return a + b;
-        }, [](ll was, ll delta, int, int) -> ll {
-            return was + delta;
-        });
-        auto q = inverse(p);
-        for (int i : range(n)) {
-            tree.update(i, n - 1, a[i]);
+        arr2d<int> aGain(l, m + 1);
+        for (int i : range(l)) {
+            aGain(i, 0) = 0;
+            for (int j : range(m)) {
+                aGain(i, j + 1) = aGain(i, j);
+                if (a[i] > b[j]) {
+                    aGain(i, j + 1) += a[i] - b[j];
+                }
+            }
         }
-        ll answer = tree.query(0, n - 1);
-        for (int i : range(n)) {
-            tree.update(q[i], n - 1, -a[q[i]]);
-            tree.update(0, q[i], a[q[i]]);
-            minim(answer, tree.query(0, n - 1));
+        arr2d<int> bGain(m, l + 1);
+        for (int i : range(m)) {
+            bGain(i, 0) = 0;
+            for (int j : range(l)) {
+                bGain(i, j + 1) = bGain(i, j);
+                if (b[i] > a[j]) {
+                    bGain(i, j + 1) += b[i] - a[j];
+                }
+            }
         }
-        out.printLine(answer);
+        arr2d<ll> score(l + 1, m + 1, 0);
+        score(0, 0) = 0;
+        for (int i : range(l + 1)) {
+            for (int j : range(m + 1)) {
+                if (i > 0) {
+                    maxim(score(i, j), score(i - 1, j) + aGain(i - 1, j));
+                }
+                if (j > 0) {
+                    maxim(score(i, j), score(i, j - 1) + bGain(j - 1, i));
+                }
+            }
+        }
+        int i = l;
+        int j = m;
+        vi ans;
+        while (i + j > 0) {
+            if (i == 0) {
+                ans.push_back(b[--j]);
+            } else if (j == 0) {
+                ans.push_back(a[--i]);
+            } else if (score(i - 1, j) + aGain(i - 1, j) > score(i, j - 1) + bGain(j - 1, i)) {
+                ans.push_back(a[--i]);
+            } else if (score(i - 1, j) + aGain(i - 1, j) < score(i, j - 1) + bGain(j - 1, i)) {
+                ans.push_back(b[--j]);
+            } else if (a[i - 1] > b[j - 1]) {
+                ans.push_back(a[--i]);
+            } else {
+                ans.push_back(b[--j]);
+            }
+        }
+        reverse(all(ans));
+        out.printLine(ans);
     }
 };
 
@@ -1230,7 +1042,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    TaskE solver;
+    TheSortingCeremony solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
     solver.solve(in, out);
