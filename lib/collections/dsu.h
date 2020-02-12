@@ -36,4 +36,11 @@ public:
         count--;
         return true;
     }
+    void reset() {
+        count = sz.size();
+        for (int i : range(count)) {
+            id[i] = i;
+            sz[i] = 1;
+        }
+    }
 };

@@ -221,7 +221,8 @@ public:
         }
 #endif
         if (n > 0) {
-            b = (T*) malloc(n * sizeof(T));
+//            b = (T*) malloc(n * sizeof(T));
+            b = new T[n];
         } else {
             b = nullptr;
         }
@@ -972,69 +973,274 @@ public:
 };
 
 
-class TheSortingCeremony {
+template <typename T>
+inline void unique(vec<T>& v) {
+    v.resize(unique(all(v)) - v.begin());
+}
+
+arri createOrder(int n) {
+    arri order(n);
+    for (int i = 0; i < n; i++) {
+        order[i] = i;
+    }
+    return order;
+}
+
+arri inverse(const arri& p) {
+    arri res(p.size());
+    for (int i : range(p.size())) {
+        res[p[i]] = i;
+    }
+    return res;
+}
+
+template <typename T, typename Iterator>
+inline void addAll(vec<T>& v, Iterator begin, Iterator end) {
+    v.insert(v.end(), begin, end);
+}
+
+template <class Collection, typename Iterator>
+inline void addAll(Collection& v, Iterator begin, Iterator end) {
+    v.insert(begin, end);
+}
+
+template <typename Iterator>
+arri getQty(Iterator begin, Iterator end, int length) {
+    arri res(length, 0);
+    for (Iterator it = begin; it != end; it++) {
+        res[*it]++;
+    }
+    return res;
+}
+
+template <typename Iterator>
+arri getQty(Iterator begin, Iterator end) {
+    return getQty(begin, end, *max_element(begin, end) + 1);
+}
+
+template <class Collection>
+void collect(Collection&) {}
+
+template <class Collection, class Other, class ...Vs>
+void collect(Collection& all, Other& a, Vs& ...vs) {
+    addAll(all, all(a));
+    collect(all, vs...);
+}
+
+void replace(const vi&) {}
+
+template <class ...Vs>
+void replace(const vi& all, vi& a, Vs& ...vs) {
+    for (int& i : a) {
+        i = lower_bound(all(all), i) - all.begin();
+    }
+    replace(all, vs...);
+}
+
+template <class ...Vs>
+void replace(const vi& all, arri& a, Vs& ...vs) {
+    for (int& i : a) {
+        i = lower_bound(all(all), i) - all.begin();
+    }
+    replace(all, vs...);
+}
+
+template <class ...Vs>
+vi compress(Vs& ...vs) {
+    vi vals;
+    collect(vals, vs...);
+    sort(all(vals));
+    unique(vals);
+    replace(vals, vs...);
+    return vals;
+}
+
+
+class DSU {
+    mutable arri id;
+    arri sz;
+    int count;
+
+public:
+    DSU(int n) {
+        id = createOrder(n);
+        sz = arri(n, 1);
+        count = n;
+    }
+
+    int get(int i) const {
+        if (id[i] == i) {
+            return i;
+        }
+        return id[i] = get(id[i]);
+    }
+
+    int operator[](int i) const { return get(i); }
+
+    int size(int i) const { return sz[get(i)]; }
+
+    int setCount() const { return count; }
+
+    bool join(int a, int b) {
+        a = get(a);
+        b = get(b);
+        if (a == b) {
+            return false;
+        }
+        sz[a] += sz[b];
+        sz[b] = 0;
+        id[b] = a;
+        count--;
+        return true;
+    }
+
+    void reset() {
+        count = sz.size();
+        for (int i : range(count)) {
+            id[i] = i;
+            sz[i] = 1;
+        }
+    }
+};
+
+
+const int DX_KNIGHT[] = {2, 1, -1, -2, -2, -1, 1, 2};
+const int DY_KNIGHT[] = {1, 2, 2, 1, -1, -2, -2, -1};
+const int DX4[] = {1, 0, -1, 0};
+const int DY4[] = {0, 1, 0, -1};
+const int DX8[] = {1, 1, 1, 0, -1, -1, -1, 0};
+const int DY8[] = {-1, 0, 1, 1, 1, 0, -1, -1};
+
+bool isValidCell(int r, int c, int n, int m) {
+    return r >= 0 && c >= 0 && r < n && c < m;
+}
+
+inline bool isSubset(int set, int subSet) {
+    return (set & subSet) == subSet;
+}
+
+inline int bitCount(int x) {
+    return __builtin_popcount(x);
+}
+
+inline int bitCount(ll x) {
+    return __builtin_popcountll(x);
+}
+
+inline int highestOneBit(int x) {
+    return 1 << (31 - __builtin_clz(x | 1));
+}
+
+inline int binaryDigits(int x) {
+    return 32 - __builtin_clz(x | 1);
+}
+
+
+class ReverseNumberIterator : public NumberIterator {
+public:
+    ReverseNumberIterator(int v) : NumberIterator(v) {}
+
+    ReverseNumberIterator& operator++() {
+        --v;
+        return *this;
+    }
+};
+
+class RevRange : pii {
+public:
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
+
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
+
+    ReverseNumberIterator begin() {
+        return first;
+    }
+
+    ReverseNumberIterator end() {
+        return second;
+    }
+};
+
+
+class TaskF {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
-        int l = in.readInt();
+        int n = in.readInt();
         int m = in.readInt();
-        auto a = in.readIntArray(l);
-        auto b = in.readIntArray(m);
+        int q = in.readInt();
+        arri x, y, c;
+        in.readArrays(q, x, y, c);
+        decreaseByOne(x, y);
 
-        arr2d<int> aGain(l, m + 1);
-        for (int i : range(l)) {
-            aGain(i, 0) = 0;
-            for (int j : range(m)) {
-                aGain(i, j + 1) = aGain(i, j);
-                if (a[i] > b[j]) {
-                    aGain(i, j + 1) += a[i] - b[j];
+        arr2d<int> cur(n, m, 0);
+        arr2d<int> next(n, m, 0);
+        arri answer(q, 0);
+        DSU dsu(n * m);
+        int at = 0;
+        arr<bool> skip(q, false);
+        while (at < q) {
+            dsu.reset();
+            int end = at;
+            int add = 0;
+            int vert = 0;
+            while (end < q && c[end] == c[at]) {
+                if (next(x[end], y[end]) == c[end]) {
+                    skip[end] = true;
+                    answer[end++] += add;
+                    continue;
+                }
+                vert++;
+                next(x[end], y[end]) = c[end];
+                add++;
+                for (int i : range(4)) {
+                    int rr = x[end] + DX4[i];
+                    int cc = y[end] + DY4[i];
+                    if (isValidCell(rr, cc, n, m) && next(rr, cc) == c[at] &&
+                        dsu.join(rr * m + cc, x[end] * m + y[end])) {
+                        add--;
+                    }
+                }
+                answer[end++] += add;
+            }
+            dsu.reset();
+            for (int i : range(n)) {
+                for (int j : range(m)) {
+                    if (i + 1 < n && next(i, j) == next(i + 1, j) && next(i, j) != c[at]) {
+                        dsu.join((i + 1) * m + j, i * m + j);
+                    }
+                    if (j + 1 < m && next(i, j) == next(i, j + 1) && next(i, j) != c[at]) {
+                        dsu.join(i * m + j + 1, i * m + j);
+                    }
                 }
             }
-        }
-        arr2d<int> bGain(m, l + 1);
-        for (int i : range(m)) {
-            bGain(i, 0) = 0;
-            for (int j : range(l)) {
-                bGain(i, j + 1) = bGain(i, j);
-                if (b[i] > a[j]) {
-                    bGain(i, j + 1) += b[i] - a[j];
+            add = vert;
+            for (int i : RevRange(end, at)) {
+                answer[i] += dsu.setCount() - add;
+                if (skip[i]) {
+                    continue;
+                }
+                add--;
+                next(x[i], y[i]) = cur(x[i], y[i]);
+                for (int j : range(4)) {
+                    int rr = x[i] + DX4[j];
+                    int cc = y[i] + DY4[j];
+                    if (isValidCell(rr, cc, n, m) && next(rr, cc) == next(x[i], y[i])) {
+                        dsu.join(rr * m + cc, x[i] * m + y[i]);
+                    }
                 }
             }
-        }
-        arr2d<ll> score(l + 1, m + 1, 0);
-        score(0, 0) = 0;
-        for (int i : range(l + 1)) {
-            for (int j : range(m + 1)) {
-                if (i > 0) {
-                    maxim(score(i, j), score(i - 1, j) + aGain(i - 1, j));
-                }
-                if (j > 0) {
-                    maxim(score(i, j), score(i, j - 1) + bGain(j - 1, i));
-                }
+            for (int i : range(at, end)) {
+                cur(x[i], y[i]) = c[i];
+                next(x[i], y[i]) = c[i];
             }
+            at = end;
         }
-        int i = l;
-        int j = m;
-        vi ans;
-        while (i + j > 0) {
-            if (i == 0) {
-                ans.push_back(b[--j]);
-            } else if (j == 0) {
-                ans.push_back(a[--i]);
-            } else if (score(i - 1, j) + aGain(i - 1, j) > score(i, j - 1) + bGain(j - 1, i)) {
-                ans.push_back(a[--i]);
-            } else if (score(i - 1, j) + aGain(i - 1, j) < score(i, j - 1) + bGain(j - 1, i)) {
-                ans.push_back(b[--j]);
-            } else if (a[i - 1] > b[j - 1]) {
-                ans.push_back(a[--i]);
-            } else {
-                ans.push_back(b[--j]);
-            }
+        for (int i : answer) {
+            out.printLine(i);
         }
-        reverse(all(ans));
-        out.printLine(ans);
     }
 };
 
@@ -1042,7 +1248,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    TheSortingCeremony solver;
+    TaskF solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
     solver.solve(in, out);

@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/TheSortingCeremony.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/TaskF.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +30,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"2 2 \n1 3\n4 2\n", "1 4 2 3\n", true, true},{"1 5\n1\n2 3 4 5 6\n", "1 2 3 4 5 6\n", true, true},
+		{"3 2 10\n2 1 1\n1 2 1\n2 2 1\n1 1 2\n3 1 2\n1 2 2\n2 2 2\n2 1 2\n3 2 4\n2 1 5\n", "2\n4\n3\n3\n4\n4\n4\n2\n2\n4\n", true, true},{"3 3 12\n1 2 1\n2 1 1\n2 3 1\n2 1 1\n2 3 1\n3 2 1\n2 2 1\n1 2 2\n2 1 2\n2 3 2\n3 2 2\n2 2 2\n", "2\n4\n6\n6\n6\n9\n5\n6\n7\n8\n9\n5\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -50,7 +50,7 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    TheSortingCeremony solver;
+			    TaskF solver;
 			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;

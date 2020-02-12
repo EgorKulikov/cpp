@@ -24,3 +24,11 @@ inline int bitCount(int x) {
 inline int bitCount(ll x) {
     return __builtin_popcountll(x);
 }
+
+inline int highestOneBit(int x) {
+    return 1 << (31 - __builtin_clz(x | 1));
+}
+
+inline int binaryDigits(int x) {
+    return 32 - __builtin_clz(x | 1);
+}

@@ -17,7 +17,8 @@ public:
         }
 #endif
         if (n > 0) {
-            b = (T*) malloc(n * sizeof(T));
+//            b = (T*) malloc(n * sizeof(T));
+            b = new T[n];
         } else {
             b = nullptr;
         }

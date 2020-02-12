@@ -3,18 +3,27 @@
 #include "../general.h"
 #include "../collections/segment_tree.h"
 #include "graph.h"
+#include "../misc.h"
+#include "../collections/mdarr.h"
 
-template <class Edge>
 class LCA {
 private:
     arri order;
     arri position;
-    ReadOnlySegmentTree<int, -1>* lcaTree;
+    arr2d<int> lcaArr;
+
+    int getMin(int a, int b) const {
+        if (level[a] < level[b]) {
+            return a;
+        }
+        return b;
+    }
 
 public:
     arri level;
     arri parent;
 
+    template <class Edge>
     LCA(Graph<Edge>& graph, int root = 0) {
         int vertexCount = graph.vertexCount;
         order = arri(2 * vertexCount - 1);
@@ -49,24 +58,29 @@ public:
                 index[vertex]++;
             }
         }
-        lcaTree = new ReadOnlySegmentTree<int, -1>(order, [this](int left, int right) -> int {
-            if (left == -1) {
-                return right;
+        lcaArr = arr2d<int>(binaryDigits(2 * vertexCount - 1), 2 * vertexCount - 1);
+        for (int i : range(2 * vertexCount - 1)) {
+            lcaArr(0, i) = order[i];
+        }
+        for (int i : range(1, lcaArr.dim1())) {
+            for (int j : range(2 * vertexCount - 1)) {
+                if (j + (1 << (i - 1)) < 2 * vertexCount - 1) {
+                    lcaArr(i, j) = getMin(lcaArr(i - 1, j), lcaArr(i - 1, j + (1 << (i - 1))));
+                } else {
+                    lcaArr(i, j) = lcaArr(i - 1, j);
+                }
             }
-            if (right == -1) {
-                return left;
-            }
-            if (level[left] < level[right]) {
-                return left;
-            }
-            return right;
-        });
+        }
     }
 
     int lca(int first, int second) const {
-        return lcaTree->query(min(position[first], position[second]), max(position[first], position[second]) + 1);
+        int from = min(position[first], position[second]);
+        int to = max(position[first], position[second]);
+        int lv = binaryDigits(to - from) - 1;
+        return getMin(lcaArr(lv, from), lcaArr(lv, to + 1 - (1 << lv)));
     }
+
     int pathLength(int first, int second) const {
-        return level[first] + level[second] - 2 * level[lca(first, second)];
+        return level[first] + level[second] - 2 * level[lcaArr(first, second)];
     }
 };
