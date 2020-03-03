@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/TaskF.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/DMOPC19Contest5P6CeciliasComputationalCrisis.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +30,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"3 2 10\n2 1 1\n1 2 1\n2 2 1\n1 1 2\n3 1 2\n1 2 2\n2 2 2\n2 1 2\n3 2 4\n2 1 5\n", "2\n4\n3\n3\n4\n4\n4\n2\n2\n4\n", true, true},{"3 3 12\n1 2 1\n2 1 1\n2 3 1\n2 1 1\n2 3 1\n3 2 1\n2 2 1\n1 2 2\n2 1 2\n2 3 2\n3 2 2\n2 2 2\n", "2\n4\n6\n6\n6\n9\n5\n6\n7\n8\n9\n5\n", true, true},
+		{"4 4\n.?XX\n?X..\n.??X\nXX..\n", "YES\n.XXX\n.X..\n.X.X\nXX..\n", true, true},{"5 5\n.X?X?\n.X..X\n.XX.X\n?.???\n.X?.X\n", "NO\n", true, true},{"4 2\n??\n??\n??\n??\n", "", true, false},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -50,7 +50,7 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    TaskF solver;
+			    DMOPC19Contest5P6CeciliasComputationalCrisis solver;
 			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;

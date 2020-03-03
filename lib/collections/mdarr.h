@@ -22,7 +22,7 @@ public:
         if (sz == 0) {
             b = nullptr;
         } else {
-            b = (T*) malloc(sz * sizeof(T));
+            b = new T[sz];
         }
 #ifdef LOCAL
         view();

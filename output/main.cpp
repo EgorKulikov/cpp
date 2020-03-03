@@ -14,6 +14,7 @@
 
 using namespace std;
 
+// BEGIN CUT HERE
 template <typename T>
 class Vector : public vector<T> {
     using parent = vector<T>;
@@ -123,8 +124,11 @@ public:
 #ifdef LOCAL
 #define vec Vector
 #else
+// END CUT HERE
 #define vec vector
+// BEGIN CUT HERE
 #endif
+// END CUT HERE
 
 using vi = vec<int>;
 
@@ -349,7 +353,7 @@ public:
         if (sz == 0) {
             b = nullptr;
         } else {
-            b = (T*) malloc(sz * sizeof(T));
+            b = new T[sz];
         }
 #ifdef LOCAL
         view();
@@ -973,196 +977,272 @@ public:
 };
 
 
-template <typename T>
-inline void unique(vec<T>& v) {
-    v.resize(unique(all(v)) - v.begin());
-}
-
-arri createOrder(int n) {
-    arri order(n);
-    for (int i = 0; i < n; i++) {
-        order[i] = i;
-    }
-    return order;
-}
-
-arri inverse(const arri& p) {
-    arri res(p.size());
-    for (int i : range(p.size())) {
-        res[p[i]] = i;
-    }
-    return res;
-}
-
-template <typename T, typename Iterator>
-inline void addAll(vec<T>& v, Iterator begin, Iterator end) {
-    v.insert(v.end(), begin, end);
-}
-
-template <class Collection, typename Iterator>
-inline void addAll(Collection& v, Iterator begin, Iterator end) {
-    v.insert(begin, end);
-}
-
-template <typename Iterator>
-arri getQty(Iterator begin, Iterator end, int length) {
-    arri res(length, 0);
-    for (Iterator it = begin; it != end; it++) {
-        res[*it]++;
-    }
-    return res;
-}
-
-template <typename Iterator>
-arri getQty(Iterator begin, Iterator end) {
-    return getQty(begin, end, *max_element(begin, end) + 1);
-}
-
-template <class Collection>
-void collect(Collection&) {}
-
-template <class Collection, class Other, class ...Vs>
-void collect(Collection& all, Other& a, Vs& ...vs) {
-    addAll(all, all(a));
-    collect(all, vs...);
-}
-
-void replace(const vi&) {}
-
-template <class ...Vs>
-void replace(const vi& all, vi& a, Vs& ...vs) {
-    for (int& i : a) {
-        i = lower_bound(all(all), i) - all.begin();
-    }
-    replace(all, vs...);
-}
-
-template <class ...Vs>
-void replace(const vi& all, arri& a, Vs& ...vs) {
-    for (int& i : a) {
-        i = lower_bound(all(all), i) - all.begin();
-    }
-    replace(all, vs...);
-}
-
-template <class ...Vs>
-vi compress(Vs& ...vs) {
-    vi vals;
-    collect(vals, vs...);
-    sort(all(vals));
-    unique(vals);
-    replace(vals, vs...);
-    return vals;
-}
-
-
-class DSU {
-    mutable arri id;
-    arri sz;
-    int count;
+template <typename W, typename C>
+class WeightedFlowEdge {
+private:
+    WeightedFlowEdge<W, C>* reverseEdge;
 
 public:
-    DSU(int n) {
-        id = createOrder(n);
-        sz = arri(n, 1);
-        count = n;
+    const int from;
+    const int to;
+    W weight;
+    C capacity;
+    int id;
+
+    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
+        reverseEdge = new WeightedFlowEdge(this);
     }
 
-    int get(int i) const {
-        if (id[i] == i) {
-            return i;
-        }
-        return id[i] = get(id[i]);
+    WeightedFlowEdge<W, C>* transposed() { return nullptr; }
+
+    WeightedFlowEdge<W, C>* reverse() { return reverseEdge; }
+
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
     }
 
-    int operator[](int i) const { return get(i); }
-
-    int size(int i) const { return sz[get(i)]; }
-
-    int setCount() const { return count; }
-
-    bool join(int a, int b) {
-        a = get(a);
-        b = get(b);
-        if (a == b) {
-            return false;
-        }
-        sz[a] += sz[b];
-        sz[b] = 0;
-        id[b] = a;
-        count--;
-        return true;
+    C flow() const {
+        return reverseEdge->capacity;
     }
 
-    void reset() {
-        count = sz.size();
-        for (int i : range(count)) {
-            id[i] = i;
-            sz[i] = 1;
+private:
+    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight),
+                                                        capacity(0) {
+        reverseEdge = reverse;
+    }
+};
+
+template <typename C>
+class FlowEdge {
+private:
+    FlowEdge<C>* reverseEdge;
+
+public:
+    const int from;
+    const int to;
+    C capacity;
+    int id;
+
+    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
+        reverseEdge = new FlowEdge(this);
+    }
+
+    FlowEdge<C>* transposed() { return nullptr; }
+
+    FlowEdge<C>* reverse() { return reverseEdge; }
+
+    void push(C flow) {
+        capacity -= flow;
+        reverseEdge->capacity += flow;
+    }
+
+    C flow() const {
+        return reverseEdge->capacity;
+    }
+
+private:
+    FlowEdge(FlowEdge<C>* reverse) : from(reverse->to), to(reverse->from), capacity(0) {
+        reverseEdge = reverse;
+    }
+};
+
+template <typename W>
+class WeightedEdge {
+public:
+    const int from;
+    const int to;
+    W weight;
+    int id;
+
+    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+    }
+
+    WeightedEdge<W>* transposed() { return nullptr; }
+
+    WeightedEdge<W>* reverse() { return nullptr; }
+};
+
+template <typename W>
+class BiWeightedEdge {
+private:
+    BiWeightedEdge<W>* transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    W weight;
+    int id;
+
+    BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
+        transposedEdge = new BiWeightedEdge(this);
+    }
+
+    BiWeightedEdge<W>* transposed() { return transposedEdge; }
+
+    BiWeightedEdge<W>* reverse() { return nullptr; }
+
+private:
+    BiWeightedEdge(BiWeightedEdge<W>* transposed) : from(transposed->to), to(transposed->from),
+                                                    weight(transposed->weight) {
+        transposedEdge = transposed;
+    }
+};
+
+class BaseEdge {
+public:
+    const int from;
+    const int to;
+    int id;
+
+    BaseEdge(int from, int to) : from(from), to(to) {
+    }
+
+    BaseEdge* transposed() { return nullptr; }
+
+    BaseEdge* reverse() { return nullptr; }
+};
+
+class BiEdge {
+private:
+    BiEdge* transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    int id;
+
+    BiEdge(int from, int to) : from(from), to(to) {
+        transposedEdge = new BiEdge(this);
+    }
+
+    BiEdge* transposed() { return transposedEdge; }
+
+    BiEdge* reverse() { return nullptr; }
+
+private:
+    BiEdge(BiEdge* transposed) : from(transposed->to), to(transposed->from) {
+        transposedEdge = transposed;
+    }
+};
+
+template <class Edge>
+class Graph {
+public:
+    int vertexCount;
+    int edgeCount = 0;
+private:
+    vec<vec<Edge*>> edges;
+
+public:
+    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vec<Edge*>()) {}
+
+    void addEdge(Edge* edge) {
+#ifdef LOCAL
+        if (edge->from < 0 || edge->to < 0 || edge->from >= vertexCount || edge->to >= vertexCount) {
+            throw "Out of bounds";
         }
+#endif
+        edge->id = edgeCount;
+        edges[edge->from].push_back(edge);
+        Edge* reverse = edge->reverse();
+        if (reverse != nullptr) {
+            reverse->id = edgeCount;
+            edges[reverse->from].push_back(reverse);
+        }
+        Edge* transposed = edge->transposed();
+        if (transposed != nullptr) {
+            edges[transposed->from].push_back(transposed);
+            transposed->id = edgeCount;
+            Edge* transRev = transposed->reverse();
+            if (transRev != nullptr) {
+                edges[transRev->from].push_back(transRev);
+                transRev->id = edgeCount;
+            }
+        }
+        edgeCount++;
+    }
+
+    template <typename...Ts>
+    void addEdge(Ts...args) {
+        addEdge(new Edge(args...));
+    }
+
+    vec<Edge*>& operator[](int at) {
+        return edges[at];
+    }
+
+    void addVertices(int count) {
+        vertexCount += count;
+        edges.resize(vertexCount);
     }
 };
 
 
-const int DX_KNIGHT[] = {2, 1, -1, -2, -2, -1, 1, 2};
-const int DY_KNIGHT[] = {1, 2, 2, 1, -1, -2, -2, -1};
-const int DX4[] = {1, 0, -1, 0};
-const int DY4[] = {0, 1, 0, -1};
-const int DX8[] = {1, 1, 1, 0, -1, -1, -1, 0};
-const int DY8[] = {-1, 0, 1, 1, 1, 0, -1, -1};
+template <class Edge, typename C>
+C maxFlow(Graph<Edge>& graph, int source, int destination) {
+    arri dist(graph.vertexCount);
+    arri nextEdge(graph.vertexCount);
+    C inf = numeric_limits<C>::max();
+    C totalFlow = 0;
+    queue<int> q;
+    auto edgeDistances = [&]() {
+        fill(all(dist), -1);
+        dist[source] = 0;
+        q.push(source);
+        while (!q.empty()) {
+            int current = q.front();
+            q.pop();
+            for (auto edge : graph[current]) {
+                if (edge->capacity != 0) {
+                    int next = edge->to;
+                    if (dist[next] == -1) {
+                        dist[next] = dist[current] + 1;
+                        q.push(next);
+                    }
+                }
+            }
+        }
+    };
+    function<C(int, C)> dinicImpl = [&](int source, C flow) {
+        if (source == destination) {
+            return flow;
+        }
+        if (flow == 0 || dist[source] == dist[destination]) {
+            return 0;
+        }
+        C totalPushed = 0;
+        while (nextEdge[source] < graph[source].size()) {
+            auto edge = graph[source][nextEdge[source]];
+            if (edge->capacity != 0 && dist[edge->to] == dist[source] + 1) {
+                C pushed = dinicImpl(edge->to, min(flow, edge->capacity));
+                if (pushed != 0) {
+                    edge->push(pushed);
+                    flow -= pushed;
+                    totalPushed += pushed;
+                    if (flow == 0) {
+                        return totalPushed;
+                    }
+                }
+            }
+            nextEdge[source]++;
+        }
+        return totalPushed;
+    };
 
-bool isValidCell(int r, int c, int n, int m) {
-    return r >= 0 && c >= 0 && r < n && c < m;
-}
-
-inline bool isSubset(int set, int subSet) {
-    return (set & subSet) == subSet;
-}
-
-inline int bitCount(int x) {
-    return __builtin_popcount(x);
-}
-
-inline int bitCount(ll x) {
-    return __builtin_popcountll(x);
-}
-
-inline int highestOneBit(int x) {
-    return 1 << (31 - __builtin_clz(x | 1));
-}
-
-inline int binaryDigits(int x) {
-    return 32 - __builtin_clz(x | 1);
-}
-
-
-class ReverseNumberIterator : public NumberIterator {
-public:
-    ReverseNumberIterator(int v) : NumberIterator(v) {}
-
-    ReverseNumberIterator& operator++() {
-        --v;
-        return *this;
+    while (true) {
+        edgeDistances();
+        if (dist[destination] == -1) {
+            break;
+        }
+        fill(nextEdge.begin(), nextEdge.end(), 0);
+        totalFlow += dinicImpl(source, inf);
     }
-};
-
-class RevRange : pii {
-public:
-    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
-
-    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
-
-    ReverseNumberIterator begin() {
-        return first;
-    }
-
-    ReverseNumberIterator end() {
-        return second;
-    }
-};
+    return totalFlow;
+}
 
 
-class TaskF {
+class DMOPC19Contest5P6CeciliasComputationalCrisis {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
@@ -1170,76 +1250,62 @@ public:
 
         int n = in.readInt();
         int m = in.readInt();
-        int q = in.readInt();
-        arri x, y, c;
-        in.readArrays(q, x, y, c);
-        decreaseByOne(x, y);
+        auto plan = in.readTable<char>(n, m);
 
-        arr2d<int> cur(n, m, 0);
-        arr2d<int> next(n, m, 0);
-        arri answer(q, 0);
-        DSU dsu(n * m);
-        int at = 0;
-        arr<bool> skip(q, false);
-        while (at < q) {
-            dsu.reset();
-            int end = at;
-            int add = 0;
-            int vert = 0;
-            while (end < q && c[end] == c[at]) {
-                if (next(x[end], y[end]) == c[end]) {
-                    skip[end] = true;
-                    answer[end++] += add;
-                    continue;
-                }
-                vert++;
-                next(x[end], y[end]) = c[end];
-                add++;
-                for (int i : range(4)) {
-                    int rr = x[end] + DX4[i];
-                    int cc = y[end] + DY4[i];
-                    if (isValidCell(rr, cc, n, m) && next(rr, cc) == c[at] &&
-                        dsu.join(rr * m + cc, x[end] * m + y[end])) {
-                        add--;
+        map<vi, int> id;
+        Graph<FlowEdge<int>> graph(n + 2);
+        int next = n + 2;
+        int source = n;
+        int sink = n + 1;
+        vec<vi> plans;
+        for (int i : range(n)) {
+            int xs = count(all(plan[i]), '?');
+            if (xs > 10) {
+                xs = 10;
+            }
+            graph.addEdge(source, i, 1);
+            for (int j : range(min(n, 1 << xs))) {
+                int at = 0;
+                vi cur((m + 31) / 32);
+                for (int k : range(m)) {
+                    if (plan(i, k) == '?') {
+                        if (j >> at & 1) {
+                            cur[k >> 5] |= 1 << (k & 31);
+                        }
+                        at++;
+                    } else if (plan(i, k) == 'X') {
+                        cur[k >> 5] |= 1 << (k & 31);
                     }
                 }
-                answer[end++] += add;
-            }
-            dsu.reset();
-            for (int i : range(n)) {
-                for (int j : range(m)) {
-                    if (i + 1 < n && next(i, j) == next(i + 1, j) && next(i, j) != c[at]) {
-                        dsu.join((i + 1) * m + j, i * m + j);
-                    }
-                    if (j + 1 < m && next(i, j) == next(i, j + 1) && next(i, j) != c[at]) {
-                        dsu.join(i * m + j + 1, i * m + j);
-                    }
+                if (!id.count(cur)) {
+                    graph.addVertices(1);
+                    graph.addEdge(next, sink, 1);
+                    id[cur] = next++;
+                    plans.push_back(cur);
                 }
+                graph.addEdge(i, id[cur], 1);
             }
-            add = vert;
-            for (int i : RevRange(end, at)) {
-                answer[i] += dsu.setCount() - add;
-                if (skip[i]) {
-                    continue;
-                }
-                add--;
-                next(x[i], y[i]) = cur(x[i], y[i]);
-                for (int j : range(4)) {
-                    int rr = x[i] + DX4[j];
-                    int cc = y[i] + DY4[j];
-                    if (isValidCell(rr, cc, n, m) && next(rr, cc) == next(x[i], y[i])) {
-                        dsu.join(rr * m + cc, x[i] * m + y[i]);
-                    }
-                }
-            }
-            for (int i : range(at, end)) {
-                cur(x[i], y[i]) = c[i];
-                next(x[i], y[i]) = c[i];
-            }
-            at = end;
         }
-        for (int i : answer) {
-            out.printLine(i);
+        if (maxFlow<FlowEdge<int>, int>(graph, source, sink) != n) {
+            out.printLine("NO");
+        } else {
+            out.printLine("YES");
+            for (int i : range(n)) {
+                for (auto* e : graph[i]) {
+                    if (e->flow()) {
+                        int ind = e->to - (n + 2);
+                        for (int j : range(m)) {
+                            if (plans[ind][j >> 5] >> (j & 31) & 1) {
+                                out.print('X');
+                            } else {
+                                out.print('.');
+                            }
+                        }
+                        out.printLine();
+                        break;
+                    }
+                }
+            }
         }
     }
 };
@@ -1248,7 +1314,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    TaskF solver;
+    DMOPC19Contest5P6CeciliasComputationalCrisis solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
     solver.solve(in, out);

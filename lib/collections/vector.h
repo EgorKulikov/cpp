@@ -3,7 +3,7 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-
+// BEGIN CUT HERE
 template<typename T>
 class Vector : public vector<T> {
     using parent = vector<T>;
@@ -99,7 +99,10 @@ public:
 #ifdef LOCAL
 #define vec Vector
 #else
+// END CUT HERE
 #define vec vector
+// BEGIN CUT HERE
 #endif
+// END CUT HERE
 
 using vi = vec<int>;

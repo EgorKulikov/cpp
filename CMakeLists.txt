@@ -5,10 +5,12 @@ add_executable(output output/main.cpp lib/graph/lca.h lib/collections/segment_tr
 add_executable(testrunner testrunner/main.cpp)
 file(GLOB TASKS "tasks/*.cpp")
 file(GLOB_RECURSE HEADERS "lib/*.h" )
+file(GLOB DIRECT "direct/*.cpp")
 
 ADD_DEFINITIONS(-std=c++17 -Wall -Wextra -Wno-sign-compare -ftrapv -Wno-reorder -g3 -gfull -ggdb -fno-inline-functions -ftrapping-math -fno-unroll-loops -Wno-logical-op-parentheses)
 
 add_executable(test ${TASKS} ${HEADERS})
-add_executable(direct direct/main.cpp)
+add_executable(direct "direct/SubstringQueries.cpp" ${HEADERS})
+set_target_properties(test PROPERTIES LINKER_LANGUAGE CXX)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLOCAL")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLOCAL")
