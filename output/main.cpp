@@ -215,35 +215,42 @@ template <typename T>
 class arr {
     T* b;
     int n;
-public:
-    arr() : arr(0) {}
 
-    arr(int n) : n(n) {
+    void allocate(int n) {
 #ifdef LOCAL
         if (n < 0) {
             throw "bad alloc";
         }
 #endif
         if (n > 0) {
-//            b = (T*) malloc(n * sizeof(T));
-            b = new T[n];
+            b = (T*) (::operator new(n * sizeof(T)));
         } else {
             b = nullptr;
+        }
+    }
+
+public:
+    arr(int n = 0) : n(n) {
+        allocate(n);
+        for (int i : range(n)) {
+            ::new((void*) (b + i)) T;
         }
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr(int n, const T& init) : arr(n) {
-        if (n > 0) {
-            fill(b, b + n, init);
+    arr(int n, const T& init) : n(n) {
+        allocate(n);
+        for (int i : range(n)) {
+            ::new((void*) (b + i)) T(init);
         }
     }
 
-    arr(initializer_list<T> l) : arr(l.size()) {
+    arr(initializer_list<T> l) : n(l.size()) {
+        allocate(n);
         if (n > 0) {
-            copy(all(l), b);
+            memcpy(b, l.begin(), n * sizeof(T));
         }
     }
 
@@ -977,336 +984,18 @@ public:
 };
 
 
-template <typename W, typename C>
-class WeightedFlowEdge {
-private:
-    WeightedFlowEdge<W, C>* reverseEdge;
-
-public:
-    const int from;
-    const int to;
-    W weight;
-    C capacity;
-    int id;
-
-    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
-        reverseEdge = new WeightedFlowEdge(this);
-    }
-
-    WeightedFlowEdge<W, C>* transposed() { return nullptr; }
-
-    WeightedFlowEdge<W, C>* reverse() { return reverseEdge; }
-
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight),
-                                                        capacity(0) {
-        reverseEdge = reverse;
-    }
-};
-
-template <typename C>
-class FlowEdge {
-private:
-    FlowEdge<C>* reverseEdge;
-
-public:
-    const int from;
-    const int to;
-    C capacity;
-    int id;
-
-    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
-        reverseEdge = new FlowEdge(this);
-    }
-
-    FlowEdge<C>* transposed() { return nullptr; }
-
-    FlowEdge<C>* reverse() { return reverseEdge; }
-
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-
-    C flow() const {
-        return reverseEdge->capacity;
-    }
-
-private:
-    FlowEdge(FlowEdge<C>* reverse) : from(reverse->to), to(reverse->from), capacity(0) {
-        reverseEdge = reverse;
-    }
-};
-
-template <typename W>
-class WeightedEdge {
-public:
-    const int from;
-    const int to;
-    W weight;
-    int id;
-
-    WeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-    }
-
-    WeightedEdge<W>* transposed() { return nullptr; }
-
-    WeightedEdge<W>* reverse() { return nullptr; }
-};
-
-template <typename W>
-class BiWeightedEdge {
-private:
-    BiWeightedEdge<W>* transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    W weight;
-    int id;
-
-    BiWeightedEdge(int from, int to, W weight) : from(from), to(to), weight(weight) {
-        transposedEdge = new BiWeightedEdge(this);
-    }
-
-    BiWeightedEdge<W>* transposed() { return transposedEdge; }
-
-    BiWeightedEdge<W>* reverse() { return nullptr; }
-
-private:
-    BiWeightedEdge(BiWeightedEdge<W>* transposed) : from(transposed->to), to(transposed->from),
-                                                    weight(transposed->weight) {
-        transposedEdge = transposed;
-    }
-};
-
-class BaseEdge {
-public:
-    const int from;
-    const int to;
-    int id;
-
-    BaseEdge(int from, int to) : from(from), to(to) {
-    }
-
-    BaseEdge* transposed() { return nullptr; }
-
-    BaseEdge* reverse() { return nullptr; }
-};
-
-class BiEdge {
-private:
-    BiEdge* transposedEdge;
-
-public:
-    const int from;
-    const int to;
-    int id;
-
-    BiEdge(int from, int to) : from(from), to(to) {
-        transposedEdge = new BiEdge(this);
-    }
-
-    BiEdge* transposed() { return transposedEdge; }
-
-    BiEdge* reverse() { return nullptr; }
-
-private:
-    BiEdge(BiEdge* transposed) : from(transposed->to), to(transposed->from) {
-        transposedEdge = transposed;
-    }
-};
-
-template <class Edge>
-class Graph {
-public:
-    int vertexCount;
-    int edgeCount = 0;
-private:
-    vec<vec<Edge*>> edges;
-
-public:
-    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vec<Edge*>()) {}
-
-    void addEdge(Edge* edge) {
-#ifdef LOCAL
-        if (edge->from < 0 || edge->to < 0 || edge->from >= vertexCount || edge->to >= vertexCount) {
-            throw "Out of bounds";
-        }
-#endif
-        edge->id = edgeCount;
-        edges[edge->from].push_back(edge);
-        Edge* reverse = edge->reverse();
-        if (reverse != nullptr) {
-            reverse->id = edgeCount;
-            edges[reverse->from].push_back(reverse);
-        }
-        Edge* transposed = edge->transposed();
-        if (transposed != nullptr) {
-            edges[transposed->from].push_back(transposed);
-            transposed->id = edgeCount;
-            Edge* transRev = transposed->reverse();
-            if (transRev != nullptr) {
-                edges[transRev->from].push_back(transRev);
-                transRev->id = edgeCount;
-            }
-        }
-        edgeCount++;
-    }
-
-    template <typename...Ts>
-    void addEdge(Ts...args) {
-        addEdge(new Edge(args...));
-    }
-
-    vec<Edge*>& operator[](int at) {
-        return edges[at];
-    }
-
-    void addVertices(int count) {
-        vertexCount += count;
-        edges.resize(vertexCount);
-    }
-};
-
-
-template <class Edge, typename C>
-C maxFlow(Graph<Edge>& graph, int source, int destination) {
-    arri dist(graph.vertexCount);
-    arri nextEdge(graph.vertexCount);
-    C inf = numeric_limits<C>::max();
-    C totalFlow = 0;
-    queue<int> q;
-    auto edgeDistances = [&]() {
-        fill(all(dist), -1);
-        dist[source] = 0;
-        q.push(source);
-        while (!q.empty()) {
-            int current = q.front();
-            q.pop();
-            for (auto edge : graph[current]) {
-                if (edge->capacity != 0) {
-                    int next = edge->to;
-                    if (dist[next] == -1) {
-                        dist[next] = dist[current] + 1;
-                        q.push(next);
-                    }
-                }
-            }
-        }
-    };
-    function<C(int, C)> dinicImpl = [&](int source, C flow) {
-        if (source == destination) {
-            return flow;
-        }
-        if (flow == 0 || dist[source] == dist[destination]) {
-            return 0;
-        }
-        C totalPushed = 0;
-        while (nextEdge[source] < graph[source].size()) {
-            auto edge = graph[source][nextEdge[source]];
-            if (edge->capacity != 0 && dist[edge->to] == dist[source] + 1) {
-                C pushed = dinicImpl(edge->to, min(flow, edge->capacity));
-                if (pushed != 0) {
-                    edge->push(pushed);
-                    flow -= pushed;
-                    totalPushed += pushed;
-                    if (flow == 0) {
-                        return totalPushed;
-                    }
-                }
-            }
-            nextEdge[source]++;
-        }
-        return totalPushed;
-    };
-
-    while (true) {
-        edgeDistances();
-        if (dist[destination] == -1) {
-            break;
-        }
-        fill(nextEdge.begin(), nextEdge.end(), 0);
-        totalFlow += dinicImpl(source, inf);
-    }
-    return totalFlow;
-}
-
-
-class DMOPC19Contest5P6CeciliasComputationalCrisis {
+class tast {
 public:
     void solve(istream& inp, ostream& outp) {
         Input in(inp);
         Output out(outp);
 
-        int n = in.readInt();
-        int m = in.readInt();
-        auto plan = in.readTable<char>(n, m);
-
-        map<vi, int> id;
-        Graph<FlowEdge<int>> graph(n + 2);
-        int next = n + 2;
-        int source = n;
-        int sink = n + 1;
-        vec<vi> plans;
-        for (int i : range(n)) {
-            int xs = count(all(plan[i]), '?');
-            if (xs > 10) {
-                xs = 10;
-            }
-            graph.addEdge(source, i, 1);
-            for (int j : range(min(n, 1 << xs))) {
-                int at = 0;
-                vi cur((m + 31) / 32);
-                for (int k : range(m)) {
-                    if (plan(i, k) == '?') {
-                        if (j >> at & 1) {
-                            cur[k >> 5] |= 1 << (k & 31);
-                        }
-                        at++;
-                    } else if (plan(i, k) == 'X') {
-                        cur[k >> 5] |= 1 << (k & 31);
-                    }
-                }
-                if (!id.count(cur)) {
-                    graph.addVertices(1);
-                    graph.addEdge(next, sink, 1);
-                    id[cur] = next++;
-                    plans.push_back(cur);
-                }
-                graph.addEdge(i, id[cur], 1);
-            }
+        vi b({1, 2, 3});
+        arr<vi> a(10);
+        for (int i : range(10)) {
+            a[i] = vi(10);
         }
-        if (maxFlow<FlowEdge<int>, int>(graph, source, sink) != n) {
-            out.printLine("NO");
-        } else {
-            out.printLine("YES");
-            for (int i : range(n)) {
-                for (auto* e : graph[i]) {
-                    if (e->flow()) {
-                        int ind = e->to - (n + 2);
-                        for (int j : range(m)) {
-                            if (plans[ind][j >> 5] >> (j & 31) & 1) {
-                                out.print('X');
-                            } else {
-                                out.print('.');
-                            }
-                        }
-                        out.printLine();
-                        break;
-                    }
-                }
-            }
-        }
+        out.printLine(b);
     }
 };
 
@@ -1314,7 +1003,7 @@ public:
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    DMOPC19Contest5P6CeciliasComputationalCrisis solver;
+    tast solver;
     std::istream& in(std::cin);
     std::ostream& out(std::cout);
     solver.solve(in, out);

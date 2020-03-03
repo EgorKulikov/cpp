@@ -10,27 +10,48 @@ class arr2d {
     int d2;
     int sz;
 
-public:
-    arr2d() : arr2d(0, 0) {}
+    void allocate(int n) {
+#ifdef LOCAL
+        if (n < 0) {
+            throw "bad alloc";
+        }
+#endif
+        if (n > 0) {
+            b = (T*)(::operator new(n * sizeof(T)));
+        } else {
+            b = nullptr;
+        }
+    }
 
-    arr2d(int d1, int d2) : d1(d1), d2(d2), sz(d1 * d2) {
+public:
+    arr2d(int d1 = 0, int d2 = 0) : d1(d1), d2(d2), sz(d1 * d2) {
 #ifdef LOCAL
         if (d1 < 0 || d2 < 0) {
             throw "bad alloc";
         }
 #endif
-        if (sz == 0) {
-            b = nullptr;
-        } else {
-            b = new T[sz];
+        allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*)(b + i)) T;
         }
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr2d(int d1, int d2, const T& init) : arr2d(d1, d2) {
-        fill(b, b + sz, init);
+    arr2d(int d1, int d2, const T& init) : d1(d1), d2(d2), sz(d1 * d2) {
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0) {
+            throw "bad alloc";
+        }
+#endif
+        allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*)(b + i)) T(init);
+        }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr2d(T* b, int d1, int d2) : b(b), d1(d1), d2(d2), sz(d1 * d2) {}
@@ -106,27 +127,48 @@ class arr3d {
     int shift;
     int sz;
 
-public:
-    arr3d() : arr3d(0, 0, 0) {}
+    void allocate(int n) {
+#ifdef LOCAL
+        if (n < 0) {
+            throw "bad alloc";
+        }
+#endif
+        if (n > 0) {
+            b = (T*)(::operator new(n * sizeof(T)));
+        } else {
+            b = nullptr;
+        }
+    }
 
-    arr3d(int d1, int d2, int d3) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
+public:
+    arr3d(int d1 = 0, int d2 = 0, int d3 = 0) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
 #ifdef LOCAL
         if (d1 < 0 || d2 < 0 || d3 < 0) {
             throw "bad alloc";
         }
 #endif
-        if (sz == 0) {
-            b = nullptr;
-        } else {
-            b = (T*) malloc(sz * sizeof(T));
+        allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*)(b + i)) T;
         }
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr3d(int d1, int d2, int d3, const T& init) : arr3d(d1, d2, d3) {
-        fill(b, b + sz, init);
+    arr3d(int d1, int d2, int d3, const T& init) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0 || d3 < 0) {
+            throw "bad alloc";
+        }
+#endif
+        allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*)(b + i)) T(init);
+        }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr3d(T* b, int d1, int d2, int d3) : b(b), d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {}
@@ -202,27 +244,48 @@ class arr4d {
     int shift2;
     int sz;
 
-public:
-    arr4d() : arr4d(0, 0, 0, 0) {}
+    void allocate(int n) {
+#ifdef LOCAL
+        if (n < 0) {
+            throw "bad alloc";
+        }
+#endif
+        if (n > 0) {
+            b = (T*)(::operator new(n * sizeof(T)));
+        } else {
+            b = nullptr;
+        }
+    }
 
-    arr4d(int d1, int d2, int d3, int d4) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
+public:
+    arr4d(int d1 = 0, int d2 = 0, int d3 = 0, int d4 = 0) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
 #ifdef LOCAL
         if (d1 < 0 || d2 < 0 || d3 < 0) {
             throw "bad alloc";
         }
 #endif
-        if (sz == 0) {
-            b = nullptr;
-        } else {
-            b = (T*) malloc(sz * sizeof(T));
+        allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*)(b + i)) T;
         }
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr4d(int d1, int d2, int d3, int d4, const T& init) : arr4d(d1, d2, d3, d4) {
-        fill(b, b + sz, init);
+    arr4d(int d1, int d2, int d3, int d4, const T& init) : : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0 || d3 < 0) {
+            throw "bad alloc";
+        }
+#endif
+        allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*)(b + i)) T(init);
+        }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr4d(T* b, int d1, int d2, int d3, int d4) : b(b), d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {

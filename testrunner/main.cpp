@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/DMOPC19Contest5P6CeciliasComputationalCrisis.cpp"
+#include "C:/Users/kulikov/proj/cpp/tasks/tast.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +30,7 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
 	std::vector<jhelper::Test> tests = {
-		{"4 4\n.?XX\n?X..\n.??X\nXX..\n", "YES\n.XXX\n.X..\n.X.X\nXX..\n", true, true},{"5 5\n.X?X?\n.X..X\n.XX.X\n?.???\n.X?.X\n", "NO\n", true, true},{"4 2\n??\n??\n??\n??\n", "", true, false},
+		{"", "", true, false},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -50,7 +50,7 @@ int main() {
 			std::ostringstream out;
 			std::clock_t start = std::clock();
 			try {
-			    DMOPC19Contest5P6CeciliasComputationalCrisis solver;
+			    tast solver;
 			    solver.solve(in, out);
             } catch (const char* e) {
                 std::cerr << e << std::endl;

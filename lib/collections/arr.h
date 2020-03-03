@@ -7,35 +7,50 @@ template <typename T>
 class arr {
     T* b;
     int n;
-public:
-    arr() : arr(0) {}
 
-    arr(int n) : n(n) {
+    void allocate(int sz) {
 #ifdef LOCAL
-        if (n < 0) {
+        if (sz < 0) {
             throw "bad alloc";
         }
 #endif
-        if (n > 0) {
-//            b = (T*) malloc(n * sizeof(T));
-            b = new T[n];
+        n = sz;
+        if (sz > 0) {
+            b = (T*)(::operator new(sz * sizeof(T)));
         } else {
             b = nullptr;
+        }
+    }
+
+public:
+    arr(int n = 0) {
+        allocate(n);
+        for (int i : range(n)) {
+            ::new((void*)(b + i)) T;
         }
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr(int n, const T& init) : arr(n) {
-        if (n > 0) {
-            fill(b, b + n, init);
+    arr(int n, const T& init) {
+        allocate(n);
+        for (int i : range(n)) {
+            ::new((void*)(b + i)) T(init);
         }
+#ifdef LOCAL
+        view();
+#endif
     }
-    arr(initializer_list<T> l) : arr(l.size()) {
+
+    arr(initializer_list<T> l) {
+        allocate(n);
         if (n > 0) {
-            copy(all(l), b);
+            memcpy(b, l.begin(), n * sizeof(T));
         }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr(T* b, int n) : arr(b, b + n) {}
