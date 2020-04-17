@@ -1,9 +1,11 @@
 #pragma once
 
+#include <limits>
+#include <functional>
 #include "../general.h"
 
 void iterate(ll from, ll to, function<void(ll, int)> process, int base = 10) {
-    vec<ll> power;
+    vector<ll> power;
     ll max = numeric_limits<ll>::max();
     power.push_back(1);
     while (max / power.back() >= base) {

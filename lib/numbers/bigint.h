@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <cmath>
+#include <iomanip>
 #include "../general.h"
 #include "../range/range.h"
 #include "modulo.h"
@@ -9,7 +12,7 @@ constexpr int base = 1000000000;
 constexpr int base_digits = 9;
 constexpr int FFT_MIN_SIZE = 50000;
 
-using vll = vec<ll>;
+using vll = vector<ll>;
 
 struct bigint {
     vi z;
@@ -288,8 +291,8 @@ struct bigint {
         return stream;
     }
 
-    static vec<modint> convert(const vi& z) {
-       vec<modint> res;
+    static vector<modint> convert(const vi& z) {
+        vector<modint> res;
        for (int i : z) {
            for (int j : range(base_digits)) {
                res.push_back(i % 10);

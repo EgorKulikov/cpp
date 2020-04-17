@@ -1,13 +1,14 @@
 #pragma once
 
-#include "../general.h"
-#include "arr.h"
+#include "mdarr.h"
 
 template <typename T>
-class arr2d {
+class arr3d {
     T* b;
     int d1;
     int d2;
+    int d3;
+    int shift;
     int sz;
 
     void allocate(int n) {
@@ -24,21 +25,24 @@ class arr2d {
     }
 
 public:
-    arr2d(int d1 = 0, int d2 = 0) : d1(d1), d2(d2), sz(d1 * d2) {
+    arr3d(int d1 = 0, int d2 = 0, int d3 = 0) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
 #ifdef LOCAL
-        if (d1 < 0 || d2 < 0) {
+        if (d1 < 0 || d2 < 0 || d3 < 0) {
             throw "bad alloc";
         }
 #endif
         allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*)(b + i)) T;
+        }
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr2d(int d1, int d2, const T& init) : d1(d1), d2(d2), sz(d1 * d2) {
+    arr3d(int d1, int d2, int d3, const T& init) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
 #ifdef LOCAL
-        if (d1 < 0 || d2 < 0) {
+        if (d1 < 0 || d2 < 0 || d3 < 0) {
             throw "bad alloc";
         }
 #endif
@@ -51,7 +55,7 @@ public:
 #endif
     }
 
-    arr2d(T* b, int d1, int d2) : b(b), d1(d1), d2(d2), sz(d1 * d2) {}
+    arr3d(T* b, int d1, int d2, int d3) : b(b), d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {}
 
     int size() const {
         return sz;
@@ -65,6 +69,10 @@ public:
         return d2;
     }
 
+    int dim3() const {
+        return d3;
+    }
+
     T* begin() {
         return b;
     }
@@ -73,45 +81,38 @@ public:
         return b + sz;
     }
 
-    T& operator()(int i1, int i2) {
+    T& operator()(int i1, int i2, int i3) {
 #ifdef LOCAL
-        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2) {
+        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
             throw "Out of bounds";
         }
 #endif
-        return b[i1 * d2 + i2];
+        return b[i1 * shift + i2 * d3 + i3];
     }
 
-    const T& operator()(int i1, int i2) const {
+    const T& operator()(int i1, int i2, int i3) const {
 #ifdef LOCAL
-        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2) {
+        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
             throw "Out of bounds";
         }
 #endif
-        return b[i1 * d2 + i2];
+        return b[i1 * shift + i2 * d3 + i3];
     }
 
-    arr<T> operator[](int at) {
+    arr2d<T> operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
             throw "Out of bounds";
         }
 #endif
-        return arr<T>(b + at * d2, d2);
+        return arr2d<T>(b + at * shift, d2, d3);
     }
 
-    vector<vector<T>> view() {
-        vector<vector<T>> res(min(d1, 50));
+    vector<vector<vector<T>>> view() {
+        vector<vector<vector<T>>> res(min(d1, 50));
         for (int i = 0; i < res.size(); ++i) {
             res[i] = (*this)[i].view();
         }
         return res;
     }
-
-    arr2d<T> clone() {
-        arr2d<T> res(d1, d2);
-        copy(b, b + sz, res.b);
-        return res;
-    }
 };
-

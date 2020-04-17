@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstdio>
+#include <cctype>
+#include <string>
 #include "../general.h"
 #include "../numbers/doubles.h"
 #include "../collections/arr.h"
@@ -11,8 +14,11 @@ inline bool isWhitespace(int c) {
 
 class Input {
 private:
-    istream &in;
     bool exhausted = false;
+    int bufSize = 4096;
+    char* buf = new char[bufSize];
+    int bufRead = 0;
+    int bufAt = 0;
 
     inline int get() {
         if (exhausted) {
@@ -21,17 +27,20 @@ private:
 #endif
             return EOF;
         }
-        int c = in.get();
-        if (c == EOF) {
-            exhausted = true;
+        if (bufRead == bufAt) {
+            bufRead = fread(buf, sizeof(char), bufSize, stdin);
+            bufAt = 0;
         }
-        return c;
+        if (bufRead == bufAt) {
+            exhausted = true;
+            return EOF;
+        }
+        return buf[bufAt++];
     }
 
     template<typename T>
     inline T readInteger() {
-        skipWhitespace();
-        int c = get();
+        int c = skipWhitespace();
         int sgn = 1;
         if (c == '-') {
             sgn = -1;
@@ -56,12 +65,12 @@ private:
 
     template <typename T, class...Vs>
     void initArrays(int n, arr<T>& array, Vs&...vs) {
-        array = arr<T>(n);
+        array = arr<T>(n, T());
         initArrays(n, vs...);
     }
 
     template <typename T, class...Vs>
-    void initArrays(int n, vec<T>&, Vs&...vs) {
+    void initArrays(int n, vector<T>&, Vs&...vs) {
         initArrays(n, vs...);
     }
 
@@ -74,22 +83,19 @@ private:
     }
 
     template <typename T, class...Vs>
-    void readImpl(int i, vec<T>& arr, Vs&...vs) {
+    void readImpl(int i, vector<T>& arr, Vs&...vs) {
         arr.push_back(readType<T>());
         readImpl(i, vs...);
     }
 
 public:
-    Input(istream &in) : in(in) {};
-
-    inline void skipWhitespace() {
+    inline int skipWhitespace() {
         int c;
-        while (isWhitespace(c = in.peek()) && c != EOF) {
-            in.get();
-        }
+        while (isWhitespace(c = get()) && c != EOF);
         if (c == EOF) {
             exhausted = true;
         }
+        return c;
     }
 
     inline int readInt() {
@@ -101,23 +107,38 @@ public:
     }
 
     string readString() {
-        skipWhitespace();
-        int c = get();
+        int c = skipWhitespace();
         if (c == EOF) {
 #ifdef LOCAL
             throw "Input exhausted";
 #endif
             return "";
         }
-        vec<char> res;
+        string res;
         do {
             res.push_back(c);
         } while (!isWhitespace(c = get()));
-        return string(all(res));
+        return res;
     }
 
     arri readIntArray(int size) {
         return readArray<int>(size);
+    }
+
+    arr<ll> readLongArray(int size) {
+        return readArray<ll>(size);
+    }
+
+    arr<double> readDoubleArray(int size) {
+        return readArray<double>(size);
+    }
+
+    arr<string> readStringArray(int size) {
+        return readArray<string>(size);
+    }
+
+    arr<char> readCharArray(int size) {
+        return readArray<char>(size);
     }
 
     template<typename T>
@@ -134,7 +155,7 @@ public:
 
     template<typename T>
     arr<T> readArray(int n) {
-        arr<T> res(n);
+        arr<T> res(n, T());
         for (int i = 0; i < n; i++) {
             res[i] = readType<T>();
         }
@@ -171,6 +192,14 @@ public:
         return result;
     }
 
+    arr2d<int> readIntTable(int rows, int cols) {
+        return readTable<int>(rows, cols);
+    }
+
+    arr2d<char> readCharTable(int rows, int cols) {
+        return readTable<char>(rows, cols);
+    }
+
     string readLine() {
         int c = get();
         if (c == EOF) {
@@ -179,17 +208,16 @@ public:
 #endif
             return "";
         }
-        vec<char> res;
+        string res;
         do {
             res.push_back(c);
             c = get();
         } while (c != '\n' && c != '\r' && c != EOF);
-        return string(all(res));
+        return res;
     }
 
     double readDouble() {
-        skipWhitespace();
-        int c = get();
+        int c = skipWhitespace();
         int sgn = 1;
         if (c == '-') {
             sgn = -1;
@@ -236,8 +264,7 @@ public:
     }
 
     char readChar() {
-        skipWhitespace();
-        int c = get();
+        int c = skipWhitespace();
         if (c == EOF) {
 #ifdef LOCAL
             throw "Input exhausted";
@@ -248,6 +275,15 @@ public:
     }
 
     bool isExhausted() { return exhausted; }
+
+    void setBufSize(int newBufSize) {
+        if (newBufSize > bufSize) {
+            char* newBuf = new char[newBufSize];
+            memcpy(newBuf, buf, bufSize);
+            buf = newBuf;
+        }
+        bufSize = newBufSize;
+    }
 };
 
 template<>
@@ -274,3 +310,5 @@ template<>
 string Input::readType() {
     return readString();
 }
+
+Input in;

@@ -1,8 +1,9 @@
 #pragma once
 
+#include <ostream>
 #include "../general.h"
 #include "numbers.h"
-#include "bigint.h"
+//#include "bigint.h"
 
 class Rational {
     void normalize() {
@@ -85,7 +86,8 @@ Rational operator -(const Rational& a) {
 }
 
 bool operator <(const Rational& a, const Rational& b) {
-    return bigint(a.num) * b.den < bigint(a.den) * b.num;
+//    return bigint(a.num) * b.den < bigint(a.den) * b.num;
+    return a.num * b.den < a.den * b.num;
 }
 
 bool operator >(const Rational& a, const Rational& b) {

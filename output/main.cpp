@@ -8,136 +8,24 @@
 
 
 
-
-
 #include <bits/stdc++.h>
 
 using namespace std;
-
-// BEGIN CUT HERE
-template <typename T>
-class Vector : public vector<T> {
-    using parent = vector<T>;
-public:
-    Vector() : parent() {}
-
-    explicit Vector(size_t __n) : parent(__n) {}
-
-    Vector(size_t __n, const T& __value) : parent(__n, __value) {}
-
-    explicit Vector(const parent& __x) : parent(__x) {}
-
-    Vector(const Vector& __x) : parent(__x) {}
-
-    Vector(Vector&& __x) noexcept : parent(move(__x)) {}
-
-    Vector(initializer_list<T> __l) : parent(__l) {}
-
-    template <typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
-    Vector(_InputIterator __first, _InputIterator __last) : parent(__first, __last) {}
-
-    const T& operator[](size_t ind) const {
-#ifdef LOCAL
-        if (ind >= parent::size()) {
-            throw "Out of bounds";
-        }
-#endif
-        return parent::operator[](ind);
-    }
-
-    T& operator[](size_t ind) {
-#ifdef LOCAL
-        if (ind >= parent::size()) {
-            throw "Out of bounds";
-        }
-#endif
-        return parent::operator[](ind);
-    }
-
-    Vector<T>& operator=(Vector<T>&& __x) noexcept {
-        parent::operator=(__x);
-        return *this;
-    }
-
-    Vector<T>& operator=(const Vector<T>& __x) {
-        if (&__x == this) {
-            return *this;
-        }
-        parent::operator=(__x);
-        return *this;
-    }
-};
-
-template <>
-class Vector<bool> : public vector<bool> {
-    using parent = vector<bool>;
-public:
-    Vector() : parent() {}
-
-    explicit Vector(size_t __n) : parent(__n) {}
-
-    Vector(size_t __n, const bool& __value) : parent(__n, __value) {}
-
-    explicit Vector(const parent& __x) : parent(__x) {}
-
-    Vector(const Vector& __x) : parent(__x) {}
-
-    Vector(Vector&& __x) noexcept : parent(move(__x)) {}
-
-    Vector(initializer_list<bool> __l) : parent(__l) {}
-
-    template <typename _InputIterator, typename = std::_RequireInputIter<_InputIterator>>
-    Vector(_InputIterator __first, _InputIterator __last) : parent(__first, __last) {}
-
-    parent::const_reference operator[](size_t ind) const {
-#ifdef LOCAL
-        if (ind >= parent::size()) {
-            throw "Out of bounds";
-        }
-#endif
-        return parent::operator[](ind);
-    }
-
-    parent::reference operator[](size_t ind) {
-#ifdef LOCAL
-        if (ind >= parent::size()) {
-            throw "Out of bounds";
-        }
-#endif
-        return parent::operator[](ind);
-    }
-
-    Vector<bool>& operator=(Vector<bool>&& __x) noexcept {
-        parent::operator=(__x);
-        return *this;
-    }
-
-    Vector<bool>& operator=(const Vector<bool>& __x) {
-        if (&__x == this) {
-            return *this;
-        }
-        parent::operator=(__x);
-        return *this;
-    }
-};
-
-#ifdef LOCAL
-#define vec Vector
-#else
-// END CUT HERE
-#define vec vector
-// BEGIN CUT HERE
-#endif
-// END CUT HERE
-
-using vi = vec<int>;
-
 
 #define all(v) (v).begin(), (v).end()
 
 using ll = long long;
 using ld = long double;
 using pii = pair<int, int>;
+using vi = vector<int>;
+
+#ifdef LOCAL
+
+void signalHandler(int) {
+    throw "Abort detected";
+}
+
+#endif
 
 void doReplace() {
 }
@@ -216,42 +104,46 @@ class arr {
     T* b;
     int n;
 
-    void allocate(int n) {
+    void allocate(int sz) {
 #ifdef LOCAL
-        if (n < 0) {
+        if (sz < 0) {
             throw "bad alloc";
         }
 #endif
-        if (n > 0) {
-            b = (T*) (::operator new(n * sizeof(T)));
+        n = sz;
+        if (sz > 0) {
+            b = (T*) (::operator new(sz * sizeof(T)));
         } else {
             b = nullptr;
         }
     }
 
 public:
-    arr(int n = 0) : n(n) {
+    arr(int n = 0) {
+        allocate(n);
+#ifdef LOCAL
+        view();
+#endif
+    }
+
+    arr(int n, const T& init) {
         allocate(n);
         for (int i : range(n)) {
-            ::new((void*) (b + i)) T;
+            ::new((void*) (b + i)) T(init);
         }
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr(int n, const T& init) : n(n) {
-        allocate(n);
-        for (int i : range(n)) {
-            ::new((void*) (b + i)) T(init);
-        }
-    }
-
-    arr(initializer_list<T> l) : n(l.size()) {
+    arr(initializer_list<T> l) {
         allocate(n);
         if (n > 0) {
             memcpy(b, l.begin(), n * sizeof(T));
         }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr(T* b, int n) : arr(b, b + n) {}
@@ -348,27 +240,45 @@ class arr2d {
     int d2;
     int sz;
 
-public:
-    arr2d() : arr2d(0, 0) {}
+    void allocate(int n) {
+#ifdef LOCAL
+        if (n < 0) {
+            throw "bad alloc";
+        }
+#endif
+        if (n > 0) {
+            b = (T*) (::operator new(n * sizeof(T)));
+        } else {
+            b = nullptr;
+        }
+    }
 
-    arr2d(int d1, int d2) : d1(d1), d2(d2), sz(d1 * d2) {
+public:
+    arr2d(int d1 = 0, int d2 = 0) : d1(d1), d2(d2), sz(d1 * d2) {
 #ifdef LOCAL
         if (d1 < 0 || d2 < 0) {
             throw "bad alloc";
         }
 #endif
-        if (sz == 0) {
-            b = nullptr;
-        } else {
-            b = new T[sz];
-        }
+        allocate(sz);
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr2d(int d1, int d2, const T& init) : arr2d(d1, d2) {
-        fill(b, b + sz, init);
+    arr2d(int d1, int d2, const T& init) : d1(d1), d2(d2), sz(d1 * d2) {
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0) {
+            throw "bad alloc";
+        }
+#endif
+        allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*) (b + i)) T(init);
+        }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr2d(T* b, int d1, int d2) : b(b), d1(d1), d2(d2), sz(d1 * d2) {}
@@ -444,27 +354,48 @@ class arr3d {
     int shift;
     int sz;
 
-public:
-    arr3d() : arr3d(0, 0, 0) {}
+    void allocate(int n) {
+#ifdef LOCAL
+        if (n < 0) {
+            throw "bad alloc";
+        }
+#endif
+        if (n > 0) {
+            b = (T*) (::operator new(n * sizeof(T)));
+        } else {
+            b = nullptr;
+        }
+    }
 
-    arr3d(int d1, int d2, int d3) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
+public:
+    arr3d(int d1 = 0, int d2 = 0, int d3 = 0) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
 #ifdef LOCAL
         if (d1 < 0 || d2 < 0 || d3 < 0) {
             throw "bad alloc";
         }
 #endif
-        if (sz == 0) {
-            b = nullptr;
-        } else {
-            b = (T*) malloc(sz * sizeof(T));
+        allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*) (b + i)) T;
         }
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr3d(int d1, int d2, int d3, const T& init) : arr3d(d1, d2, d3) {
-        fill(b, b + sz, init);
+    arr3d(int d1, int d2, int d3, const T& init) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0 || d3 < 0) {
+            throw "bad alloc";
+        }
+#endif
+        allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*) (b + i)) T(init);
+        }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr3d(T* b, int d1, int d2, int d3) : b(b), d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {}
@@ -540,28 +471,50 @@ class arr4d {
     int shift2;
     int sz;
 
-public:
-    arr4d() : arr4d(0, 0, 0, 0) {}
+    void allocate(int n) {
+#ifdef LOCAL
+        if (n < 0) {
+            throw "bad alloc";
+        }
+#endif
+        if (n > 0) {
+            b = (T*) (::operator new(n * sizeof(T)));
+        } else {
+            b = nullptr;
+        }
+    }
 
-    arr4d(int d1, int d2, int d3, int d4) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4), shift2(d3 * d4),
-                                            sz(d1 * d2 * d3 * d4) {
+public:
+    arr4d(int d1 = 0, int d2 = 0, int d3 = 0, int d4 = 0) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
+                                                            shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
 #ifdef LOCAL
         if (d1 < 0 || d2 < 0 || d3 < 0) {
             throw "bad alloc";
         }
 #endif
-        if (sz == 0) {
-            b = nullptr;
-        } else {
-            b = (T*) malloc(sz * sizeof(T));
+        allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*) (b + i)) T;
         }
 #ifdef LOCAL
         view();
 #endif
     }
 
-    arr4d(int d1, int d2, int d3, int d4, const T& init) : arr4d(d1, d2, d3, d4) {
-        fill(b, b + sz, init);
+    arr4d(int d1, int d2, int d3, int d4, const T& init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
+                                                           shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
+#ifdef LOCAL
+        if (d1 < 0 || d2 < 0 || d3 < 0) {
+            throw "bad alloc";
+        }
+#endif
+        allocate(sz);
+        for (int i : range(sz)) {
+            ::new((void*) (b + i)) T(init);
+        }
+#ifdef LOCAL
+        view();
+#endif
     }
 
     arr4d(T* b, int d1, int d2, int d3, int d4) : b(b), d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
@@ -639,8 +592,11 @@ inline bool isWhitespace(int c) {
 
 class Input {
 private:
-    istream& in;
     bool exhausted = false;
+    int bufSize = 4096;
+    char* buf = new char[bufSize];
+    int bufRead = 0;
+    int bufAt = 0;
 
     inline int get() {
         if (exhausted) {
@@ -649,17 +605,20 @@ private:
 #endif
             return EOF;
         }
-        int c = in.get();
-        if (c == EOF) {
-            exhausted = true;
+        if (bufRead == bufAt) {
+            bufRead = fread(buf, sizeof(char), bufSize, stdin);
+            bufAt = 0;
         }
-        return c;
+        if (bufRead == bufAt) {
+            exhausted = true;
+            return EOF;
+        }
+        return buf[bufAt++];
     }
 
     template <typename T>
     inline T readInteger() {
-        skipWhitespace();
-        int c = get();
+        int c = skipWhitespace();
         int sgn = 1;
         if (c == '-') {
             sgn = -1;
@@ -684,12 +643,12 @@ private:
 
     template <typename T, class...Vs>
     void initArrays(int n, arr<T>& array, Vs& ...vs) {
-        array = arr<T>(n);
+        array = arr<T>(n, T());
         initArrays(n, vs...);
     }
 
     template <typename T, class...Vs>
-    void initArrays(int n, vec<T>&, Vs& ...vs) {
+    void initArrays(int n, vector<T>&, Vs& ...vs) {
         initArrays(n, vs...);
     }
 
@@ -702,22 +661,19 @@ private:
     }
 
     template <typename T, class...Vs>
-    void readImpl(int i, vec<T>& arr, Vs& ...vs) {
+    void readImpl(int i, vector<T>& arr, Vs& ...vs) {
         arr.push_back(readType<T>());
         readImpl(i, vs...);
     }
 
 public:
-    Input(istream& in) : in(in) {};
-
-    inline void skipWhitespace() {
+    inline int skipWhitespace() {
         int c;
-        while (isWhitespace(c = in.peek()) && c != EOF) {
-            in.get();
-        }
+        while (isWhitespace(c = get()) && c != EOF);
         if (c == EOF) {
             exhausted = true;
         }
+        return c;
     }
 
     inline int readInt() {
@@ -729,23 +685,38 @@ public:
     }
 
     string readString() {
-        skipWhitespace();
-        int c = get();
+        int c = skipWhitespace();
         if (c == EOF) {
 #ifdef LOCAL
             throw "Input exhausted";
 #endif
             return "";
         }
-        vec<char> res;
+        string res;
         do {
             res.push_back(c);
         } while (!isWhitespace(c = get()));
-        return string(all(res));
+        return res;
     }
 
     arri readIntArray(int size) {
         return readArray<int>(size);
+    }
+
+    arr<ll> readLongArray(int size) {
+        return readArray<ll>(size);
+    }
+
+    arr<double> readDoubleArray(int size) {
+        return readArray<double>(size);
+    }
+
+    arr<string> readStringArray(int size) {
+        return readArray<string>(size);
+    }
+
+    arr<char> readCharArray(int size) {
+        return readArray<char>(size);
     }
 
     template <typename T>
@@ -762,7 +733,7 @@ public:
 
     template <typename T>
     arr<T> readArray(int n) {
-        arr<T> res(n);
+        arr<T> res(n, T());
         for (int i = 0; i < n; i++) {
             res[i] = readType<T>();
         }
@@ -798,6 +769,14 @@ public:
         return result;
     }
 
+    arr2d<int> readIntTable(int rows, int cols) {
+        return readTable<int>(rows, cols);
+    }
+
+    arr2d<char> readCharTable(int rows, int cols) {
+        return readTable<char>(rows, cols);
+    }
+
     string readLine() {
         int c = get();
         if (c == EOF) {
@@ -806,17 +785,16 @@ public:
 #endif
             return "";
         }
-        vec<char> res;
+        string res;
         do {
             res.push_back(c);
             c = get();
         } while (c != '\n' && c != '\r' && c != EOF);
-        return string(all(res));
+        return res;
     }
 
     double readDouble() {
-        skipWhitespace();
-        int c = get();
+        int c = skipWhitespace();
         int sgn = 1;
         if (c == '-') {
             sgn = -1;
@@ -863,8 +841,7 @@ public:
     }
 
     char readChar() {
-        skipWhitespace();
-        int c = get();
+        int c = skipWhitespace();
         if (c == EOF) {
 #ifdef LOCAL
             throw "Input exhausted";
@@ -875,6 +852,15 @@ public:
     }
 
     bool isExhausted() { return exhausted; }
+
+    void setBufSize(int newBufSize) {
+        if (newBufSize > bufSize) {
+            char* newBuf = new char[newBufSize];
+            memcpy(newBuf, buf, bufSize);
+            buf = newBuf;
+        }
+        bufSize = newBufSize;
+    }
 };
 
 template <>
@@ -902,10 +888,12 @@ string Input::readType() {
     return readString();
 }
 
+Input in;
+
 
 class Output {
 private:
-    ostream& out;
+    ostream& out = cout;
 
     template <typename T>
     void printSingle(const T& value) {
@@ -913,7 +901,7 @@ private:
     }
 
     template <typename T>
-    void printSingle(const vec<T>& array) {
+    void printSingle(const vector<T>& array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -957,7 +945,7 @@ private:
     }
 
 public:
-    Output(ostream& out) : out(out) {
+    Output() {//ostream& out) : out(out) {
         out << fixed << setprecision(20);
     }
 
@@ -981,31 +969,187 @@ public:
     void flush() {
         out.flush();
     }
+
+    void setPrecision(int digs) {
+        out << fixed << setprecision(digs);
+    }
+};
+
+Output out;
+
+
+class ReverseNumberIterator : public NumberIterator {
+public:
+    ReverseNumberIterator(int v) : NumberIterator(v) {}
+
+    ReverseNumberIterator& operator++() {
+        --v;
+        return *this;
+    }
+};
+
+class RevRange : pii {
+public:
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
+
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
+
+    ReverseNumberIterator begin() {
+        return first;
+    }
+
+    ReverseNumberIterator end() {
+        return second;
+    }
 };
 
 
-class tast {
+class TaskD {
 public:
-    void solve(istream& inp, ostream& outp) {
-        Input in(inp);
-        Output out(outp);
-
-        vi b({1, 2, 3});
-        arr<vi> a(10);
-        for (int i : range(10)) {
-            a[i] = vi(10);
+    void solve() {
+        in.setBufSize(1);
+        int n = in.readInt();
+        arri sets(n + 1);
+        arri strs(n + 1);
+        sets[0] = in.readInt();
+        strs[0] = in.readInt();
+        for (int i : range(n)) {
+            out.printLine('+', max(i - 1, 0) + 1);
+            out.flush();
+            sets[i + 1] = in.readInt();
+            strs[i + 1] = in.readInt();
         }
-        out.printLine(b);
+        vector<vi> vars;
+        vars.push_back(vi());
+        arri base(n);
+        for (int i : range(n)) {
+            if (i != n - 1) {
+                int delta = sets[i + 2] - sets[i + 1];
+                if (delta == 0) {
+                    base[i] = i == 0 ? 2 : 1;
+                } else {
+                    for (int x : range(1, n + 5)) {
+                        if ((x - 1) * (x - 2) / 2 == delta) {
+                            base[i] = x;
+                            break;
+                        }
+                    }
+                }
+                if (base[i] == 1) {
+                    vector<vi> nvars;
+                    for (const auto& v : vars) {
+                        vi nv = v;
+                        nv.push_back(1);
+                        nvars.push_back(nv);
+                        nv = v;
+                        nv.push_back(2);
+                        nvars.push_back(nv);
+                    }
+                    vars.swap(nvars);
+                } else {
+                    for (auto& v : vars) {
+                        v.push_back(base[i]);
+                    }
+                }
+            } else {
+                int delta = sets[n];
+                for (int j : range(n - 1)) {
+                    delta -= base[j] * (base[j] - 1) * (base[j] - 2) / 6;
+                }
+                if (delta == 0) {
+                    base[n - 1] = 0;
+                    vector<vi> nvars;
+                    for (const auto& v : vars) {
+                        vi nv = v;
+                        nv.push_back(1);
+                        nvars.push_back(nv);
+                        nv = v;
+                        nv.push_back(2);
+                        nvars.push_back(nv);
+                        nv = v;
+                        nv.push_back(3);
+                        nvars.push_back(nv);
+                    }
+                    vars.swap(nvars);
+                } else {
+                    for (int x : range(n + 5)) {
+                        if (x * (x - 1) * (x - 2) / 6 == delta) {
+                            base[i] = x + 1;
+                            break;
+                        }
+                    }
+                    for (auto& v : vars) {
+                        v.push_back(base[i]);
+                    }
+                }
+            }
+            vector<vi> nvars;
+            for (const auto& v : vars) {
+                bool good = true;
+                if (i >= 4) {
+                    int val = v[i - 4] * v[i - 3] + v[i - 3] * (v[i - 1] - 1) + (v[i - 1] - 1) * (v[i] - 1);
+                    if (val != strs[i] - strs[i - 1]) {
+                        good = false;
+                    }
+                } else if (i == 3) {
+                    int val = v[i - 3] * (v[i - 1] - 1) + (v[i - 1] - 1) * (v[i] - 1);
+                    if (val != strs[i] - strs[i - 1]) {
+                        good = false;
+                    }
+                } else if (i == 2) {
+                    int val = (v[i - 1] - 1) * (v[i] - 1);
+                    if (val != strs[i] - strs[i - 1]) {
+                        good = false;
+                    }
+                }
+                if (good && i == n - 1) {
+                    int val = v[i - 3] * v[i - 2] + v[i - 2] * (v[i] - 1);
+                    if (val != strs[n] - strs[n - 1]) {
+                        good = false;
+                    }
+                }
+                if (good) {
+                    nvars.push_back(v);
+                }
+            }
+            nvars.swap(vars);
+        }
+        vector<vi> nvars;
+        for (auto& v : vars) {
+            v[n - 1]--;
+            int total = 0;
+            for (int i : range(n - 2)) {
+                total += v[i] * v[i + 1] * v[i + 2];
+            }
+            if (total == strs[n]) {
+                nvars.push_back(v);
+            }
+        }
+        if (nvars.size() != 1) {
+            throw "Jopa";
+        }
+        vi v = nvars[0];
+        for (int i : range(n - 1)) {
+            v[i]--;
+        }
+        v[0]--;
+        out.print("! ");
+        out.printLine(v);
+        out.flush();
     }
 };
 
 
 int main() {
+#ifdef LOCAL
+    signal(SIGABRT, &signalHandler);
+#endif
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    tast solver;
-    std::istream& in(std::cin);
-    std::ostream& out(std::cout);
-    solver.solve(in, out);
+    TaskD solver;
+
+
+    solver.solve();
+    fflush(stdout);
     return 0;
 }

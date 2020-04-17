@@ -25,9 +25,6 @@ class arr {
 public:
     arr(int n = 0) {
         allocate(n);
-        for (int i : range(n)) {
-            ::new((void*)(b + i)) T;
-        }
 #ifdef LOCAL
         view();
 #endif
@@ -131,7 +128,7 @@ void decreaseByOne(arr<T>& array, Vs&...vs) {
 }
 
 template <typename T, typename U>
-void decreaseByOne(arr<pair<T, U> >& v) {
+void decreaseByOne(arr<pair<T, U>>& v) {
     for (auto& p : v) {
         p.first--;
         p.second--;

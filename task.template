@@ -4,10 +4,6 @@
 
 class %ClassName% {
 public:
-	void solve(istream& inp, ostream& outp) {
-        Input in(inp);
-        Output out(outp);
-
-
+	void solve() {
 	}
 };

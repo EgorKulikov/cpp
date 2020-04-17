@@ -1,11 +1,12 @@
 #pragma once
 
+#include <functional>
 #include "../general.h"
 #include "../collections/arr.h"
 #include "graph.h"
 
 struct HLDecomposition {
-    vec<vi> paths;
+    vector<vi> paths;
     arri id;
     arri pos;
 
@@ -29,7 +30,7 @@ struct HLDecomposition {
         pos = arri(n);
         id[root] = 0;
         pos[root] = 0;
-        paths.push_back(vi(1, root));
+        paths.emplace_back(1, root);
         function<void(int, int)> build = [&](int vert, int last) {
             if (last != -1) {
                 if (2 * size[vert] >= size[last]) {
@@ -39,7 +40,7 @@ struct HLDecomposition {
                 } else {
                     id[vert] = paths.size();
                     pos[vert] = 0;
-                    paths.push_back(vi(1, vert));
+                    paths.emplace_back(1, vert);
                 }
             }
             for (auto* e : graph[vert]) {

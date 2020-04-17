@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ostream>
+#include <unordered_map>
 #include "../general.h"
 
 const int MOD7 = 1000000007;
@@ -24,7 +26,11 @@ class modint {
 public:
     int n;
     modint() : n(0) {}
-    modint(ll n) {
+    modint(ll n, bool special = false) {
+        if (special) {
+            this->n = -1;
+            return;
+        }
         if (n >= 0 && n < mod) {
             this->n = n;
             return;
@@ -36,6 +42,11 @@ public:
         this->n = n;
     }
     modint& operator +=(const modint& other) {
+#ifdef LOCAL
+        if (n == -1 || other.n == -1) {
+            throw "Illegal state";
+        }
+#endif
         n += other.n;
         if (n >= mod) {
             n -= mod;
@@ -43,6 +54,11 @@ public:
         return *this;
     }
     modint& operator -=(const modint& other) {
+#ifdef LOCAL
+        if (n == -1 || other.n == -1) {
+            throw "Illegal state";
+        }
+#endif
         n -= other.n;
         if (n < 0) {
             n += mod;
@@ -50,6 +66,11 @@ public:
         return *this;
     }
     modint& operator *=(const modint& other) {
+#ifdef LOCAL
+        if (n == -1 || other.n == -1) {
+            throw "Illegal state";
+        }
+#endif
         n = ll(n) * other.n % mod;
         return *this;
     }
@@ -58,16 +79,29 @@ public:
         if (other.n == 0) {
             throw "Division by zero";
         }
+        if (n == -1 || other.n == -1) {
+            throw "Illegal state";
+        }
 #endif
         return *this *= other.inverse();
     }
     modint operator -() {
+#ifdef LOCAL
+        if (n == -1) {
+            throw "Illegal state";
+        }
+#endif
         if (n == 0) {
             return 0;
         }
         return modint(mod - n);
     }
     modint inverse() const {
+#ifdef LOCAL
+        if (n == -1) {
+            throw "Illegal state";
+        }
+#endif
         ll x, y;
         ll g = gcd(ll(n), ll(mod), x, y);
 #ifdef LOCAL
@@ -79,6 +113,8 @@ public:
     }
     int log(modint alpha);
 };
+
+modint nullModint(-1, true);
 
 modint operator +(const modint& a, const modint& b) {
     return modint(a) += b;
@@ -118,6 +154,11 @@ namespace std {
 }
 
 int modint::log(modint alpha) {
+#ifdef LOCAL
+    if (n == -1 || alpha.n == -1) {
+        throw "Illegal state";
+    }
+#endif
     unordered_map<modint, int> base;
     int exp = 0;
     modint pow = 1;

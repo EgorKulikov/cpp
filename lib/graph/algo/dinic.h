@@ -1,15 +1,18 @@
 #pragma once
 
-#include "graph.h"
-#include "../collections/arr.h"
+#include <limits>
+#include <functional>
+#include "../graph.h"
+#include "../../collections/arr.h"
+#include "../../collections/queue.h"
 
 template <class Edge, typename C>
-C maxFlow(Graph<Edge>& graph, int source, int destination) {
+C dinic(Graph<Edge>& graph, int source, int destination) {
     arri dist(graph.vertexCount);
     arri nextEdge(graph.vertexCount);
     C inf = numeric_limits<C>::max();
     C totalFlow = 0;
-    queue<int> q;
+    que<int> q;
     auto edgeDistances = [&]() {
         fill(all(dist), -1);
         dist[source] = 0;

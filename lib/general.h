@@ -1,12 +1,21 @@
 #pragma once
 
-#include "collections/vector.h"
+#include <vector>
+
+using namespace std;
 
 #define all(v) (v).begin(), (v).end()
 
 using ll = long long;
 using ld = long double;
 using pii = pair<int, int>;
+using vi = vector<int>;
+
+#ifdef LOCAL
+void signalHandler(int) {
+    throw "Abort detected";
+}
+#endif
 
 void doReplace() {
 }

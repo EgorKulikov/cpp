@@ -1,11 +1,12 @@
 #pragma once
 
+#include <algorithm>
 #include "general.h"
 #include "collections/arr.h"
 #include "range/range.h"
 
 template <typename T>
-inline void unique(vec<T>& v) {
+inline void unique(vector<T>& v) {
     v.resize(unique(all(v)) - v.begin());
 }
 
@@ -26,7 +27,7 @@ arri inverse(const arri& p) {
 }
 
 template <typename T, typename Iterator>
-inline void addAll(vec<T>& v, Iterator begin, Iterator end) {
+inline void addAll(vector<T>& v, Iterator begin, Iterator end) {
     v.insert(v.end(), begin, end);
 }
 

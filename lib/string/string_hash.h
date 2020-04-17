@@ -1,5 +1,6 @@
 #pragma once
 
+#include <random>
 #include "../general.h"
 #include "../numbers/modulo.h"
 #include "../numbers/primes.h"
@@ -28,10 +29,10 @@ namespace string_hash {
     }
 
 
-    vec<modint> firstRevPow;
-    vec<modint> secondRevPow;
-    vec<modint> firstPower;
-    vec<modint> secondPower;
+    vector<modint> firstRevPow;
+    vector<modint> secondRevPow;
+    vector<modint> firstPower;
+    vector<modint> secondPower;
 
     void ensureCapacity(int n) {
         int wasMod = mod;

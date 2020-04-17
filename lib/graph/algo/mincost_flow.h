@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../general.h"
-#include "graph.h"
-#include "../collections/arr.h"
-#include "../range/range.h"
-#include "../collections/indexed_heap.h"
-#include "../range/rev_range.h"
+#include "../../general.h"
+#include "../graph.h"
+#include "../../collections/arr.h"
+#include "../../range/range.h"
+#include "../../collections/indexed_heap.h"
+#include "../../range/rev_range.h"
 
 template <class Edge>
 pair<ll, ll> minCostFlow(Graph<Edge>& orGraph, int source, int sink, bool onlyNegative = false) {

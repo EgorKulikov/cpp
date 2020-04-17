@@ -1,20 +1,21 @@
 #pragma once
 
+#include <random>
 #include "../general.h"
 
 random_device rd;
 mt19937_64 gen(rd());
 
 template<typename T, typename Data>
-class TreapNode {
+class Node {
 public:
     ll priority = gen();
     T key;
     Data data;
-    TreapNode *left;
-    TreapNode *right;
+    Node *left;
+    Node *right;
 
-    TreapNode(T key, Data data = Data(), TreapNode *left = nullptr, TreapNode *right = nullptr) : key(key), data(data), left(left), right(right) {
+    Node(T key, Data data = Data(), Node *left = nullptr, Node *right = nullptr) : key(key), data(data), left(left), right(right) {
         dataUpdate();
     }
 
@@ -22,22 +23,22 @@ public:
         data.update(left, right);
     }
 
-    pair<TreapNode<T, Data>*, TreapNode<T, Data>*> split(T splitKey) {
-        if (key < splitKey) {
-            auto result = right == nullptr ? make_pair(nullptr, nullptr) : right->split(splitKey);
+    pair<Node<T, Data>*, Node<T, Data>*> split(T splitKey, bool toLeft = false) {
+        if (toLeft ? key <= splitKey : key < splitKey) {
+            auto result = right == nullptr ? make_pair(nullptr, nullptr) : right->split(splitKey, toLeft);
             right = result.first;
             dataUpdate();
             result.first = this;
             return result;
         }
-        auto result = left == nullptr ? make_pair(nullptr, nullptr) : left->split(splitKey);
+        auto result = left == nullptr ? make_pair(nullptr, nullptr) : left->split(splitKey, toLeft);
         left = result.second;
         dataUpdate();
         result.second = this;
         return result;
     }
 
-    TreapNode<T, Data>* leftmost() {
+    Node<T, Data>* leftmost() {
         if (left == nullptr) {
             return this;
         }
@@ -46,7 +47,7 @@ public:
 };
 
 template<typename T, typename Data>
-TreapNode<T, Data> *merge(TreapNode<T, Data> *left, TreapNode<T, Data> *right) {
+Node<T, Data> *merge(Node<T, Data> *left, Node<T, Data> *right) {
     if (left == nullptr) {
         return right;
     }
@@ -68,7 +69,7 @@ public:
     int size;
 
     template <typename T>
-    void update(TreapNode<T, SizeData>* left, TreapNode<T, SizeData>* right) {
+    void update(Node<T, SizeData>* left, Node<T, SizeData>* right) {
         size = 1 + (left == nullptr ? 0 : left->data.size) + (right == nullptr ? 0 : right->data.size);
     }
 };

@@ -1,18 +1,20 @@
 #pragma once
 
+#include <iostream>
+#include <iomanip>
 #include "../general.h"
 #include "../collections/arr.h"
 #include "../collections/mdarr.h"
 
 class Output {
 private:
-    ostream& out;
+    ostream& out = cout;
 
     template<typename T> void printSingle(const T& value) {
         out << value;
     }
 
-    template<typename T> void printSingle(const vec<T>& array) {
+    template<typename T> void printSingle(const vector<T>& array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -50,7 +52,7 @@ private:
     }
 
 public:
-    Output(ostream& out) : out(out) {
+    Output() {//ostream& out) : out(out) {
         out << fixed << setprecision(20);
     }
 
@@ -74,4 +76,10 @@ public:
     void flush() {
         out.flush();
     }
+
+    void setPrecision(int digs) {
+        out << fixed << setprecision(digs);
+    }
 };
+
+Output out;
