@@ -5,6 +5,7 @@
 #include "graph.h"
 #include "../misc.h"
 #include "../collections/mdarr.h"
+#include "../bits.h"
 
 class LCA {
 private:

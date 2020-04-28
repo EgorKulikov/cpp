@@ -1,7 +1,6 @@
 #pragma once
 
 #include <limits>
-#include <functional>
 #include "../graph.h"
 #include "../../collections/arr.h"
 #include "../../collections/queue.h"
@@ -31,7 +30,7 @@ C dinic(Graph<Edge>& graph, int source, int destination) {
             }
         }
     };
-    function<C(int, C)> dinicImpl = [&] (int source, C flow) {
+    function<C(int, C)> dinicImpl = [&] (int source, C flow) -> C {
         if (source == destination) {
             return flow;
         }
@@ -62,7 +61,7 @@ C dinic(Graph<Edge>& graph, int source, int destination) {
         if (dist[destination] == -1) {
             break;
         }
-        fill(nextEdge.begin(), nextEdge.end(), 0);
+        fill(all(nextEdge), 0);
         totalFlow += dinicImpl(source, inf);
     }
     return totalFlow;

@@ -6,15 +6,23 @@
 
 
 
+#include <cstdio>
+#include <cctype>
+#include <string>
+#include <cstring>
 
 
-#include <bits/stdc++.h>
+#include <vector>
+#include <functional>
 
 using namespace std;
 
 #define all(v) (v).begin(), (v).end()
 
 using ll = long long;
+using ull = unsigned long long;
+using li = __int128;
+using uli = unsigned __int128;
 using ld = long double;
 using pii = pair<int, int>;
 using vi = vector<int>;
@@ -70,6 +78,9 @@ D dPower(D base, ll exponent) {
         return res * res;
     }
 }
+
+
+#include <algorithm>
 
 
 class NumberIterator : iterator<forward_iterator_tag, int> {
@@ -136,14 +147,10 @@ public:
 #endif
     }
 
-    arr(initializer_list<T> l) {
-        allocate(n);
+    arr(initializer_list<T> l) : arr(l.size()) {
         if (n > 0) {
             memcpy(b, l.begin(), n * sizeof(T));
         }
-#ifdef LOCAL
-        view();
-#endif
     }
 
     arr(T* b, int n) : arr(b, b + n) {}
@@ -345,246 +352,6 @@ public:
     }
 };
 
-template <typename T>
-class arr3d {
-    T* b;
-    int d1;
-    int d2;
-    int d3;
-    int shift;
-    int sz;
-
-    void allocate(int n) {
-#ifdef LOCAL
-        if (n < 0) {
-            throw "bad alloc";
-        }
-#endif
-        if (n > 0) {
-            b = (T*) (::operator new(n * sizeof(T)));
-        } else {
-            b = nullptr;
-        }
-    }
-
-public:
-    arr3d(int d1 = 0, int d2 = 0, int d3 = 0) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
-#ifdef LOCAL
-        if (d1 < 0 || d2 < 0 || d3 < 0) {
-            throw "bad alloc";
-        }
-#endif
-        allocate(sz);
-        for (int i : range(sz)) {
-            ::new((void*) (b + i)) T;
-        }
-#ifdef LOCAL
-        view();
-#endif
-    }
-
-    arr3d(int d1, int d2, int d3, const T& init) : d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {
-#ifdef LOCAL
-        if (d1 < 0 || d2 < 0 || d3 < 0) {
-            throw "bad alloc";
-        }
-#endif
-        allocate(sz);
-        for (int i : range(sz)) {
-            ::new((void*) (b + i)) T(init);
-        }
-#ifdef LOCAL
-        view();
-#endif
-    }
-
-    arr3d(T* b, int d1, int d2, int d3) : b(b), d1(d1), d2(d2), d3(d3), shift(d2 * d3), sz(d1 * d2 * d3) {}
-
-    int size() const {
-        return sz;
-    }
-
-    int dim1() const {
-        return d1;
-    }
-
-    int dim2() const {
-        return d2;
-    }
-
-    int dim3() const {
-        return d3;
-    }
-
-    T* begin() {
-        return b;
-    }
-
-    T* end() {
-        return b + sz;
-    }
-
-    T& operator()(int i1, int i2, int i3) {
-#ifdef LOCAL
-        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
-            throw "Out of bounds";
-        }
-#endif
-        return b[i1 * shift + i2 * d3 + i3];
-    }
-
-    const T& operator()(int i1, int i2, int i3) const {
-#ifdef LOCAL
-        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3) {
-            throw "Out of bounds";
-        }
-#endif
-        return b[i1 * shift + i2 * d3 + i3];
-    }
-
-    arr2d<T> operator[](int at) {
-#ifdef LOCAL
-        if (at < 0 || at >= d1) {
-            throw "Out of bounds";
-        }
-#endif
-        return arr2d<T>(b + at * shift, d2, d3);
-    }
-
-    vector<vector<vector<T>>> view() {
-        vector<vector<vector<T>>> res(min(d1, 50));
-        for (int i = 0; i < res.size(); ++i) {
-            res[i] = (*this)[i].view();
-        }
-        return res;
-    }
-};
-
-template <typename T>
-class arr4d {
-    T* b;
-    int d1;
-    int d2;
-    int d3;
-    int d4;
-    int shift1;
-    int shift2;
-    int sz;
-
-    void allocate(int n) {
-#ifdef LOCAL
-        if (n < 0) {
-            throw "bad alloc";
-        }
-#endif
-        if (n > 0) {
-            b = (T*) (::operator new(n * sizeof(T)));
-        } else {
-            b = nullptr;
-        }
-    }
-
-public:
-    arr4d(int d1 = 0, int d2 = 0, int d3 = 0, int d4 = 0) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
-                                                            shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
-#ifdef LOCAL
-        if (d1 < 0 || d2 < 0 || d3 < 0) {
-            throw "bad alloc";
-        }
-#endif
-        allocate(sz);
-        for (int i : range(sz)) {
-            ::new((void*) (b + i)) T;
-        }
-#ifdef LOCAL
-        view();
-#endif
-    }
-
-    arr4d(int d1, int d2, int d3, int d4, const T& init) : d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
-                                                           shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
-#ifdef LOCAL
-        if (d1 < 0 || d2 < 0 || d3 < 0) {
-            throw "bad alloc";
-        }
-#endif
-        allocate(sz);
-        for (int i : range(sz)) {
-            ::new((void*) (b + i)) T(init);
-        }
-#ifdef LOCAL
-        view();
-#endif
-    }
-
-    arr4d(T* b, int d1, int d2, int d3, int d4) : b(b), d1(d1), d2(d2), d3(d3), d4(d4), shift1(d2 * d3 * d4),
-                                                  shift2(d3 * d4), sz(d1 * d2 * d3 * d4) {
-    }
-
-    int size() const {
-        return sz;
-    }
-
-    int dim1() const {
-        return d1;
-    }
-
-    int dim2() const {
-        return d2;
-    }
-
-    int dim3() const {
-        return d3;
-    }
-
-    int dim4() const {
-        return d4;
-    }
-
-    T* begin() {
-        return b;
-    }
-
-    T* end() {
-        return b + sz;
-    }
-
-    T& operator()(int i1, int i2, int i3, int i4) {
-#ifdef LOCAL
-        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3 || i4 < 0 || i4 >= d4) {
-            throw "Out of bounds";
-        }
-#endif
-        return b[i1 * shift1 + i2 * shift2 + i3 * d4 + i4];
-    }
-
-    const T& operator()(int i1, int i2, int i3, int i4) const {
-#ifdef LOCAL
-        if (i1 < 0 || i1 >= d1 || i2 < 0 || i2 >= d2 || i3 < 0 || i3 >= d3 || i4 < 0 || i4 >= d4) {
-            throw "Out of bounds";
-        }
-#endif
-        return b[i1 * shift1 + i2 * shift2 + i3 * d4 + i4];
-    }
-
-    arr3d<T> operator[](int at) {
-#ifdef LOCAL
-        if (at < 0 || at >= d1) {
-            throw "Out of bounds";
-        }
-#endif
-        return arr3d<T>(b + at * shift1, d2, d3, d4);
-    }
-
-    vector<vector<vector<vector<T>>>> view() {
-        vector<vector<vector<vector<T>>>> res(min(d1, 50));
-        for (int i = 0; i < res.size(); ++i) {
-            res[i] = (*this)[i].view();
-        }
-        return res;
-    }
-};
-
 
 inline bool isWhitespace(int c) {
     return isspace(c) || c == EOF;
@@ -680,7 +447,7 @@ public:
         return readInteger<int>();
     }
 
-    ll readLong() {
+    inline ll readLong() {
         return readInteger<ll>();
     }
 
@@ -793,7 +560,7 @@ public:
         return res;
     }
 
-    double readDouble() {
+    inline double readDouble() {
         int c = skipWhitespace();
         int sgn = 1;
         if (c == '-') {
@@ -840,7 +607,7 @@ public:
         return res * sgn;
     }
 
-    char readChar() {
+    inline char readChar() {
         int c = skipWhitespace();
         if (c == EOF) {
 #ifdef LOCAL
@@ -851,9 +618,9 @@ public:
         return c;
     }
 
-    bool isExhausted() { return exhausted; }
+    inline bool isExhausted() { return exhausted; }
 
-    void setBufSize(int newBufSize) {
+    inline void setBufSize(int newBufSize) {
         if (newBufSize > bufSize) {
             char* newBuf = new char[newBufSize];
             memcpy(newBuf, buf, bufSize);
@@ -864,31 +631,35 @@ public:
 };
 
 template <>
-double Input::readType() {
+inline double Input::readType() {
     return readDouble();
 }
 
 template <>
-int Input::readType() {
+inline int Input::readType() {
     return readInt();
 }
 
 template <>
-ll Input::readType() {
+inline ll Input::readType() {
     return readLong();
 }
 
 template <>
-char Input::readType() {
+inline char Input::readType() {
     return readChar();
 }
 
 template <>
-string Input::readType() {
+inline string Input::readType() {
     return readString();
 }
 
 Input in;
+
+
+#include <iostream>
+#include <iomanip>
 
 
 class Output {
@@ -896,7 +667,7 @@ private:
     ostream& out = cout;
 
     template <typename T>
-    void printSingle(const T& value) {
+    inline void printSingle(const T& value) {
         out << value;
     }
 
@@ -940,19 +711,19 @@ private:
     }
 
     template <typename T, typename U>
-    void printSingle(const pair<T, U>& value) {
+    inline void printSingle(const pair<T, U>& value) {
         out << value.first << ' ' << value.second;
     }
 
 public:
-    Output() {//ostream& out) : out(out) {
+    Output() {
         out << fixed << setprecision(20);
     }
 
-    void print() {}
+    inline void print() {}
 
     template <typename T, typename...Targs>
-    void print(const T& first, const Targs... args) {
+    inline void print(const T& first, const Targs... args) {
         printSingle(first);
         if (sizeof...(args) != 0) {
             out << ' ';
@@ -961,16 +732,16 @@ public:
     }
 
     template <typename...Targs>
-    void printLine(const Targs... args) {
+    inline void printLine(const Targs... args) {
         print(args...);
         out << '\n';
     }
 
-    void flush() {
+    inline void flush() {
         out.flush();
     }
 
-    void setPrecision(int digs) {
+    inline void setPrecision(int digs) {
         out << fixed << setprecision(digs);
     }
 };
@@ -978,164 +749,244 @@ public:
 Output out;
 
 
-class ReverseNumberIterator : public NumberIterator {
-public:
-    ReverseNumberIterator(int v) : NumberIterator(v) {}
+template <typename Value, Value defaultValue = 0>
+class ReadOnlySegmentTree {
+private:
+    const int size;
+    function<Value(Value, Value)> joinValue;
+    arr<Value> value;
 
-    ReverseNumberIterator& operator++() {
-        --v;
-        return *this;
+    void init(int root, int left, int right, const arr<Value>& array) {
+        if (left + 1 == right) {
+            value[root] = array[left];
+        } else {
+            int mid = (left + right) >> 1;
+            init(2 * root + 1, left, mid, array);
+            init(2 * root + 2, mid, right, array);
+            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
+        }
+    }
+
+    Value query(int root, int left, int right, int from, int to) const {
+        if (left >= from && right <= to) {
+            return value[root];
+        }
+        if (right <= from || left >= to) {
+            return defaultValue;
+        }
+        int mid = (left + right) >> 1;
+        Value lValue = query(2 * root + 1, left, mid, from, to);
+        Value rValue = query(2 * root + 2, mid, right, from, to);
+        return joinValue(lValue, rValue);
+    }
+
+public:
+    ReadOnlySegmentTree(const arr<Value>& array, function<Value(Value, Value)> joinValue) :
+            size(array.size()), joinValue(joinValue) {
+        int vertexSize = size * 4;
+        value = arr<Value>(vertexSize);
+        if (size > 0) {
+            init(0, 0, size, array);
+        }
+    }
+
+    Value query(int from, int to) const {
+        return query(0, 0, size, max(0, from), to);
     }
 };
 
-class RevRange : pii {
-public:
-    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
 
-    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
-
-    ReverseNumberIterator begin() {
-        return first;
+template <typename T>
+T gcd(T a, T b) {
+    a = abs(a);
+    b = abs(b);
+    while (b != 0) {
+        a = a % b;
+        swap(a, b);
     }
+    return a;
+}
 
-    ReverseNumberIterator end() {
-        return second;
+template <typename T>
+T lcm(T a, T b) {
+    return a / gcd(a, b) * b;
+}
+
+template <typename T>
+T power(const T& a, ll b) {
+    if (b == 0) {
+        return 1;
     }
-};
+    if ((b & 1) == 0) {
+        T res = power(a, b >> 1);
+        return res * res;
+    } else {
+        return power(a, b - 1) * a;
+    }
+}
+
+template <typename T>
+T factorial(int n) {
+    T result = 1;
+    for (int i = 2; i <= n; i++) {
+        result *= i;
+    }
+    return result;
+}
+
+template <typename T>
+arr<T> factorials(int length) {
+    arr<T> result(length);
+    if (length > 0) {
+        result[0] = 1;
+    }
+    for (int i = 1; i < length; i++) {
+        result[i] = result[i - 1] * i;
+    }
+    return result;
+}
+
+template <typename T>
+arr<T> powers(T base, int length) {
+    arr<T> result(length);
+    if (length > 0) {
+        result[0] = 1;
+    }
+    for (int i = 1; i < length; i++) {
+        result[i] = result[i - 1] * base;
+    }
+    return result;
+}
 
 
-class TaskD {
+inline bool isSubset(int set, int subSet) {
+    return (set & subSet) == subSet;
+}
+
+inline int bitCount(int x) {
+    return __builtin_popcount(x);
+}
+
+inline int bitCount(ll x) {
+    return __builtin_popcountll(x);
+}
+
+inline int highestOneBit(int x) {
+    return 1 << (31 - __builtin_clz(x | 1));
+}
+
+inline int binaryDigits(int x) {
+    return 32 - __builtin_clz(x | 1);
+}
+
+inline ll setBit(ll mask, int bit) {
+#ifdef LOCAL
+    if (bit < 0 || bit >= 64) {
+        throw "Bad index";
+    }
+#endif
+    mask |= 1ll << bit;
+    return mask;
+}
+
+inline int setBit(int mask, int bit) {
+#ifdef LOCAL
+    if (bit < 0 || bit >= 32) {
+        throw "Bad index";
+    }
+#endif
+    mask |= 1 << bit;
+    return mask;
+}
+
+inline ll unsetBit(ll mask, int bit) {
+#ifdef LOCAL
+    if (bit < 0 || bit >= 64) {
+        throw "Bad index";
+    }
+#endif
+    mask &= ~(1ll << bit);
+    return mask;
+}
+
+inline int unsetBit(int mask, int bit) {
+#ifdef LOCAL
+    if (bit < 0 || bit >= 32) {
+        throw "Bad index";
+    }
+#endif
+    mask &= ~(1 << bit);
+    return mask;
+}
+
+inline bool isSet(ll mask, int bit) {
+#ifdef LOCAL
+    if (bit < 0 || bit >= 64) {
+        throw "Bad index";
+    }
+#endif
+    return mask >> bit & 1;
+}
+
+inline bool isSet(int mask, int bit) {
+#ifdef LOCAL
+    if (bit < 0 || bit >= 32) {
+        throw "Bad index";
+    }
+#endif
+    return mask >> bit & 1;
+}
+
+#include <set>
+
+class SIMPLELCM {
 public:
     void solve() {
-        in.setBufSize(1);
         int n = in.readInt();
-        arri sets(n + 1);
-        arri strs(n + 1);
-        sets[0] = in.readInt();
-        strs[0] = in.readInt();
-        for (int i : range(n)) {
-            out.printLine('+', max(i - 1, 0) + 1);
-            out.flush();
-            sets[i + 1] = in.readInt();
-            strs[i + 1] = in.readInt();
-        }
-        vector<vi> vars;
-        vars.push_back(vi());
-        arri base(n);
-        for (int i : range(n)) {
-            if (i != n - 1) {
-                int delta = sets[i + 2] - sets[i + 1];
-                if (delta == 0) {
-                    base[i] = i == 0 ? 2 : 1;
-                } else {
-                    for (int x : range(1, n + 5)) {
-                        if ((x - 1) * (x - 2) / 2 == delta) {
-                            base[i] = x;
-                            break;
-                        }
-                    }
-                }
-                if (base[i] == 1) {
-                    vector<vi> nvars;
-                    for (const auto& v : vars) {
-                        vi nv = v;
-                        nv.push_back(1);
-                        nvars.push_back(nv);
-                        nv = v;
-                        nv.push_back(2);
-                        nvars.push_back(nv);
-                    }
-                    vars.swap(nvars);
-                } else {
-                    for (auto& v : vars) {
-                        v.push_back(base[i]);
-                    }
-                }
-            } else {
-                int delta = sets[n];
-                for (int j : range(n - 1)) {
-                    delta -= base[j] * (base[j] - 1) * (base[j] - 2) / 6;
-                }
-                if (delta == 0) {
-                    base[n - 1] = 0;
-                    vector<vi> nvars;
-                    for (const auto& v : vars) {
-                        vi nv = v;
-                        nv.push_back(1);
-                        nvars.push_back(nv);
-                        nv = v;
-                        nv.push_back(2);
-                        nvars.push_back(nv);
-                        nv = v;
-                        nv.push_back(3);
-                        nvars.push_back(nv);
-                    }
-                    vars.swap(nvars);
-                } else {
-                    for (int x : range(n + 5)) {
-                        if (x * (x - 1) * (x - 2) / 6 == delta) {
-                            base[i] = x + 1;
-                            break;
-                        }
-                    }
-                    for (auto& v : vars) {
-                        v.push_back(base[i]);
-                    }
+        auto a = in.readIntArray(n);
+
+        arri present(100001, 0);
+        for (int i : a) {
+            vector<pii> pp;
+            for (int j = 2; j * j <= i; j++) {
+                if (i % j == 0) {
+                    int q = 1;
+                    do {
+                        i /= j;
+                        q *= j;
+                    } while (i % j == 0);
+                    pp.emplace_back(j, q);
                 }
             }
-            vector<vi> nvars;
-            for (const auto& v : vars) {
-                bool good = true;
-                if (i >= 4) {
-                    int val = v[i - 4] * v[i - 3] + v[i - 3] * (v[i - 1] - 1) + (v[i - 1] - 1) * (v[i] - 1);
-                    if (val != strs[i] - strs[i - 1]) {
-                        good = false;
-                    }
-                } else if (i == 3) {
-                    int val = v[i - 3] * (v[i - 1] - 1) + (v[i - 1] - 1) * (v[i] - 1);
-                    if (val != strs[i] - strs[i - 1]) {
-                        good = false;
-                    }
-                } else if (i == 2) {
-                    int val = (v[i - 1] - 1) * (v[i] - 1);
-                    if (val != strs[i] - strs[i - 1]) {
-                        good = false;
+            if (i != 1) {
+                pp.emplace_back(i, i);
+            }
+            for (int j : range(1 << pp.size())) {
+                int at = 1;
+                int val = 1;
+                for (int k : range(pp.size())) {
+                    if (isSet(j, k)) {
+                        at *= pp[k].first;
+                        val *= pp[k].second;
                     }
                 }
-                if (good && i == n - 1) {
-                    int val = v[i - 3] * v[i - 2] + v[i - 2] * (v[i] - 1);
-                    if (val != strs[n] - strs[n - 1]) {
-                        good = false;
+                maxim(present[at], val);
+            }
+        }
+        set<pair<int, int>> best;
+        ll answer = 1;
+        for (int i : range(present.size())) {
+            if (present[i] != 0) {
+                for (const auto& p : best) {
+                    if (gcd(p.second, i) == 1) {
+                        maxim(answer, -ll(p.first) * present[i]);
+                        break;
                     }
                 }
-                if (good) {
-                    nvars.push_back(v);
-                }
-            }
-            nvars.swap(vars);
-        }
-        vector<vi> nvars;
-        for (auto& v : vars) {
-            v[n - 1]--;
-            int total = 0;
-            for (int i : range(n - 2)) {
-                total += v[i] * v[i + 1] * v[i + 2];
-            }
-            if (total == strs[n]) {
-                nvars.push_back(v);
+                best.emplace(-present[i], i);
             }
         }
-        if (nvars.size() != 1) {
-            throw "Jopa";
-        }
-        vi v = nvars[0];
-        for (int i : range(n - 1)) {
-            v[i]--;
-        }
-        v[0]--;
-        out.print("! ");
-        out.printLine(v);
-        out.flush();
+        out.printLine(answer);
     }
 };
 
@@ -1146,7 +997,7 @@ int main() {
 #endif
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    TaskD solver;
+    SIMPLELCM solver;
 
 
     solver.solve();

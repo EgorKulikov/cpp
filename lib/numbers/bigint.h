@@ -291,15 +291,22 @@ struct bigint {
         return stream;
     }
 
+    string toString() {
+        ostringstream out;
+        out << *this;
+        return out.str();
+    }
+
+
     static vector<modint> convert(const vi& z) {
         vector<modint> res;
-       for (int i : z) {
-           for (int j : range(base_digits)) {
-               res.push_back(i % 10);
-               i /= 10;
-           }
-       }
-       return res;
+        for (int i : z) {
+            for (int j : range(base_digits)) {
+                res.push_back(i % 10);
+                i /= 10;
+            }
+        }
+        return res;
     }
 
     bigint operator*(const bigint& v) const {

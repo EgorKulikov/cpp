@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include "../general.h"
 
 class NumberIterator : iterator<forward_iterator_tag, int> {

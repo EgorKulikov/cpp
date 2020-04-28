@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/TaskD.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/SIMPLELCM.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -34,7 +34,7 @@ int main() {
     signal(SIGABRT, &signalHandler);
 #endif
     std::vector<jhelper::Test> tests = {
-		{"5\n1 6\n2 9\n5 12\n5 24\n6 24\n", "+ 1\n+ 1\n+ 2\n+ 5\n! 2 1 3 0 2\n", true, true},
+		{"4\n12 9 1 8", "72\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -42,6 +42,11 @@ int main() {
 	double maxTime = 0.0;
 	for(const jhelper::Test& test: tests ) {
 		std::cout << "Test #" << ++testID << std::endl;
+		if (!test.active) {
+            std::cout << "SKIPPED\n";
+            std::cout << std::endl;
+            continue;
+		}
 		std::cout << "Input: \n" << test.input << std::endl;
 		if (test.has_output) {
 			std::cout << "Expected output: \n" << test.output << std::endl;
@@ -60,7 +65,7 @@ int main() {
 			std::clock_t start = std::clock();
 			try {
 			    in = Input();
-			    TaskD solver;
+			    SIMPLELCM solver;
 			    solver.solve();
 			    fflush(stdout);
 			    fclose(stdout);

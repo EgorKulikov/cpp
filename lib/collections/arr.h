@@ -40,14 +40,10 @@ public:
 #endif
     }
 
-    arr(initializer_list<T> l) {
-        allocate(n);
+    arr(initializer_list<T> l) : arr(l.size()) {
         if (n > 0) {
             memcpy(b, l.begin(), n * sizeof(T));
         }
-#ifdef LOCAL
-        view();
-#endif
     }
 
     arr(T* b, int n) : arr(b, b + n) {}

@@ -16,12 +16,20 @@ public:
         data = new T[rows * cols];
     }
 
-    T* operator[](int row) {
+    inline T* operator[](int row) {
         return data + (row * cols);
     }
 
-    const T* operator[](int row) const {
+    inline const T* operator[](int row) const {
         return data + (row * cols);
+    }
+
+    inline T& operator()(int row, int col) {
+        return data[row * cols + col];
+    }
+
+    inline const T& operator()(int row, int col) const {
+        return data[row * cols + col];
     }
 
     Matrix<T> power(ll exponent) const;
@@ -36,7 +44,7 @@ void multiply(Matrix<T>& c, const Matrix<T>& a, const Matrix<T>& b) {
     for (int i = 0; i < c.rows; i++) {
         for (int j = 0; j < b.rows; j++) {
             for (int k = 0; k < c.cols; k++) {
-                c[i][k] += a[i][j] * b[j][k];
+                c(i, k) += a(i, j) * b(j, k);
             }
         }
     }

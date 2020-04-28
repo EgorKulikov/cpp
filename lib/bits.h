@@ -22,22 +22,44 @@ inline int binaryDigits(int x) {
     return 32 - __builtin_clz(x | 1);
 }
 
-inline void setBit(ll& mask, int bit) {
+inline ll setBit(ll mask, int bit) {
 #ifdef LOCAL
     if (bit < 0 || bit >= 64) {
         throw "Bad index";
     }
 #endif
     mask |= 1ll << bit;
+    return mask;
 }
 
-inline void setBit(int& mask, int bit) {
+inline int setBit(int mask, int bit) {
 #ifdef LOCAL
     if (bit < 0 || bit >= 32) {
         throw "Bad index";
     }
 #endif
     mask |= 1 << bit;
+    return mask;
+}
+
+inline ll unsetBit(ll mask, int bit) {
+#ifdef LOCAL
+    if (bit < 0 || bit >= 64) {
+        throw "Bad index";
+    }
+#endif
+    mask &= ~(1ll << bit);
+    return mask;
+}
+
+inline int unsetBit(int mask, int bit) {
+#ifdef LOCAL
+    if (bit < 0 || bit >= 32) {
+        throw "Bad index";
+    }
+#endif
+    mask &= ~(1 << bit);
+    return mask;
 }
 
 inline bool isSet(ll mask, int bit) {

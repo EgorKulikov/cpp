@@ -1,6 +1,5 @@
 #pragma once
 
-#include <functional>
 #include "../general.h"
 #include "primes.h"
 

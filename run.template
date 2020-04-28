@@ -42,6 +42,11 @@ int main() {
 	double maxTime = 0.0;
 	for(const jhelper::Test& test: tests ) {
 		std::cout << "Test #" << ++testID << std::endl;
+		if (!test.active) {
+            std::cout << "SKIPPED\n";
+            std::cout << std::endl;
+            continue;
+		}
 		std::cout << "Input: \n" << test.input << std::endl;
 		if (test.has_output) {
 			std::cout << "Expected output: \n" << test.output << std::endl;

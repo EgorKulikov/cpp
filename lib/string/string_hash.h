@@ -63,7 +63,7 @@ namespace string_hash {
             if (secondPower.empty()) {
                 secondPower.push_back(1);
             } else {
-                secondPower.push_back(firstPower.back() * multiplier);
+                secondPower.push_back(secondPower.back() * multiplier);
             }
         }
         mod = wasMod;

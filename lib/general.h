@@ -1,12 +1,16 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 
 using namespace std;
 
 #define all(v) (v).begin(), (v).end()
 
 using ll = long long;
+using ull = unsigned long long;
+using li = __int128;
+using uli = unsigned __int128;
 using ld = long double;
 using pii = pair<int, int>;
 using vi = vector<int>;

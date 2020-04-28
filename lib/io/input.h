@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cctype>
 #include <string>
+#include <cstring>
 #include "../general.h"
 #include "../numbers/doubles.h"
 #include "../collections/arr.h"
@@ -102,7 +103,7 @@ public:
         return readInteger<int>();
     }
 
-    ll readLong() {
+    inline ll readLong() {
         return readInteger<ll>();
     }
 
@@ -216,7 +217,7 @@ public:
         return res;
     }
 
-    double readDouble() {
+    inline double readDouble() {
         int c = skipWhitespace();
         int sgn = 1;
         if (c == '-') {
@@ -263,7 +264,7 @@ public:
         return res * sgn;
     }
 
-    char readChar() {
+    inline char readChar() {
         int c = skipWhitespace();
         if (c == EOF) {
 #ifdef LOCAL
@@ -274,9 +275,9 @@ public:
         return c;
     }
 
-    bool isExhausted() { return exhausted; }
+    inline bool isExhausted() { return exhausted; }
 
-    void setBufSize(int newBufSize) {
+    inline void setBufSize(int newBufSize) {
         if (newBufSize > bufSize) {
             char* newBuf = new char[newBufSize];
             memcpy(newBuf, buf, bufSize);
@@ -287,27 +288,27 @@ public:
 };
 
 template<>
-double Input::readType() {
+inline double Input::readType() {
     return readDouble();
 }
 
 template<>
-int Input::readType() {
+inline int Input::readType() {
     return readInt();
 }
 
 template<>
-ll Input::readType() {
+inline ll Input::readType() {
     return readLong();
 }
 
 template<>
-char Input::readType() {
+inline char Input::readType() {
     return readChar();
 }
 
 template<>
-string Input::readType() {
+inline string Input::readType() {
     return readString();
 }
 

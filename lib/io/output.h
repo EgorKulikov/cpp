@@ -10,11 +10,13 @@ class Output {
 private:
     ostream& out = cout;
 
-    template<typename T> void printSingle(const T& value) {
+    template<typename T>
+    inline void printSingle(const T& value) {
         out << value;
     }
 
-    template<typename T> void printSingle(const vector<T>& array) {
+    template<typename T>
+    void printSingle(const vector<T>& array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -23,7 +25,8 @@ private:
             }
         }
     }
-    template<typename T> void printSingle(const arr<T>& array) {
+    template<typename T>
+    void printSingle(const arr<T>& array) {
         size_t n = array.size();
         for (int i = 0; i < n; ++i) {
             out << array[i];
@@ -32,7 +35,8 @@ private:
             }
         }
     }
-    template<typename T> void printSingle(const arr2d<T>& array) {
+    template<typename T>
+    void printSingle(const arr2d<T>& array) {
         size_t n = array.dim1();
         size_t m = array.dim2();
         for (int i = 0; i < n; ++i) {
@@ -47,19 +51,20 @@ private:
             }
         }
     }
-    template<typename T, typename U> void printSingle(const pair<T, U>& value) {
+    template<typename T, typename U>
+    inline void printSingle(const pair<T, U>& value) {
         out << value.first << ' ' << value.second;
     }
 
 public:
-    Output() {//ostream& out) : out(out) {
+    Output() {
         out << fixed << setprecision(20);
     }
 
-    void print() {}
+    inline void print() {}
 
     template<typename T, typename...Targs>
-    void print(const T& first, const Targs... args) {
+    inline void print(const T& first, const Targs... args) {
         printSingle(first);
         if (sizeof...(args) != 0) {
             out << ' ';
@@ -68,16 +73,16 @@ public:
     }
 
     template<typename...Targs>
-    void printLine(const Targs... args) {
+    inline void printLine(const Targs... args) {
         print(args...);
         out << '\n';
     }
 
-    void flush() {
+    inline void flush() {
         out.flush();
     }
 
-    void setPrecision(int digs) {
+    inline void setPrecision(int digs) {
         out << fixed << setprecision(digs);
     }
 };
