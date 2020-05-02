@@ -8,10 +8,10 @@ public:
     int vertexCount;
     int edgeCount = 0;
 private:
-    vector<vector<Edge*>> edges;
+    vector<basic_string<Edge*>> edges;
 
 public:
-    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vector<Edge*>()) {}
+    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, basic_string<Edge*>()) {}
 
     void addEdge(Edge* edge) {
 #ifdef LOCAL
@@ -44,7 +44,7 @@ public:
         addEdge(new Edge(args...));
     }
 
-    vector<Edge*>& operator [](int at) {
+    basic_string<Edge*>& operator [](int at) {
         return edges[at];
     }
 

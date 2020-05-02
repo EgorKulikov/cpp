@@ -5,6 +5,7 @@
 #include "../../collections/arr.h"
 #include "../../range/rev_range.h"
 #include "../edges/base_edge.h"
+#include "../../recursive_function.h"
 
 pair<arri, Graph<BaseEdge>> stronglyConnectedComponents(Graph<BaseEdge>& graph) {
     int n = graph.vertexCount;
@@ -12,13 +13,13 @@ pair<arri, Graph<BaseEdge>> stronglyConnectedComponents(Graph<BaseEdge>& graph) 
     arr<bool> visited(n, false);
     arri condensed(n);
     order.reserve(n);
-    function<void(int)> firstDFS = [&](int vert) {
+    RecursiveFunction firstDFS = [&](const auto& self, int vert) -> void {
         if (visited[vert]) {
             return;
         }
         visited[vert] = true;
         for (auto* e : graph[vert]) {
-            firstDFS(e->to);
+            self(e->to);
         }
         order.push_back(vert);
     };
@@ -39,7 +40,7 @@ pair<arri, Graph<BaseEdge>> stronglyConnectedComponents(Graph<BaseEdge>& graph) 
             gt.addEdge(e->to, i);
         }
     }
-    function<void(int)> secondDFS = [&](int vert) {
+    RecursiveFunction secondDFS = [&](const auto& self, int vert) -> void {
         if (visited[vert]) {
             if (condensed[vert] != index) {
                 if (next[condensed[vert]] != key) {
@@ -52,7 +53,7 @@ pair<arri, Graph<BaseEdge>> stronglyConnectedComponents(Graph<BaseEdge>& graph) 
         condensed[vert] = index;
         visited[vert] = true;
         for (auto* e : gt[vert]) {
-            secondDFS(e->to);
+            self(e->to);
         }
     };
     for (int i : RevRange(n)) {

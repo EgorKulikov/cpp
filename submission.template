@@ -6,10 +6,18 @@ int main() {
 #endif
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
+#ifder LOCAL_RELEASE
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+    auto time = clock();
+#endif
 	%ClassName% solver;
 	%Input%
 	%Output%
 	%SolverCall%
 	fflush(stdout);
+#ifdef LOCAL_RELEASE
+	cerr << clock() - time << endl;
+#endif
 	return 0;
 }

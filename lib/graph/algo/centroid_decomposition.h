@@ -3,15 +3,16 @@
 #include "../../general.h"
 #include "../../collections/arr.h"
 #include "../graph.h"
+#include "../../recursive_function.h"
 
 template <class Edge>
 void centroidDecomposition(Graph<Edge>& graph, const function<void(int, const arr<bool>&, const vi&)>& callback) {
     int n = graph.vertexCount;
     arr<bool> forb(n, false);
     arri size(n);
-    function<void(int)> doWork = [&](int vert) {
+    RecursiveFunction doWork = [&](const auto& self, int vert) -> void {
         vi part;
-        function<void(int, int)> dfs = [&](int vert, int last) {
+        RecursiveFunction dfs = [&](const auto& self, int vert, int last) -> void {
             size[vert] = 1;
             part.push_back(vert);
             for (auto* e : graph[vert]) {
@@ -19,7 +20,7 @@ void centroidDecomposition(Graph<Edge>& graph, const function<void(int, const ar
                 if (next == last || forb[next]) {
                     continue;
                 }
-                dfs(next, vert);
+                self(next, vert);
                 size[vert] += size[next];
             }
         };
@@ -48,7 +49,7 @@ void centroidDecomposition(Graph<Edge>& graph, const function<void(int, const ar
         for (auto* e : graph[end]) {
             int to = e->to;
             if (!forb[to]) {
-                doWork(to);
+                self(to);
             }
         }
     };

@@ -4,6 +4,7 @@
 #include "../graph.h"
 #include "../../collections/arr.h"
 #include "../../collections/queue.h"
+#include "../../recursive_function.h"
 
 template <class Edge, typename C>
 C dinic(Graph<Edge>& graph, int source, int destination) {
@@ -30,7 +31,7 @@ C dinic(Graph<Edge>& graph, int source, int destination) {
             }
         }
     };
-    function<C(int, C)> dinicImpl = [&] (int source, C flow) -> C {
+    RecursiveFunction dinicImpl = [&](const auto& self, int source, C flow) -> C {
         if (source == destination) {
             return flow;
         }
@@ -41,7 +42,7 @@ C dinic(Graph<Edge>& graph, int source, int destination) {
         while (nextEdge[source] < graph[source].size()) {
             auto edge = graph[source][nextEdge[source]];
             if (edge->capacity != 0 && dist[edge->to] == dist[source] + 1) {
-                C pushed = dinicImpl(edge->to, min(flow, edge->capacity));
+                C pushed = self(edge->to, min(flow, edge->capacity));
                 if (pushed != 0) {
                     edge->push(pushed);
                     flow -= pushed;

@@ -365,6 +365,7 @@ private:
     int bufRead = 0;
     int bufAt = 0;
 
+public:
     inline int get() {
         if (exhausted) {
 #ifdef LOCAL
@@ -383,6 +384,7 @@ private:
         return buf[bufAt++];
     }
 
+private:
     template <typename T>
     inline T readInteger() {
         int c = skipWhitespace();
@@ -437,9 +439,6 @@ public:
     inline int skipWhitespace() {
         int c;
         while (isWhitespace(c = get()) && c != EOF);
-        if (c == EOF) {
-            exhausted = true;
-        }
         return c;
     }
 
@@ -749,244 +748,138 @@ public:
 Output out;
 
 
-template <typename Value, Value defaultValue = 0>
-class ReadOnlySegmentTree {
+template <class Edge>
+class Graph {
+public:
+    int vertexCount;
+    int edgeCount = 0;
 private:
-    const int size;
-    function<Value(Value, Value)> joinValue;
-    arr<Value> value;
-
-    void init(int root, int left, int right, const arr<Value>& array) {
-        if (left + 1 == right) {
-            value[root] = array[left];
-        } else {
-            int mid = (left + right) >> 1;
-            init(2 * root + 1, left, mid, array);
-            init(2 * root + 2, mid, right, array);
-            value[root] = joinValue(value[2 * root + 1], value[2 * root + 2]);
-        }
-    }
-
-    Value query(int root, int left, int right, int from, int to) const {
-        if (left >= from && right <= to) {
-            return value[root];
-        }
-        if (right <= from || left >= to) {
-            return defaultValue;
-        }
-        int mid = (left + right) >> 1;
-        Value lValue = query(2 * root + 1, left, mid, from, to);
-        Value rValue = query(2 * root + 2, mid, right, from, to);
-        return joinValue(lValue, rValue);
-    }
+    vector<vector<Edge*>> edges;
 
 public:
-    ReadOnlySegmentTree(const arr<Value>& array, function<Value(Value, Value)> joinValue) :
-            size(array.size()), joinValue(joinValue) {
-        int vertexSize = size * 4;
-        value = arr<Value>(vertexSize);
-        if (size > 0) {
-            init(0, 0, size, array);
+    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vector<Edge*>()) {}
+
+    void addEdge(Edge* edge) {
+#ifdef LOCAL
+        if (edge->from < 0 || edge->to < 0 || edge->from >= vertexCount || edge->to >= vertexCount) {
+            throw "Out of bounds";
         }
+#endif
+        edge->id = edgeCount;
+        edges[edge->from].push_back(edge);
+        Edge* reverse = edge->reverse();
+        if (reverse != nullptr) {
+            reverse->id = edgeCount;
+            edges[reverse->from].push_back(reverse);
+        }
+        Edge* transposed = edge->transposed();
+        if (transposed != nullptr) {
+            edges[transposed->from].push_back(transposed);
+            transposed->id = edgeCount;
+            Edge* transRev = transposed->reverse();
+            if (transRev != nullptr) {
+                edges[transRev->from].push_back(transRev);
+                transRev->id = edgeCount;
+            }
+        }
+        edgeCount++;
     }
 
-    Value query(int from, int to) const {
-        return query(0, 0, size, max(0, from), to);
+    template <typename...Ts>
+    void addEdge(Ts...args) {
+        addEdge(new Edge(args...));
+    }
+
+    vector<Edge*>& operator[](int at) {
+        return edges[at];
+    }
+
+    void addVertices(int count) {
+        vertexCount += count;
+        edges.resize(vertexCount);
+    }
+};
+
+
+class BiEdge {
+private:
+    BiEdge* transposedEdge;
+
+public:
+    const int from;
+    const int to;
+    int id;
+
+    BiEdge(int from, int to) : from(from), to(to) {
+        transposedEdge = new BiEdge(this);
+    }
+
+    BiEdge* transposed() { return transposedEdge; }
+
+    BiEdge* reverse() { return nullptr; }
+
+private:
+    BiEdge(BiEdge* transposed) : from(transposed->to), to(transposed->from) {
+        transposedEdge = transposed;
     }
 };
 
 
 template <typename T>
-T gcd(T a, T b) {
-    a = abs(a);
-    b = abs(b);
-    while (b != 0) {
-        a = a % b;
-        swap(a, b);
+class RecursiveFunction {
+    T t;
+
+public:
+    RecursiveFunction(T&& t) : t(forward<T>(t)) {}
+
+    template <typename... Args>
+    auto operator()(Args&& ... args) const {
+        return t(*this, forward<Args>(args)...);
     }
-    return a;
-}
-
-template <typename T>
-T lcm(T a, T b) {
-    return a / gcd(a, b) * b;
-}
-
-template <typename T>
-T power(const T& a, ll b) {
-    if (b == 0) {
-        return 1;
-    }
-    if ((b & 1) == 0) {
-        T res = power(a, b >> 1);
-        return res * res;
-    } else {
-        return power(a, b - 1) * a;
-    }
-}
-
-template <typename T>
-T factorial(int n) {
-    T result = 1;
-    for (int i = 2; i <= n; i++) {
-        result *= i;
-    }
-    return result;
-}
-
-template <typename T>
-arr<T> factorials(int length) {
-    arr<T> result(length);
-    if (length > 0) {
-        result[0] = 1;
-    }
-    for (int i = 1; i < length; i++) {
-        result[i] = result[i - 1] * i;
-    }
-    return result;
-}
-
-template <typename T>
-arr<T> powers(T base, int length) {
-    arr<T> result(length);
-    if (length > 0) {
-        result[0] = 1;
-    }
-    for (int i = 1; i < length; i++) {
-        result[i] = result[i - 1] * base;
-    }
-    return result;
-}
+};
 
 
-inline bool isSubset(int set, int subSet) {
-    return (set & subSet) == subSet;
-}
-
-inline int bitCount(int x) {
-    return __builtin_popcount(x);
-}
-
-inline int bitCount(ll x) {
-    return __builtin_popcountll(x);
-}
-
-inline int highestOneBit(int x) {
-    return 1 << (31 - __builtin_clz(x | 1));
-}
-
-inline int binaryDigits(int x) {
-    return 32 - __builtin_clz(x | 1);
-}
-
-inline ll setBit(ll mask, int bit) {
-#ifdef LOCAL
-    if (bit < 0 || bit >= 64) {
-        throw "Bad index";
-    }
-#endif
-    mask |= 1ll << bit;
-    return mask;
-}
-
-inline int setBit(int mask, int bit) {
-#ifdef LOCAL
-    if (bit < 0 || bit >= 32) {
-        throw "Bad index";
-    }
-#endif
-    mask |= 1 << bit;
-    return mask;
-}
-
-inline ll unsetBit(ll mask, int bit) {
-#ifdef LOCAL
-    if (bit < 0 || bit >= 64) {
-        throw "Bad index";
-    }
-#endif
-    mask &= ~(1ll << bit);
-    return mask;
-}
-
-inline int unsetBit(int mask, int bit) {
-#ifdef LOCAL
-    if (bit < 0 || bit >= 32) {
-        throw "Bad index";
-    }
-#endif
-    mask &= ~(1 << bit);
-    return mask;
-}
-
-inline bool isSet(ll mask, int bit) {
-#ifdef LOCAL
-    if (bit < 0 || bit >= 64) {
-        throw "Bad index";
-    }
-#endif
-    return mask >> bit & 1;
-}
-
-inline bool isSet(int mask, int bit) {
-#ifdef LOCAL
-    if (bit < 0 || bit >= 32) {
-        throw "Bad index";
-    }
-#endif
-    return mask >> bit & 1;
-}
-
-#include <set>
-
-class SIMPLELCM {
+class FLISOnTree {
 public:
     void solve() {
         int n = in.readInt();
         auto a = in.readIntArray(n);
+        arri u, v;
+        in.readArrays(n - 1, u, v);
+        decreaseByOne(u, v);
 
-        arri present(100001, 0);
-        for (int i : a) {
-            vector<pii> pp;
-            for (int j = 2; j * j <= i; j++) {
-                if (i % j == 0) {
-                    int q = 1;
-                    do {
-                        i /= j;
-                        q *= j;
-                    } while (i % j == 0);
-                    pp.emplace_back(j, q);
-                }
-            }
-            if (i != 1) {
-                pp.emplace_back(i, i);
-            }
-            for (int j : range(1 << pp.size())) {
-                int at = 1;
-                int val = 1;
-                for (int k : range(pp.size())) {
-                    if (isSet(j, k)) {
-                        at *= pp[k].first;
-                        val *= pp[k].second;
-                    }
-                }
-                maxim(present[at], val);
-            }
+        Graph<BiEdge> graph(n);
+        for (int i : range(n - 1)) {
+            graph.addEdge(u[i], v[i]);
         }
-        set<pair<int, int>> best;
-        ll answer = 1;
-        for (int i : range(present.size())) {
-            if (present[i] != 0) {
-                for (const auto& p : best) {
-                    if (gcd(p.second, i) == 1) {
-                        maxim(answer, -ll(p.first) * present[i]);
-                        break;
-                    }
-                }
-                best.emplace(-present[i], i);
+        arri answer(n);
+        vi seq;
+        RecursiveFunction dfs = [&](const auto& self, int vert, int last) -> void {
+            int pos = lower_bound(all(seq), a[vert]) - seq.begin();
+            int was = pos == seq.size() ? -1 : seq[pos];
+            if (pos < seq.size()) {
+                seq[pos] = a[vert];
+            } else {
+                seq.push_back(a[vert]);
             }
+            answer[vert] = seq.size();
+            for (auto* e : graph[vert]) {
+                int next = e->to;
+                if (next == last) {
+                    continue;
+                }
+                self(next, vert);
+            }
+            if (was == -1) {
+                seq.pop_back();
+            } else {
+                seq[pos] = was;
+            }
+        };
+        dfs(0, -1);
+        for (int i : answer) {
+            out.printLine(i);
         }
-        out.printLine(answer);
     }
 };
 
@@ -997,10 +890,14 @@ int main() {
 #endif
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-    SIMPLELCM solver;
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+    auto time = clock();
+    FLISOnTree solver;
 
 
     solver.solve();
     fflush(stdout);
+    cerr << clock() - time << endl;
     return 0;
 }

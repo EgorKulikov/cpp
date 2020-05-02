@@ -21,6 +21,7 @@ private:
     int bufRead = 0;
     int bufAt = 0;
 
+public:
     inline int get() {
         if (exhausted) {
 #ifdef LOCAL
@@ -39,6 +40,7 @@ private:
         return buf[bufAt++];
     }
 
+private:
     template<typename T>
     inline T readInteger() {
         int c = skipWhitespace();
@@ -93,9 +95,6 @@ public:
     inline int skipWhitespace() {
         int c;
         while (isWhitespace(c = get()) && c != EOF);
-        if (c == EOF) {
-            exhausted = true;
-        }
         return c;
     }
 

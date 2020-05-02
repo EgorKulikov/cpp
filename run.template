@@ -72,6 +72,9 @@ int main() {
             } catch (const char* e) {
                 std::cerr << e << std::endl;
             }
+			if (!in.isExhausted() && in.skipWhitespace() != EOF) {
+			    cerr << "Input is not exhausted" << endl;
+			}
 			fdopen(fd, "w");
             dup2(fd, fileno(stdout));
             std::clock_t finish = std::clock();
