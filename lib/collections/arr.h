@@ -117,7 +117,7 @@ void decreaseByOne() {}
 template <typename T, class...Vs>
 void decreaseByOne(arr<T>& array, Vs&...vs) {
     int n = array.size();
-    for (int i = 0; i < n; ++i) {
+    for (int i : range(n)) {
         array[i]--;
     }
     decreaseByOne(vs...);

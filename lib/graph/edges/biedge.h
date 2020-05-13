@@ -7,19 +7,18 @@ private:
     BiEdge* transposedEdge;
 
 public:
-    const int from;
     const int to;
     int id;
 
-    BiEdge(int from, int to) : from(from), to(to) {
-        transposedEdge = new BiEdge(this);
+    BiEdge(int from, int to) : to(to) {
+        transposedEdge = new BiEdge(this, from);
     }
 
     BiEdge* transposed() { return transposedEdge; }
     BiEdge* reverse() { return nullptr; }
 
 private:
-    BiEdge(BiEdge* transposed) : from(transposed->to), to(transposed->from) {
+    BiEdge(BiEdge* transposed, int from) : to(from) {
         transposedEdge = transposed;
     }
 };

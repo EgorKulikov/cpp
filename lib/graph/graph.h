@@ -13,35 +13,33 @@ private:
 public:
     Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, basic_string<Edge*>()) {}
 
-    void addEdge(Edge* edge) {
+    template <typename...Ts>
+    Edge* addEdge(int from, int to, Ts... args) {
 #ifdef LOCAL
-        if (edge->from < 0 || edge->to < 0 || edge->from >= vertexCount || edge->to >= vertexCount) {
+        if (from < 0 || to < 0 || from >= vertexCount || to >= vertexCount) {
             throw "Out of bounds";
         }
 #endif
+        Edge* edge = new Edge(from, to, args...);
         edge->id = edgeCount;
-        edges[edge->from].push_back(edge);
+        edges[from].push_back(edge);
         Edge* reverse = edge->reverse();
         if (reverse != nullptr) {
             reverse->id = edgeCount;
-            edges[reverse->from].push_back(reverse);
+            edges[to].push_back(reverse);
         }
         Edge* transposed = edge->transposed();
         if (transposed != nullptr) {
-            edges[transposed->from].push_back(transposed);
+            edges[to].push_back(transposed);
             transposed->id = edgeCount;
             Edge* transRev = transposed->reverse();
             if (transRev != nullptr) {
-                edges[transRev->from].push_back(transRev);
+                edges[from].push_back(transRev);
                 transRev->id = edgeCount;
             }
         }
         edgeCount++;
-    }
-
-    template <typename...Ts>
-    void addEdge(Ts...args) {
-        addEdge(new Edge(args...));
+        return edge;
     }
 
     basic_string<Edge*>& operator [](int at) {

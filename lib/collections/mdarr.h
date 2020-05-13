@@ -91,6 +91,14 @@ public:
         return b[i1 * d2 + i2];
     }
 
+    T& operator[](const pii& p) {
+        return operator()(p.first, p.second);
+    }
+
+    const T& operator[](const pii& p) const {
+        return operator()(p.first, p.second);
+    }
+
     arr<T> operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
@@ -102,7 +110,7 @@ public:
 
     vector<vector<T>> view() {
         vector<vector<T>> res(min(d1, 50));
-        for (int i = 0; i < res.size(); ++i) {
+        for (int i : range(res.size())) {
             res[i] = (*this)[i].view();
         }
         return res;

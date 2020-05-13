@@ -225,7 +225,7 @@ void decreaseByOne() {}
 template <typename T, class...Vs>
 void decreaseByOne(arr<T>& array, Vs& ...vs) {
     int n = array.size();
-    for (int i = 0; i < n; ++i) {
+    for (int i : range(n)) {
         array[i]--;
     }
     decreaseByOne(vs...);
@@ -328,6 +328,14 @@ public:
         return b[i1 * d2 + i2];
     }
 
+    T& operator[](const pii& p) {
+        return operator()(p.first, p.second);
+    }
+
+    const T& operator[](const pii& p) const {
+        return operator()(p.first, p.second);
+    }
+
     arr<T> operator[](int at) {
 #ifdef LOCAL
         if (at < 0 || at >= d1) {
@@ -339,7 +347,7 @@ public:
 
     vector<vector<T>> view() {
         vector<vector<T>> res(min(d1, 50));
-        for (int i = 0; i < res.size(); ++i) {
+        for (int i : range(res.size())) {
             res[i] = (*this)[i].view();
         }
         return res;
@@ -500,7 +508,7 @@ public:
     template <typename T>
     arr<T> readArray(int n) {
         arr<T> res(n, T());
-        for (int i = 0; i < n; i++) {
+        for (int i : range(n)) {
             res[i] = readType<T>();
         }
         return res;
@@ -510,7 +518,7 @@ public:
     template <class...Vs>
     void readArrays(int n, Vs& ...vs) {
         initArrays(n, vs...);
-        for (int i = 0; i < n; i++) {
+        for (int i : range(n)) {
             readImpl(i, vs...);
         }
     }
@@ -518,7 +526,7 @@ public:
     template <typename U, typename V>
     arr<pair<U, V>> readArray(int n) {
         arr<pair<U, V>> res(n);
-        for (int i = 0; i < n; i++) {
+        for (int i : range(n)) {
             res[i] = readType<U, V>();
         }
         return res;
@@ -527,8 +535,8 @@ public:
     template <typename T>
     arr2d<T> readTable(int rows, int cols) {
         arr2d<T> result(rows, cols);
-        for (int i = 0; i < rows; ++i) {
-            for (int j = 0; j < cols; ++j) {
+        for (int i : range(rows)) {
+            for (int j : range(cols)) {
                 result(i, j) = readType<T>();
             }
         }
@@ -663,7 +671,8 @@ Input in;
 
 class Output {
 private:
-    ostream& out = cout;
+    ostream& out;
+    bool autoflush;
 
     template <typename T>
     inline void printSingle(const T& value) {
@@ -673,7 +682,7 @@ private:
     template <typename T>
     void printSingle(const vector<T>& array) {
         size_t n = array.size();
-        for (int i = 0; i < n; ++i) {
+        for (int i : range(n)) {
             out << array[i];
             if (i + 1 != n) {
                 out << ' ';
@@ -683,8 +692,8 @@ private:
 
     template <typename T>
     void printSingle(const arr<T>& array) {
-        size_t n = array.size();
-        for (int i = 0; i < n; ++i) {
+        int n = array.size();
+        for (int i : range(n)) {
             out << array[i];
             if (i + 1 != n) {
                 out << ' ';
@@ -696,8 +705,8 @@ private:
     void printSingle(const arr2d<T>& array) {
         size_t n = array.dim1();
         size_t m = array.dim2();
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < m; ++j) {
+        for (int i : range(n)) {
+            for (int j : range(m)) {
                 out << array(i, j);
                 if (j + 1 != m) {
                     out << ' ';
@@ -715,7 +724,7 @@ private:
     }
 
 public:
-    Output() {
+    Output(ostream& out, bool autoflush) : out(out), autoflush(autoflush) {
         out << fixed << setprecision(20);
     }
 
@@ -728,12 +737,18 @@ public:
             out << ' ';
             print(args...);
         }
+        if (autoflush) {
+            flush();
+        }
     }
 
     template <typename...Targs>
     inline void printLine(const Targs... args) {
         print(args...);
         out << '\n';
+        if (autoflush) {
+            flush();
+        }
     }
 
     inline void flush() {
@@ -745,141 +760,260 @@ public:
     }
 };
 
-Output out;
+Output out(cout, false);
+Output err(cerr, true);
 
 
-template <class Edge>
-class Graph {
-public:
-    int vertexCount;
-    int edgeCount = 0;
-private:
-    vector<vector<Edge*>> edges;
-
-public:
-    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vector<Edge*>()) {}
-
-    void addEdge(Edge* edge) {
-#ifdef LOCAL
-        if (edge->from < 0 || edge->to < 0 || edge->from >= vertexCount || edge->to >= vertexCount) {
-            throw "Out of bounds";
-        }
-#endif
-        edge->id = edgeCount;
-        edges[edge->from].push_back(edge);
-        Edge* reverse = edge->reverse();
-        if (reverse != nullptr) {
-            reverse->id = edgeCount;
-            edges[reverse->from].push_back(reverse);
-        }
-        Edge* transposed = edge->transposed();
-        if (transposed != nullptr) {
-            edges[transposed->from].push_back(transposed);
-            transposed->id = edgeCount;
-            Edge* transRev = transposed->reverse();
-            if (transRev != nullptr) {
-                edges[transRev->from].push_back(transRev);
-                transRev->id = edgeCount;
-            }
-        }
-        edgeCount++;
-    }
-
-    template <typename...Ts>
-    void addEdge(Ts...args) {
-        addEdge(new Edge(args...));
-    }
-
-    vector<Edge*>& operator[](int at) {
-        return edges[at];
-    }
-
-    void addVertices(int count) {
-        vertexCount += count;
-        edges.resize(vertexCount);
-    }
-};
+#include <ostream>
+#include <unordered_map>
 
 
-class BiEdge {
-private:
-    BiEdge* transposedEdge;
+const int MOD7 = 1000000007;
+const int MOD9 = 1000000009;
+const int MODF = 998244353;
 
-public:
-    const int from;
-    const int to;
-    int id;
-
-    BiEdge(int from, int to) : from(from), to(to) {
-        transposedEdge = new BiEdge(this);
-    }
-
-    BiEdge* transposed() { return transposedEdge; }
-
-    BiEdge* reverse() { return nullptr; }
-
-private:
-    BiEdge(BiEdge* transposed) : from(transposed->to), to(transposed->from) {
-        transposedEdge = transposed;
-    }
-};
-
+int mod = MOD7;
 
 template <typename T>
-class RecursiveFunction {
-    T t;
+T gcd(T a, T b, T& x, T& y) {
+    if (a == 0) {
+        x = 0;
+        y = 1;
+        return b;
+    }
+    int d = gcd(b % a, a, y, x);
+    x -= (b / a) * y;
+    return d;
+}
 
+class modint {
 public:
-    RecursiveFunction(T&& t) : t(forward<T>(t)) {}
+    int n;
 
-    template <typename... Args>
-    auto operator()(Args&& ... args) const {
-        return t(*this, forward<Args>(args)...);
+    modint() : n(0) {}
+
+    modint(ll n, bool special = false) {
+        if (special) {
+            this->n = -1;
+            return;
+        }
+        if (n >= 0 && n < mod) {
+            this->n = n;
+            return;
+        }
+        n %= mod;
+        if (n < 0) {
+            n += mod;
+        }
+        this->n = n;
+    }
+
+    modint& operator+=(const modint& other) {
+#ifdef LOCAL
+        if (n == -1 || other.n == -1) {
+            throw "Illegal state";
+        }
+#endif
+        n += other.n;
+        if (n >= mod) {
+            n -= mod;
+        }
+        return *this;
+    }
+
+    modint& operator-=(const modint& other) {
+#ifdef LOCAL
+        if (n == -1 || other.n == -1) {
+            throw "Illegal state";
+        }
+#endif
+        n -= other.n;
+        if (n < 0) {
+            n += mod;
+        }
+        return *this;
+    }
+
+    modint& operator*=(const modint& other) {
+#ifdef LOCAL
+        if (n == -1 || other.n == -1) {
+            throw "Illegal state";
+        }
+#endif
+        n = ll(n) * other.n % mod;
+        return *this;
+    }
+
+    modint& operator/=(const modint& other) {
+#ifdef LOCAL
+        if (other.n == 0) {
+            throw "Division by zero";
+        }
+        if (n == -1 || other.n == -1) {
+            throw "Illegal state";
+        }
+#endif
+        return *this *= other.inverse();
+    }
+
+    modint operator-() {
+#ifdef LOCAL
+        if (n == -1) {
+            throw "Illegal state";
+        }
+#endif
+        if (n == 0) {
+            return 0;
+        }
+        return modint(mod - n);
+    }
+
+    modint inverse() const {
+#ifdef LOCAL
+        if (n == -1) {
+            throw "Illegal state";
+        }
+#endif
+        ll x, y;
+        ll g = gcd(ll(n), ll(mod), x, y);
+#ifdef LOCAL
+        if (g != 1) {
+            throw "not inversable";
+        }
+#endif
+        return x;
+    }
+
+    int log(modint alpha);
+};
+
+modint nullModint(-1, true);
+
+modint operator+(const modint& a, const modint& b) {
+    return modint(a) += b;
+}
+
+modint operator-(const modint& a, const modint& b) {
+    return modint(a) -= b;
+}
+
+modint operator*(const modint& a, const modint& b) {
+    return modint(a) *= b;
+}
+
+modint operator/(const modint& a, const modint& b) {
+    return modint(a) /= b;
+}
+
+ostream& operator<<(ostream& out, const modint& val) {
+    return out << val.n;
+}
+
+bool operator==(const modint& a, const modint& b) {
+    return a.n == b.n;
+}
+
+bool operator!=(const modint& a, const modint& b) {
+    return a.n != b.n;
+}
+
+namespace std {
+    template <>
+    struct hash<modint> {
+        size_t operator()(const modint& n) const {
+            return n.n;
+        }
+    };
+}
+
+int modint::log(modint alpha) {
+#ifdef LOCAL
+    if (n == -1 || alpha.n == -1) {
+        throw "Illegal state";
+    }
+#endif
+    unordered_map<modint, int> base;
+    int exp = 0;
+    modint pow = 1;
+    modint inv = *this;
+    modint alInv = alpha.inverse();
+    while (exp * exp < mod) {
+        if (inv == 1) {
+            return exp;
+        }
+        base[inv] = exp++;
+        pow *= alpha;
+        inv *= alInv;
+    }
+    modint step = pow;
+    for (int i = 1;; i++) {
+        if (base.count(pow)) {
+            return exp * i + base[pow];
+        }
+        pow *= step;
+    }
+}
+
+
+class ReverseNumberIterator : public NumberIterator {
+public:
+    ReverseNumberIterator(int v) : NumberIterator(v) {}
+
+    ReverseNumberIterator& operator++() {
+        --v;
+        return *this;
+    }
+};
+
+class RevRange : pii {
+public:
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
+
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
+
+    ReverseNumberIterator begin() {
+        return first;
+    }
+
+    ReverseNumberIterator end() {
+        return second;
     }
 };
 
 
-class FLISOnTree {
+class F1SlaimIPosledovatelnostiUproshchennayaVersiya {
 public:
     void solve() {
         int n = in.readInt();
-        auto a = in.readIntArray(n);
-        arri u, v;
-        in.readArrays(n - 1, u, v);
-        decreaseByOne(u, v);
 
-        Graph<BiEdge> graph(n);
-        for (int i : range(n - 1)) {
-            graph.addEdge(u[i], v[i]);
+        mod = MODF;
+        arr2d<modint> s(n, n, 0);
+        for (int i : range(n)) {
+            s(n - 1, i) = 1;
         }
-        arri answer(n);
-        vi seq;
-        RecursiveFunction dfs = [&](const auto& self, int vert, int last) -> void {
-            int pos = lower_bound(all(seq), a[vert]) - seq.begin();
-            int was = pos == seq.size() ? -1 : seq[pos];
-            if (pos < seq.size()) {
-                seq[pos] = a[vert];
-            } else {
-                seq.push_back(a[vert]);
+        for (int i : RevRange(n - 1)) {
+            for (int j : range(i + 1)) {
+                s(i, j) = (j + 1) * s(i + 1, j) + s(i + 1, j + 1);
             }
-            answer[vert] = seq.size();
-            for (auto* e : graph[vert]) {
-                int next = e->to;
-                if (next == last) {
-                    continue;
-                }
-                self(next, vert);
-            }
-            if (was == -1) {
-                seq.pop_back();
-            } else {
-                seq[pos] = was;
-            }
-        };
-        dfs(0, -1);
-        for (int i : answer) {
-            out.printLine(i);
         }
+        arr<modint> qty(n, 0);
+        qty[0] = 1;
+        arr<modint> answer(n, 0);
+        answer[0] = s(0, 0);
+        arr<modint> delta(n, 0);
+        for (int i : range(1, n)) {
+            for (int j : RevRange(i)) {
+                answer[j + 1] += qty[j] * s(i, j + 1);
+                delta[j] += qty[j] * s(i, j);
+                qty[j + 1] += qty[j];
+                qty[j] *= j + 1;
+            }
+        }
+        for (int i : RevRange(n - 1)) {
+            delta[i] += delta[i + 1];
+            answer[i] += delta[i];
+        }
+        out.printLine(answer);
     }
 };
 
@@ -890,14 +1024,18 @@ int main() {
 #endif
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
+#ifdef LOCAL_RELEASE
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
     auto time = clock();
-    FLISOnTree solver;
+#endif
+    F1SlaimIPosledovatelnostiUproshchennayaVersiya solver;
 
 
     solver.solve();
     fflush(stdout);
+#ifdef LOCAL_RELEASE
     cerr << clock() - time << endl;
+#endif
     return 0;
 }

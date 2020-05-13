@@ -1,6 +1,5 @@
 #include "../lib/io/input.h"
 #include "../lib/io/output.h"
-#include "../lib/range/range.h"
 
 class %ClassName% {
 public:

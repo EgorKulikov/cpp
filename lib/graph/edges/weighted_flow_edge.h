@@ -8,14 +8,13 @@ private:
     WeightedFlowEdge<W, C>* reverseEdge;
 
 public:
-    const int from;
     const int to;
     W weight;
     C capacity;
     int id;
 
-    WeightedFlowEdge(int from, int to, W weight, C capacity) : from(from), to(to), weight(weight), capacity(capacity) {
-        reverseEdge = new WeightedFlowEdge(this);
+    WeightedFlowEdge(int from, int to, W weight, C capacity) : to(to), weight(weight), capacity(capacity) {
+        reverseEdge = new WeightedFlowEdge(this, from);
     }
 
     WeightedFlowEdge<W, C>* transposed() { return nullptr; }
@@ -29,7 +28,7 @@ public:
     }
 
 private:
-    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse) : from(reverse->to), to(reverse->from), weight(-reverse->weight), capacity(0) {
+    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse, int from) : to(from), weight(-reverse->weight), capacity(0) {
         reverseEdge = reverse;
     }
 };

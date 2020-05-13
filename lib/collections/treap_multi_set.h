@@ -15,10 +15,10 @@ public:
 
 template <typename T>
 struct TreapMultiSet {
-    using Node = Node<T, MultiSizeData>;
-    mutable Node* root = nullptr;
+    using TNode = Node<T, MultiSizeData>;
+    mutable TNode* root = nullptr;
 
-    bool addToLeftmost(Node* node, const T& key) {
+    bool addToLeftmost(TNode* node, const T& key) {
         if (node->left == nullptr) {
             if (node->key == key) {
                 node->data.curSize++;
@@ -34,7 +34,7 @@ struct TreapMultiSet {
     }
 
     bool insert(const T& element) {
-        auto* node = new Node(element);
+        auto* node = new TNode(element);
         if (root == nullptr) {
             root = node;
             return true;
@@ -86,6 +86,9 @@ struct TreapMultiSet {
     }
 
     int toLeft(const T& element) const {
+        if (root == nullptr) {
+            return 0;
+        }
         auto split = root->split(element);
         int res = split.first == nullptr ? 0 : split.first->data.size;
         root = merge(split.first, split.second);
@@ -93,6 +96,9 @@ struct TreapMultiSet {
     }
 
     int toRight(const T& element) const {
+        if (root == nullptr) {
+            return 0;
+        }
         auto split = root->split(element, true);
         int res = split.second == nullptr ? 0 : split.second->data.size;
         root = merge(split.first, split.second);
@@ -112,7 +118,7 @@ struct TreapMultiSet {
             throw "Index out of bounds";
         }
 #endif
-        Node* node = root;
+        TNode* node = root;
         while (true) {
             int leftSize = node->left == nullptr ? 0 : node->left->data.size;
             if (leftSize == index) {

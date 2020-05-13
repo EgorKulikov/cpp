@@ -6,7 +6,7 @@ int main() {
 #endif
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
-#ifder LOCAL_RELEASE
+#ifdef LOCAL_RELEASE
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
     auto time = clock();

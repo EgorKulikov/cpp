@@ -97,12 +97,10 @@ int main() {
 		}
 
 		std::cout << std::endl;
-
 	}
-	if(allOK) {
+	if (allOK) {
 		std::cout << "All OK" << std::endl;
-	}
-	else {
+	} else {
 		std::cout << "Some cases failed" << std::endl;
 	}
 	std::cout << "Maximal time: " << int(maxTime) << "." << (int(maxTime * 10) % 10) << (int(maxTime * 100) % 10) << (int(maxTime * 1000) % 10) << "s." << std::endl;

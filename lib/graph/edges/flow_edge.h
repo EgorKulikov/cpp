@@ -8,18 +8,22 @@ private:
     FlowEdge<C>* reverseEdge;
 
 public:
-    const int from;
     const int to;
     C capacity;
     int id;
 
-    FlowEdge(int from, int to, C capacity) : from(from), to(to), capacity(capacity) {
-        reverseEdge = new FlowEdge(this);
+    FlowEdge(int from, int to, C capacity) : to(to), capacity(capacity) {
+        reverseEdge = new FlowEdge(this, from);
     }
 
     FlowEdge<C>* transposed() { return nullptr; }
     FlowEdge<C>* reverse() { return reverseEdge; }
     void push(C flow) {
+#ifdef LOCAL
+        if (flow < 0 || flow > capacity) {
+            throw "Invalid flow";
+        }
+#endif
         capacity -= flow;
         reverseEdge->capacity += flow;
     }
@@ -28,7 +32,7 @@ public:
     }
 
 private:
-    FlowEdge(FlowEdge<C>* reverse) : from(reverse->to), to(reverse->from), capacity(0) {
+    FlowEdge(FlowEdge<C>* reverse, int from) : to(from), capacity(0) {
         reverseEdge = reverse;
     }
 };

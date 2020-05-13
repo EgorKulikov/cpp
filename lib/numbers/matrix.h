@@ -5,8 +5,8 @@
 template <typename T>
 class Matrix {
 private:
-    const int rows;
-    const int cols;
+    int rows;
+    int cols;
     T* data;
 
     void powerImpl(Matrix<T>& result, Matrix<T>& temp, ll exponent) const;

@@ -4,11 +4,10 @@
 
 class BaseEdge {
 public:
-    const int from;
     const int to;
     int id;
 
-    BaseEdge(int from, int to) : from(from), to(to) {
+    BaseEdge(int, int to) : to(to) {
     }
 
     BaseEdge* transposed() { return nullptr; }

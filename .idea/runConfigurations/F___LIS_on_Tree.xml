@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="F - LIS on Tree" type="name.admitriev.jhelper.configuration.TaskConfigurationType" className="FLISOnTree" cppPath="tasks/FLISOnTree.cpp" inputType="STANDARD" outputType="STANDARD" testType="SINGLE">
-    <tests>
-      <test input="10&#10;1 2 5 3 4 6 7 3 2 4&#10;1 2&#10;2 3&#10;3 4&#10;4 5&#10;3 6&#10;6 7&#10;1 8&#10;8 9&#10;9 10&#10;" output="1&#10;2&#10;3&#10;3&#10;4&#10;4&#10;5&#10;2&#10;2&#10;3&#10;" active="true" />
-    </tests>
-    <method v="2" />
-  </configuration>
-</component>

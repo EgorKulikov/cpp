@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/FLISOnTree.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/F1SlaimIPosledovatelnostiUproshchennayaVersiya.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -34,7 +34,7 @@ int main() {
     signal(SIGABRT, &signalHandler);
 #endif
     std::vector<jhelper::Test> tests = {
-		{"10\n1 2 5 3 4 6 7 3 2 4\n1 2\n2 3\n3 4\n4 5\n3 6\n6 7\n1 8\n8 9\n9 10\n", "1\n2\n3\n3\n4\n4\n5\n2\n2\n3\n", true, true},
+		{"2\n", "3 1 \n", true, true},{"3\n", "10 7 1 \n", true, true},{"1\n", "1 \n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -65,7 +65,7 @@ int main() {
 			std::clock_t start = std::clock();
 			try {
 			    in = Input();
-			    FLISOnTree solver;
+			    F1SlaimIPosledovatelnostiUproshchennayaVersiya solver;
 			    solver.solve();
 			    fflush(stdout);
 			    fclose(stdout);
@@ -97,12 +97,10 @@ int main() {
 		}
 
 		std::cout << std::endl;
-
 	}
-	if(allOK) {
+	if (allOK) {
 		std::cout << "All OK" << std::endl;
-	}
-	else {
+	} else {
 		std::cout << "Some cases failed" << std::endl;
 	}
 	std::cout << "Maximal time: " << int(maxTime) << "." << (int(maxTime * 10) % 10) << (int(maxTime * 100) % 10) << (int(maxTime * 1000) % 10) << "s." << std::endl;

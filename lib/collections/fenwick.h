@@ -35,4 +35,8 @@ public:
         }
         return get(to - 1) - get(from - 1);
     }
+
+    void clear() {
+        fill(all(value), 0);
+    }
 };
