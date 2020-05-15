@@ -1,27 +1,23 @@
 #pragma once
 
 #include "../../general.h"
+#include "biedge.h"
 
 template <typename W>
-class BiWeightedEdge {
-private:
-    BiWeightedEdge<W>* transposedEdge;
-
+class BiWeightedEdge : public BiEdge {
 public:
-    const int to;
+    const static bool reversable = true;
     W weight;
-    int id;
 
-    BiWeightedEdge(int from, int to, W weight) : to(to), weight(weight) {
-        transposedEdge = new BiWeightedEdge(this, from);
+    BiWeightedEdge(int to, int id, W weight) : BiEdge(to, id), weight(weight) {
     }
 
-    BiWeightedEdge<W>* transposed() { return transposedEdge; }
-    BiWeightedEdge<W>* reverse() { return nullptr; }
+    BiWeightedEdge reverseEdge(int from) {
+        return BiWeightedEdge(from, id, weight);
+    }
 
-private:
-    BiWeightedEdge(BiWeightedEdge<W>* transposed, int from) : to(from), weight(transposed->weight) {
-        transposedEdge = transposed;
+    BiWeightedEdge<W>& reverseEdge(Graph<BiWeightedEdge<W>>& graph) {
+        return graph[to][rev];
     }
 };
 

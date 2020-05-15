@@ -1,35 +1,37 @@
 #pragma once
 
 #include "../../general.h"
+#include "flow_edge.h"
 
 template <typename W, typename C>
-class WeightedFlowEdge {
-private:
-    WeightedFlowEdge<W, C>* reverseEdge;
-
+class WeightedFlowEdge : public FlowEdge<C> {
 public:
-    const int to;
+    const static bool reversable = true;
     W weight;
-    C capacity;
-    int id;
 
-    WeightedFlowEdge(int from, int to, W weight, C capacity) : to(to), weight(weight), capacity(capacity) {
-        reverseEdge = new WeightedFlowEdge(this, from);
+    WeightedFlowEdge(int to, int id, W weight, C capacity) : FlowEdge<C>(to, id, capacity), weight(weight) {
     }
 
-    WeightedFlowEdge<W, C>* transposed() { return nullptr; }
-    WeightedFlowEdge<W, C>* reverse() { return reverseEdge; }
-    void push(C flow) {
-        capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-    C flow() const {
-        return reverseEdge->capacity;
+    WeightedFlowEdge<W, C> reverseEdge(int from) {
+        return WeightedFlowEdge<W, C>(from, BaseEdge::id, -weight, 0);
     }
 
-private:
-    WeightedFlowEdge(WeightedFlowEdge<W, C>* reverse, int from) : to(from), weight(-reverse->weight), capacity(0) {
-        reverseEdge = reverse;
+    WeightedFlowEdge<W, C>& reverseEdge(Graph<WeightedFlowEdge<W, C>>& graph) const {
+        return graph[BaseEdge::to][BiEdge::rev];
+    }
+
+    void push(Graph<WeightedFlowEdge<W, C>>& graph, C flow) {
+#ifdef LOCAL
+        if (flow < 0 || flow > FlowEdge<C>::capacity) {
+            throw "Invalid flow";
+        }
+#endif
+        FlowEdge<C>::capacity -= flow;
+        reverseEdge(graph).FlowEdge<C>::capacity += flow;
+    }
+
+    C flow(Graph<WeightedFlowEdge<W, C>>& graph) const {
+        return reverseEdge(graph).FlowEdge<C>::capacity;
     }
 };
 

@@ -5,14 +5,14 @@
 #include "../graph.h"
 
 template <class Edge, typename W>
-arr2d<W> floydWarshall(Graph<Edge> graph) {
+arr2d<W> floydWarshall(Graph<Edge>& graph) {
     int n = graph.vertexCount;
     W inf = numeric_limits<W>().max() / 2;
     arr2d<W> dist(n, n, inf);
     for (int i = 0; i < n; i++) {
         dist(i, i) = 0;
-        for (auto edge : graph[i]) {
-            minim(dist(i, edge->to), edge->weight);
+        for (auto& edge : graph[i]) {
+            minim(dist(i, edge.to), edge.weight);
         }
     }
     for (int k = 0; k < n; k++) {
@@ -24,4 +24,3 @@ arr2d<W> floydWarshall(Graph<Edge> graph) {
     }
     return dist;
 }
-

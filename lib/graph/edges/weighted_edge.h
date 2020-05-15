@@ -1,18 +1,14 @@
 #pragma once
 
 #include "../../general.h"
+#include "base_edge.h"
 
 template <typename W>
-class WeightedEdge {
+class WeightedEdge : public BaseEdge {
 public:
-    const int to;
+    const static bool reversable = false;
     W weight;
-    int id;
 
-    WeightedEdge(int, int to, W weight) : to(to), weight(weight) {
+    WeightedEdge(int to, int id, W weight) : BaseEdge(to, id), weight(weight) {
     }
-
-    WeightedEdge<W>* transposed() { return nullptr; }
-    WeightedEdge<W>* reverse() { return nullptr; }
 };
-

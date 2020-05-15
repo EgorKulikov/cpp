@@ -12,8 +12,8 @@ vi topologicalSort(Graph<Edge>& graph) {
     result.reserve(n);
     arri degree(n, 0);
     for (int i = 0; i < n; ++i) {
-        for (auto edge : graph[i]) {
-            degree[edge->to]++;
+        for (auto& edge : graph[i]) {
+            degree[edge.to]++;
         }
     }
     que<int> q;
@@ -25,9 +25,9 @@ vi topologicalSort(Graph<Edge>& graph) {
     while (!q.empty()) {
         int cur = q.pop();
         result.push_back(cur);
-        for (auto edge : graph[cur]) {
-            if (--degree[edge->to] == 0) {
-                q.push(edge->to);
+        for (auto& edge : graph[cur]) {
+            if (--degree[edge.to] == 0) {
+                q.push(edge.to);
             }
         }
     }

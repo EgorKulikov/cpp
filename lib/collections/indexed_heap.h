@@ -15,7 +15,7 @@ class IndexedHeap {
     }
 
 public:
-    IndexedHeap(int capacity = 0, const function<bool(int, int)> cmp = less<>()) : heap(arri(capacity)), pos(arri(capacity, -1)), cmp(cmp) {}
+    IndexedHeap(int capacity = 0, const function<bool(int, int)> cmp = less<int>()) : heap(arri(capacity)), pos(arri(capacity, -1)), cmp(cmp) {}
 
     int* begin() {
         return heap.begin();

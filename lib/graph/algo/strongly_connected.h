@@ -13,13 +13,21 @@ pair<arri, Graph<BaseEdge>> stronglyConnectedComponents(Graph<BaseEdge>& graph) 
     arr<bool> visited(n, false);
     arri condensed(n);
     order.reserve(n);
+#if __cplusplus >= 201700L
     RecursiveFunction firstDFS = [&](const auto& self, int vert) -> void {
+#else
+    function<void(int)> firstDFS = [&](int vert) -> void {
+#endif
         if (visited[vert]) {
             return;
         }
         visited[vert] = true;
-        for (auto* e : graph[vert]) {
-            self(e->to);
+        for (auto& e : graph[vert]) {
+#if __cplusplus >= 201700L
+            self(e.to);
+#else
+            firstDFS(e.to);
+#endif
         }
         order.push_back(vert);
     };
@@ -36,11 +44,15 @@ pair<arri, Graph<BaseEdge>> stronglyConnectedComponents(Graph<BaseEdge>& graph) 
     int key;
     Graph<BaseEdge> gt(n);
     for (int i : range(n)) {
-        for (auto* e : graph[i]) {
-            gt.addEdge(e->to, i);
+        for (auto& e : graph[i]) {
+            gt.addEdge(e.to, i);
         }
     }
+#if __cplusplus >= 201700L
     RecursiveFunction secondDFS = [&](const auto& self, int vert) -> void {
+#else
+    function<void(int)> secondDFS = [&](int vert) -> void {
+#endif
         if (visited[vert]) {
             if (condensed[vert] != index) {
                 if (next[condensed[vert]] != key) {
@@ -52,8 +64,12 @@ pair<arri, Graph<BaseEdge>> stronglyConnectedComponents(Graph<BaseEdge>& graph) 
         }
         condensed[vert] = index;
         visited[vert] = true;
-        for (auto* e : gt[vert]) {
-            self(e->to);
+        for (auto& e : gt[vert]) {
+#if __cplusplus >= 201700L
+            self(e.to);
+#else
+            secondDFS(e.to);
+#endif
         }
     };
     for (int i : RevRange(n)) {
@@ -68,5 +84,5 @@ pair<arri, Graph<BaseEdge>> stronglyConnectedComponents(Graph<BaseEdge>& graph) 
             index++;
         }
     }
-    return {condensed, graph};
+    return {condensed, result};
 }

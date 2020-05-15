@@ -1,4 +1,4 @@
-#include "C:/Users/egor/proj/cpp/tasks/F1SlaimIPosledovatelnostiUproshchennayaVersiya.cpp"
+#include "C:/Users/egor/proj/cpp/tasks/CapitalCity.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -34,7 +34,7 @@ int main() {
     signal(SIGABRT, &signalHandler);
 #endif
     std::vector<jhelper::Test> tests = {
-		{"2\n", "3 1 \n", true, true},{"3\n", "10 7 1 \n", true, true},{"1\n", "1 \n", true, true},
+		{"4 4\n1 2\n3 2\n4 3\n2 1\n", "2\n1 2\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -65,7 +65,7 @@ int main() {
 			std::clock_t start = std::clock();
 			try {
 			    in = Input();
-			    F1SlaimIPosledovatelnostiUproshchennayaVersiya solver;
+			    CapitalCity solver;
 			    solver.solve();
 			    fflush(stdout);
 			    fclose(stdout);

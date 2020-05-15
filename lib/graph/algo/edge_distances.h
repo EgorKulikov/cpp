@@ -13,8 +13,8 @@ arri edgeDistances(Graph<Edge>& graph, int source) {
     q.push(source);
     while (!q.empty()) {
         int current = q.pop();
-        for (auto edge : graph[current]) {
-            int next = edge->to;
+        for (auto& edge : graph[current]) {
+            int next = edge.to;
             if (dist[next] == -1) {
                 dist[next] = dist[current] + 1;
                 q.push(next);

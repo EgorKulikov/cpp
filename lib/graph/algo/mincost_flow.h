@@ -6,8 +6,10 @@
 #include "../../range/range.h"
 #include "../../collections/indexed_heap.h"
 #include "../../range/rev_range.h"
+#include "../edges/weighted_flow_edge.h"
 
-template <class Edge>
+using Edge = WeightedFlowEdge<ll, ll>;
+
 pair<ll, ll> minCostFlow(Graph<Edge>& orGraph, int source, int sink, bool onlyNegative = false) {
     ll inf = numeric_limits<ll>::max() / 2;
     ll large = 1ll << 40;
@@ -18,18 +20,16 @@ pair<ll, ll> minCostFlow(Graph<Edge>& orGraph, int source, int sink, bool onlyNe
 
     Graph<Edge> graph(n + 1);
     arr<Edge*> base(orGraph.edgeCount, nullptr);
-    arr<Edge*> corresponding(orGraph.edgeCount);
+    arri corresponding(orGraph.edgeCount);
     for (int i : range(n)) {
-        for (auto* e : orGraph[i]) {
-            if (e->capacity > 0) {
-                base[e->id] = e;
-                corresponding[e->id] = new Edge(e->from, e->to, e->weight, 0);
-                graph.addEdge(corresponding[e->id]);
+        for (auto& e : orGraph[i]) {
+            if (e.capacity > 0) {
+                base[e.id] = &e;
+                corresponding[e.id] = graph.addEdge(i, e.to, e.weight, 0).reverseEdge(graph).rev;
             }
         }
     }
-    Edge* back = new Edge(sink, source, onlyNegative ? 0 : -large, 0);
-    graph.addEdge(back);
+    int back = graph.addEdge(sink, source, onlyNegative ? 0 : -large, 0).reverseEdge(graph).rev;
     for (int i : range(n)) {
         graph.addEdge(n, i, 0, 1);
     }
@@ -39,8 +39,8 @@ pair<ll, ll> minCostFlow(Graph<Edge>& orGraph, int source, int sink, bool onlyNe
         return dis[a] < dis[b];
     });
     arr<Edge*> pre(n + 1);
-    auto c = [&](Edge* e) -> ll {
-        return p[e->from] + e->weight - p[e->to];
+    auto c = [&](int from, Edge& e) -> ll {
+        return p[from] + e.weight - p[e.to];
     };
     auto dijkstra = [&](int s) {
         fill(all(dis), inf);
@@ -51,16 +51,16 @@ pair<ll, ll> minCostFlow(Graph<Edge>& orGraph, int source, int sink, bool onlyNe
         while (!heap.empty()) {
             int u = heap.pop();
             ll w = dis[u];
-            for (auto* e : graph[u]) {
-                int v = e->to;
+            for (auto& e : graph[u]) {
+                int v = e.to;
 #ifdef LOCAL
-                if (e->capacity > 0 && c(e) < 0) {
+                if (e.capacity > 0 && c(u, e) < 0) {
                     throw "Negative edge";
                 }
 #endif
-                if (e->capacity > 0 && dis[v] > w + c(e)) {
-                    dis[v] = w + c(e);
-                    pre[v] = e;
+                if (e.capacity > 0 && dis[v] > w + c(u, e)) {
+                    dis[v] = w + c(u, e);
+                    pre[v] = &e;
                     int at = heap.at(v);
                     if (at == -1) {
                         heap.push(v);
@@ -72,24 +72,25 @@ pair<ll, ll> minCostFlow(Graph<Edge>& orGraph, int source, int sink, bool onlyNe
         }
     };
 
-    auto addOne = [&](Edge* e) {
-        int u = e->from;
-        int v = e->to;
-        ll curLen = c(e);
-        if (e->capacity != 0) {
-            e->capacity++;
+    auto addOne = [&](int from, int id) {
+        Edge& e = graph[from][id];
+        int u = from;
+        int v = e.to;
+        ll curLen = c(u, e);
+        if (e.capacity != 0) {
+            e.capacity++;
             return;
         }
         dijkstra(v);
-        if (dis[u] < inf && dis[u] + c(e) < 0) {
-            e->reverse()->capacity++;
+        if (dis[u] < inf && dis[u] + c(u, e) < 0) {
+            e.reverseEdge(graph).capacity++;
             while (u != v) {
                 Edge* x = pre[u];
-                x->push(1);
-                u = x->from;
+                x->push(graph, 1);
+                u = x->reverseEdge(graph).to;
             }
         } else {
-            e->capacity++;
+            e.capacity++;
         }
         ll maxDis = 0;
         for (int i : range(n)) {
@@ -106,29 +107,29 @@ pair<ll, ll> minCostFlow(Graph<Edge>& orGraph, int source, int sink, bool onlyNe
         }
     };
 
-    addOne(back);
+    addOne(sink, back);
     for (int i : RevRange(40)) {
         for (int j : range(n + 1)) {
-            for (Edge* e : graph[j]) {
-                e->capacity <<= 1;
+            for (Edge& e : graph[j]) {
+                e.capacity <<= 1;
             }
         }
         for (Edge* e : base) {
             if (e != nullptr && (e->capacity >> i & 1) == 1) {
-                addOne(corresponding[e->id]);
+                addOne(e->reverseEdge(orGraph).to, corresponding[e->id]);
             }
         }
     }
 
     ll minCost = 0;
-    ll minFlow = back->flow();
+    ll minFlow = graph[sink][back].flow(graph);
     for (Edge* e : base) {
         if (e == nullptr) {
             continue;
         }
-        Edge* x = corresponding[e->id];
-        minCost += x->flow() * x->weight;
-        e->push(x->flow());
+        Edge& x = graph[e->reverseEdge(orGraph).to][corresponding[e->id]];
+        minCost += x.flow(graph) * x.weight;
+        e->push(orGraph, x.flow(graph));
     }
     return {minCost, minFlow};
 }

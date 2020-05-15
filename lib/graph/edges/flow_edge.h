@@ -1,39 +1,36 @@
 #pragma once
 
 #include "../../general.h"
+#include "biedge.h"
 
 template <typename C>
-class FlowEdge {
-private:
-    FlowEdge<C>* reverseEdge;
-
+class FlowEdge : public BiEdge {
 public:
-    const int to;
+    const static bool reversable = true;
     C capacity;
-    int id;
 
-    FlowEdge(int from, int to, C capacity) : to(to), capacity(capacity) {
-        reverseEdge = new FlowEdge(this, from);
+    FlowEdge(int to, int id, C capacity) : BiEdge(to, id), capacity(capacity) {
     }
 
-    FlowEdge<C>* transposed() { return nullptr; }
-    FlowEdge<C>* reverse() { return reverseEdge; }
-    void push(C flow) {
+    FlowEdge<C> reverseEdge(int from) {
+        return FlowEdge<C>(from, id, 0);
+    }
+
+    FlowEdge<C>& reverseEdge(Graph<FlowEdge<C>>& graph) {
+        return graph[to][rev];
+    }
+
+    void push(Graph<FlowEdge<C>>& graph, C flow) {
 #ifdef LOCAL
         if (flow < 0 || flow > capacity) {
             throw "Invalid flow";
         }
 #endif
         capacity -= flow;
-        reverseEdge->capacity += flow;
-    }
-    C flow() const {
-        return reverseEdge->capacity;
+        reverseEdge(graph).capacity += flow;
     }
 
-private:
-    FlowEdge(FlowEdge<C>* reverse, int from) : to(from), capacity(0) {
-        reverseEdge = reverse;
+    C flow(Graph<FlowEdge<C>>& graph) const {
+        return reverseEdge(graph).capacity;
     }
 };
-

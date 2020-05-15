@@ -20,9 +20,9 @@ C dinic(Graph<Edge>& graph, int source, int destination) {
         while (!q.empty()) {
             int current = q.front();
             q.pop();
-            for (auto edge : graph[current]) {
-                if (edge->capacity != 0) {
-                    int next = edge->to;
+            for (auto& edge : graph[current]) {
+                if (edge.capacity != 0) {
+                    int next = edge.to;
                     if (dist[next] == -1) {
                         dist[next] = dist[current] + 1;
                         q.push(next);
@@ -31,7 +31,11 @@ C dinic(Graph<Edge>& graph, int source, int destination) {
             }
         }
     };
+#if __cplusplus >= 201700L
     RecursiveFunction dinicImpl = [&](const auto& self, int source, C flow) -> C {
+#else
+    function<C(int, C)> dinicImpl = [&](int source, C flow) -> C {
+#endif
         if (source == destination) {
             return flow;
         }
@@ -40,11 +44,15 @@ C dinic(Graph<Edge>& graph, int source, int destination) {
         }
         C totalPushed = 0;
         while (nextEdge[source] < graph[source].size()) {
-            auto edge = graph[source][nextEdge[source]];
-            if (edge->capacity != 0 && dist[edge->to] == dist[source] + 1) {
-                C pushed = self(edge->to, min(flow, edge->capacity));
+            auto& edge = graph[source][nextEdge[source]];
+            if (edge.capacity != 0 && dist[edge.to] == dist[source] + 1) {
+#if __cplusplus >= 201700L
+                C pushed = self(edge.to, min(flow, edge.capacity));
+#else
+                C pushed = dinicImpl(edge.to, min(flow, edge.capacity));
+#endif
                 if (pushed != 0) {
-                    edge->push(pushed);
+                    edge.push(graph, pushed);
                     flow -= pushed;
                     totalPushed += pushed;
                     if (flow == 0) {

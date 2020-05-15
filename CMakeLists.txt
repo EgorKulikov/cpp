@@ -11,10 +11,10 @@ file(GLOB DIRECT "direct/*.cpp")
 add_executable(test ${TASKS} ${HEADERS})
 add_executable(direct "direct/main.cpp" ${HEADERS})
 
-ADD_DEFINITIONS(-std=c++17 -Wall -Wextra -Wno-sign-compare -Wno-reorder -Wno-logical-op-parentheses)
+ADD_DEFINITIONS(-static -std=c++17 -Wall -Wextra -Wno-sign-compare -Wno-reorder -Wno-logical-op-parentheses)
 
 set_target_properties(test PROPERTIES LINKER_LANGUAGE CXX)
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ftrapv -ftrapping-math -g3 -gfull -ggdb -fno-inline-functions -fno-unroll-loops -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -DLOCAL")
 set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ftrapping-math -g3 -gfull -ggdb -fno-inline-functions -fno-unroll-loops -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -DLOCAL")
-set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DLOCAL_RELEASE")
+set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DLOCAL_RELEASE")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--stack,268435456")

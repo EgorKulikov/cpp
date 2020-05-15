@@ -29,7 +29,7 @@ public:
                 end[current] = index + 1;
                 size--;
             } else {
-                int next = graph[current][cEdge]->to;
+                int next = graph[current][cEdge].to;
                 if (next == last[current]) {
                     cEdge++;
                     continue;

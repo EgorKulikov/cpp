@@ -764,195 +764,66 @@ Output out(cout, false);
 Output err(cerr, true);
 
 
-#include <ostream>
-#include <unordered_map>
-
-
-const int MOD7 = 1000000007;
-const int MOD9 = 1000000009;
-const int MODF = 998244353;
-
-int mod = MOD7;
-
-template <typename T>
-T gcd(T a, T b, T& x, T& y) {
-    if (a == 0) {
-        x = 0;
-        y = 1;
-        return b;
-    }
-    int d = gcd(b % a, a, y, x);
-    x -= (b / a) * y;
-    return d;
-}
-
-class modint {
+template <class Edge>
+class Graph {
 public:
-    int n;
+    int vertexCount;
+    int edgeCount = 0;
+private:
+    vector<vector<Edge>> edges;
 
-    modint() : n(0) {}
+public:
+    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vector<Edge>()) {}
 
-    modint(ll n, bool special = false) {
-        if (special) {
-            this->n = -1;
-            return;
-        }
-        if (n >= 0 && n < mod) {
-            this->n = n;
-            return;
-        }
-        n %= mod;
-        if (n < 0) {
-            n += mod;
-        }
-        this->n = n;
-    }
-
-    modint& operator+=(const modint& other) {
+    template <typename...Ts>
+    Edge& addEdge(int from, int to, Ts... args) {
 #ifdef LOCAL
-        if (n == -1 || other.n == -1) {
-            throw "Illegal state";
+        if (from < 0 || to < 0 || from >= vertexCount || to >= vertexCount) {
+            throw "Out of bounds";
         }
 #endif
-        n += other.n;
-        if (n >= mod) {
-            n -= mod;
+        edges[from].emplace_back(to, edgeCount, args...);
+        Edge& direct = edges[from].back();
+        int directId = edges[from].size() - 1;
+        if (Edge::reversable) {
+            edges[to].push_back(direct.reverseEdge(from));
+            Edge& reverse = edges[to].back();
+            int revId = edges[to].size() - 1;
+            direct.setReverseId(revId);
+            reverse.setReverseId(directId);
         }
-        return *this;
+        edgeCount++;
+        return direct;
     }
 
-    modint& operator-=(const modint& other) {
-#ifdef LOCAL
-        if (n == -1 || other.n == -1) {
-            throw "Illegal state";
-        }
-#endif
-        n -= other.n;
-        if (n < 0) {
-            n += mod;
-        }
-        return *this;
+    vector<Edge>& operator[](int at) {
+        return edges[at];
     }
 
-    modint& operator*=(const modint& other) {
-#ifdef LOCAL
-        if (n == -1 || other.n == -1) {
-            throw "Illegal state";
-        }
-#endif
-        n = ll(n) * other.n % mod;
-        return *this;
+    void addVertices(int count) {
+        vertexCount += count;
+        edges.resize(vertexCount);
     }
-
-    modint& operator/=(const modint& other) {
-#ifdef LOCAL
-        if (other.n == 0) {
-            throw "Division by zero";
-        }
-        if (n == -1 || other.n == -1) {
-            throw "Illegal state";
-        }
-#endif
-        return *this *= other.inverse();
-    }
-
-    modint operator-() {
-#ifdef LOCAL
-        if (n == -1) {
-            throw "Illegal state";
-        }
-#endif
-        if (n == 0) {
-            return 0;
-        }
-        return modint(mod - n);
-    }
-
-    modint inverse() const {
-#ifdef LOCAL
-        if (n == -1) {
-            throw "Illegal state";
-        }
-#endif
-        ll x, y;
-        ll g = gcd(ll(n), ll(mod), x, y);
-#ifdef LOCAL
-        if (g != 1) {
-            throw "not inversable";
-        }
-#endif
-        return x;
-    }
-
-    int log(modint alpha);
 };
 
-modint nullModint(-1, true);
 
-modint operator+(const modint& a, const modint& b) {
-    return modint(a) += b;
-}
+class BaseEdge {
+public:
+    const static bool reversable = false;
+    int to;
+    int id;
 
-modint operator-(const modint& a, const modint& b) {
-    return modint(a) -= b;
-}
-
-modint operator*(const modint& a, const modint& b) {
-    return modint(a) *= b;
-}
-
-modint operator/(const modint& a, const modint& b) {
-    return modint(a) /= b;
-}
-
-ostream& operator<<(ostream& out, const modint& val) {
-    return out << val.n;
-}
-
-bool operator==(const modint& a, const modint& b) {
-    return a.n == b.n;
-}
-
-bool operator!=(const modint& a, const modint& b) {
-    return a.n != b.n;
-}
-
-namespace std {
-    template <>
-    struct hash<modint> {
-        size_t operator()(const modint& n) const {
-            return n.n;
-        }
-    };
-}
-
-int modint::log(modint alpha) {
-#ifdef LOCAL
-    if (n == -1 || alpha.n == -1) {
-        throw "Illegal state";
+    BaseEdge(int to, int id) : to(to), id(id) {
     }
-#endif
-    unordered_map<modint, int> base;
-    int exp = 0;
-    modint pow = 1;
-    modint inv = *this;
-    modint alInv = alpha.inverse();
-    while (exp * exp < mod) {
-        if (inv == 1) {
-            return exp;
-        }
-        base[inv] = exp++;
-        pow *= alpha;
-        inv *= alInv;
+
+    BaseEdge reverseEdge(int) {
+        throw "Unsupported operation exception";
     }
-    modint step = pow;
-    for (int i = 1;; i++) {
-        if (base.count(pow)) {
-            return exp * i + base[pow];
-        }
-        pow *= step;
+
+    void setReverseId(int) {
+        throw "Unsupported operation exception";
     }
-}
+};
 
 
 class ReverseNumberIterator : public NumberIterator {
@@ -981,38 +852,137 @@ public:
 };
 
 
-class F1SlaimIPosledovatelnostiUproshchennayaVersiya {
+template <typename T>
+class RecursiveFunction {
+    T t;
+
+public:
+    RecursiveFunction(T&& t) : t(forward<T>(t)) {}
+
+    template <typename... Args>
+    auto operator()(Args&& ... args) const {
+        return t(*this, forward<Args>(args)...);
+    }
+};
+
+
+pair<arri, Graph<BaseEdge>> stronglyConnectedComponents(Graph<BaseEdge>& graph) {
+    int n = graph.vertexCount;
+    vi order;
+    arr<bool> visited(n, false);
+    arri condensed(n);
+    order.reserve(n);
+#if __cplusplus >= 201700L
+    RecursiveFunction firstDFS = [&](const auto& self, int vert) -> void {
+#else
+        function<void(int)> firstDFS = [&](int vert) -> void {
+#endif
+        if (visited[vert]) {
+            return;
+        }
+        visited[vert] = true;
+        for (auto& e : graph[vert]) {
+#if __cplusplus >= 201700L
+            self(e.to);
+#else
+            firstDFS(e.to);
+#endif
+        }
+        order.push_back(vert);
+    };
+    for (int i : range(n)) {
+        if (!visited[i]) {
+            firstDFS(i);
+        }
+    }
+    fill(all(visited), false);
+    Graph<BaseEdge> result(0);
+    int index = 0;
+    arri next(n, -1);
+    vi queue;
+    int key;
+    Graph<BaseEdge> gt(n);
+    for (int i : range(n)) {
+        for (auto& e : graph[i]) {
+            gt.addEdge(e.to, i);
+        }
+    }
+#if __cplusplus >= 201700L
+    RecursiveFunction secondDFS = [&](const auto& self, int vert) -> void {
+#else
+        function<void(int)> secondDFS = [&](int vert) -> void {
+#endif
+        if (visited[vert]) {
+            if (condensed[vert] != index) {
+                if (next[condensed[vert]] != key) {
+                    next[condensed[vert]] = key;
+                    queue.push_back(condensed[vert]);
+                }
+            }
+            return;
+        }
+        condensed[vert] = index;
+        visited[vert] = true;
+        for (auto& e : gt[vert]) {
+#if __cplusplus >= 201700L
+            self(e.to);
+#else
+            secondDFS(e.to);
+#endif
+        }
+    };
+    for (int i : RevRange(n)) {
+        if (!visited[order[i]]) {
+            key = i;
+            queue.clear();
+            secondDFS(order[i]);
+            result.addVertices(1);
+            for (int j : queue) {
+                result.addEdge(j, index);
+            }
+            index++;
+        }
+    }
+    return {condensed, result};
+}
+
+
+class CapitalCity {
 public:
     void solve() {
         int n = in.readInt();
+        int m = in.readInt();
+        arri u, v;
+        in.readArrays(m, u, v);
+        decreaseByOne(u, v);
 
-        mod = MODF;
-        arr2d<modint> s(n, n, 0);
+        Graph<BaseEdge> graph(n);
+        for (int i : range(m)) {
+            graph.addEdge(u[i], v[i]);
+        }
+        auto res = stronglyConnectedComponents(graph);
+        int sz = res.second.vertexCount;
+        arr<bool> reachable(sz, false);
+        reachable[sz - 1] = true;
+        for (int i : RevRange(sz)) {
+            for (auto& e : res.second[i]) {
+                if (reachable[e.to]) {
+                    reachable[i] = true;
+                    break;
+                }
+            }
+        }
+        if (count(all(reachable), false)) {
+            out.printLine(0);
+            return;
+        }
+        vi answer;
         for (int i : range(n)) {
-            s(n - 1, i) = 1;
-        }
-        for (int i : RevRange(n - 1)) {
-            for (int j : range(i + 1)) {
-                s(i, j) = (j + 1) * s(i + 1, j) + s(i + 1, j + 1);
+            if (res.first[i] == sz - 1) {
+                answer.push_back(i + 1);
             }
         }
-        arr<modint> qty(n, 0);
-        qty[0] = 1;
-        arr<modint> answer(n, 0);
-        answer[0] = s(0, 0);
-        arr<modint> delta(n, 0);
-        for (int i : range(1, n)) {
-            for (int j : RevRange(i)) {
-                answer[j + 1] += qty[j] * s(i, j + 1);
-                delta[j] += qty[j] * s(i, j);
-                qty[j + 1] += qty[j];
-                qty[j] *= j + 1;
-            }
-        }
-        for (int i : RevRange(n - 1)) {
-            delta[i] += delta[i + 1];
-            answer[i] += delta[i];
-        }
+        out.printLine(answer.size());
         out.printLine(answer);
     }
 };
@@ -1029,7 +999,7 @@ int main() {
     freopen("output.txt", "w", stdout);
     auto time = clock();
 #endif
-    F1SlaimIPosledovatelnostiUproshchennayaVersiya solver;
+    CapitalCity solver;
 
 
     solver.solve();
