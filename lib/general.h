@@ -15,12 +15,6 @@ using ld = long double;
 using pii = pair<int, int>;
 using vi = vector<int>;
 
-#ifdef LOCAL
-void signalHandler(int) {
-    throw "Abort detected";
-}
-#endif
-
 void doReplace() {
 }
 

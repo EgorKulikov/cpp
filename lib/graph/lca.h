@@ -53,8 +53,8 @@ public:
             }
             if (index[vertex] < graph[vertex].size()) {
                 stack[size++] = vertex;
-                int to = graph[vertex][index[vertex]]->to;
-                stack[size++] = graph[vertex][index[vertex]]->to;
+                int to = graph[vertex][index[vertex]].to;
+                stack[size++] = graph[vertex][index[vertex]].to;
                 last[to] = vertex;
                 index[vertex]++;
             }

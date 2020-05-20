@@ -8,21 +8,20 @@
 
 class Output {
 private:
-    ostream& out;
-    bool autoflush;
+    ostream* out;
 
     template<typename T>
     inline void printSingle(const T& value) {
-        out << value;
+        *out << value;
     }
 
     template<typename T>
     void printSingle(const vector<T>& array) {
         size_t n = array.size();
         for (int i : range(n)) {
-            out << array[i];
+            *out << array[i];
             if (i + 1 != n) {
-                out << ' ';
+                *out << ' ';
             }
         }
     }
@@ -31,9 +30,9 @@ private:
     void printSingle(const arr<T>& array) {
         int n = array.size();
         for (int i : range(n)) {
-            out << array[i];
+            *out << array[i];
             if (i + 1 != n) {
-                out << ' ';
+                *out << ' ';
             }
         }
     }
@@ -44,13 +43,13 @@ private:
         size_t m = array.dim2();
         for (int i : range(n)) {
             for (int j : range(m)) {
-                out << array(i, j);
+                *out << array(i, j);
                 if (j + 1 != m) {
-                    out << ' ';
+                    *out << ' ';
                 }
             }
             if (i + 1 != n) {
-                out << '\n';
+                *out << '\n';
             }
         }
     }
@@ -61,8 +60,14 @@ private:
     }
 
 public:
-    Output(ostream& out, bool autoflush) : out(out), autoflush(autoflush) {
+    bool autoflush;
+
+    Output(ostream& out, bool autoflush) : out(&out), autoflush(autoflush) {
         out << fixed << setprecision(20);
+    }
+
+    void setOut(ostream& nOut) {
+        out = &nOut;
     }
 
     inline void print() {}
@@ -71,7 +76,7 @@ public:
     inline void print(const T& first, const Targs... args) {
         printSingle(first);
         if (sizeof...(args) != 0) {
-            out << ' ';
+            *out << ' ';
             print(args...);
         }
         if (autoflush) {
@@ -82,18 +87,18 @@ public:
     template<typename...Targs>
     inline void printLine(const Targs... args) {
         print(args...);
-        out << '\n';
+        *out << '\n';
         if (autoflush) {
             flush();
         }
     }
 
     inline void flush() {
-        out.flush();
+        out->flush();
     }
 
     inline void setPrecision(int digs) {
-        out << fixed << setprecision(digs);
+        *out << fixed << setprecision(digs);
     }
 };
 

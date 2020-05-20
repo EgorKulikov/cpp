@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../general.h"
+#include "../range/range.h"
 
 template <class Edge>
 class Graph {
@@ -41,5 +42,12 @@ public:
     void addVertices(int count) {
         vertexCount += count;
         edges.resize(vertexCount);
+    }
+
+    void clear() {
+        edgeCount = 0;
+        for (int i : range(vertexCount)) {
+            edges[i].clear();
+        }
     }
 };

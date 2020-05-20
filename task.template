@@ -3,6 +3,6 @@
 
 class %ClassName% {
 public:
-	void solve() {
-	}
+    void solve() {
+    }
 };
