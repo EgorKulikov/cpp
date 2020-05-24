@@ -61,8 +61,8 @@ int main() {
             try {
                 in = Input();
                 out.setOut(fout);
-                task solver;
-                solver.solve();
+                %ClassName% solver;
+                %SolverCall%
                 out.flush();
                 fout.close();
             } catch (const char* e) {

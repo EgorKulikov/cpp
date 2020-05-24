@@ -1,9 +1,7 @@
 #pragma once
 
-#include <ostream>
 #include "../general.h"
 #include "numbers.h"
-//#include "bigint.h"
 
 class Rational {
     void normalize() {

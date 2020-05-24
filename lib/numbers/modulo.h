@@ -1,7 +1,5 @@
 #pragma once
 
-#include <ostream>
-#include <unordered_map>
 #include "../general.h"
 
 const int MOD7 = 1000000007;
@@ -10,8 +8,7 @@ const int MODF = 998244353;
 
 int mod = MOD7;
 
-template <typename T>
-T gcd(T a, T b, T& x, T& y) {
+ll gcd(ll a, ll b, ll& x, ll& y) {
     if (a == 0) {
         x = 0;
         y = 1;

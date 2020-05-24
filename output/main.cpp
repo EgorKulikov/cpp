@@ -6,14 +6,9 @@
 
 
 
-#include <cstdio>
-#include <cctype>
-#include <string>
-#include <cstring>
 
 
-#include <vector>
-#include <functional>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -26,14 +21,6 @@ using uli = unsigned __int128;
 using ld = long double;
 using pii = pair<int, int>;
 using vi = vector<int>;
-
-#ifdef LOCAL
-
-void signalHandler(int) {
-    throw "Abort detected";
-}
-
-#endif
 
 void doReplace() {
 }
@@ -78,9 +65,6 @@ D dPower(D base, ll exponent) {
         return res * res;
     }
 }
-
-
-#include <algorithm>
 
 
 class NumberIterator : iterator<forward_iterator_tag, int> {
@@ -665,27 +649,22 @@ inline string Input::readType() {
 Input in;
 
 
-#include <iostream>
-#include <iomanip>
-
-
 class Output {
 private:
-    ostream& out;
-    bool autoflush;
+    ostream* out;
 
     template <typename T>
     inline void printSingle(const T& value) {
-        out << value;
+        *out << value;
     }
 
     template <typename T>
     void printSingle(const vector<T>& array) {
         size_t n = array.size();
         for (int i : range(n)) {
-            out << array[i];
+            *out << array[i];
             if (i + 1 != n) {
-                out << ' ';
+                *out << ' ';
             }
         }
     }
@@ -694,9 +673,9 @@ private:
     void printSingle(const arr<T>& array) {
         int n = array.size();
         for (int i : range(n)) {
-            out << array[i];
+            *out << array[i];
             if (i + 1 != n) {
-                out << ' ';
+                *out << ' ';
             }
         }
     }
@@ -707,13 +686,13 @@ private:
         size_t m = array.dim2();
         for (int i : range(n)) {
             for (int j : range(m)) {
-                out << array(i, j);
+                *out << array(i, j);
                 if (j + 1 != m) {
-                    out << ' ';
+                    *out << ' ';
                 }
             }
             if (i + 1 != n) {
-                out << '\n';
+                *out << '\n';
             }
         }
     }
@@ -724,8 +703,14 @@ private:
     }
 
 public:
-    Output(ostream& out, bool autoflush) : out(out), autoflush(autoflush) {
+    bool autoflush;
+
+    Output(ostream& out, bool autoflush) : out(&out), autoflush(autoflush) {
         out << fixed << setprecision(20);
+    }
+
+    void setOut(ostream& nOut) {
+        out = &nOut;
     }
 
     inline void print() {}
@@ -734,7 +719,7 @@ public:
     inline void print(const T& first, const Targs... args) {
         printSingle(first);
         if (sizeof...(args) != 0) {
-            out << ' ';
+            *out << ' ';
             print(args...);
         }
         if (autoflush) {
@@ -745,18 +730,18 @@ public:
     template <typename...Targs>
     inline void printLine(const Targs... args) {
         print(args...);
-        out << '\n';
+        *out << '\n';
         if (autoflush) {
             flush();
         }
     }
 
     inline void flush() {
-        out.flush();
+        out->flush();
     }
 
     inline void setPrecision(int digs) {
-        out << fixed << setprecision(digs);
+        *out << fixed << setprecision(digs);
     }
 };
 
@@ -764,234 +749,304 @@ Output out(cout, false);
 Output err(cerr, true);
 
 
-template <class Edge>
-class Graph {
-public:
-    int vertexCount;
-    int edgeCount = 0;
-private:
-    vector<vector<Edge>> edges;
+template <typename T>
+class FenwickTree {
+    arr<T> value;
 
-public:
-    Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vector<Edge>()) {}
-
-    template <typename...Ts>
-    Edge& addEdge(int from, int to, Ts... args) {
-#ifdef LOCAL
-        if (from < 0 || to < 0 || from >= vertexCount || to >= vertexCount) {
-            throw "Out of bounds";
+    T get(int to) const {
+        minim(to, int(value.size()) - 1);
+        T result = 0;
+        while (to >= 0) {
+            result += value[to];
+            to = (to & (to + 1)) - 1;
         }
-#endif
-        edges[from].emplace_back(to, edgeCount, args...);
-        Edge& direct = edges[from].back();
-        int directId = edges[from].size() - 1;
-        if (Edge::reversable) {
-            edges[to].push_back(direct.reverseEdge(from));
-            Edge& reverse = edges[to].back();
-            int revId = edges[to].size() - 1;
-            direct.setReverseId(revId);
-            reverse.setReverseId(directId);
+        return result;
+    }
+
+public:
+    FenwickTree(int size) {
+        value = arr<T>(size, 0);
+    }
+
+    void add(int at, T val) {
+        while (at < value.size()) {
+            value[at] += val;
+            at = at | (at + 1);
         }
-        edgeCount++;
-        return direct;
     }
 
-    vector<Edge>& operator[](int at) {
-        return edges[at];
+    T get(int from, int to) const {
+        if (from >= to) {
+            return 0;
+        }
+        return get(to - 1) - get(from - 1);
     }
 
-    void addVertices(int count) {
-        vertexCount += count;
-        edges.resize(vertexCount);
-    }
-};
-
-
-class BaseEdge {
-public:
-    const static bool reversable = false;
-    int to;
-    int id;
-
-    BaseEdge(int to, int id) : to(to), id(id) {
-    }
-
-    BaseEdge reverseEdge(int) {
-        throw "Unsupported operation exception";
-    }
-
-    void setReverseId(int) {
-        throw "Unsupported operation exception";
-    }
-};
-
-
-class ReverseNumberIterator : public NumberIterator {
-public:
-    ReverseNumberIterator(int v) : NumberIterator(v) {}
-
-    ReverseNumberIterator& operator++() {
-        --v;
-        return *this;
-    }
-};
-
-class RevRange : pii {
-public:
-    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
-
-    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
-
-    ReverseNumberIterator begin() {
-        return first;
-    }
-
-    ReverseNumberIterator end() {
-        return second;
+    void clear() {
+        fill(all(value), 0);
     }
 };
 
 
 template <typename T>
-class RecursiveFunction {
-    T t;
-
+class que : public queue<T> {
+    using parent = queue<T>;
 public:
-    RecursiveFunction(T&& t) : t(forward<T>(t)) {}
+    que() : parent() {}
 
-    template <typename... Args>
-    auto operator()(Args&& ... args) const {
-        return t(*this, forward<Args>(args)...);
+    que(const que<T>& q) : parent(q) {}
+
+    que(que<T>&& q) noexcept: parent(move(q)) {}
+
+    T pop() {
+#ifdef LOCAL
+        if (parent::empty()) {
+            throw "Pop on empty queue";
+        }
+#endif
+        T res = parent::front();
+        parent::pop();
+        return res;
+    }
+
+    que<T>& operator=(que<T>&& __x) noexcept {
+        parent::operator=(__x);
+        return *this;
+    }
+
+    que<T>& operator=(const que<T>& __x) {
+        parent::operator=(__x);
+        return *this;
     }
 };
 
+using qi = que<int>;
 
-pair<arri, Graph<BaseEdge>> stronglyConnectedComponents(Graph<BaseEdge>& graph) {
-    int n = graph.vertexCount;
-    vi order;
-    arr<bool> visited(n, false);
-    arri condensed(n);
-    order.reserve(n);
-#if __cplusplus >= 201700L
-    RecursiveFunction firstDFS = [&](const auto& self, int vert) -> void {
-#else
-        function<void(int)> firstDFS = [&](int vert) -> void {
-#endif
-        if (visited[vert]) {
-            return;
-        }
-        visited[vert] = true;
-        for (auto& e : graph[vert]) {
-#if __cplusplus >= 201700L
-            self(e.to);
-#else
-            firstDFS(e.to);
-#endif
-        }
-        order.push_back(vert);
-    };
-    for (int i : range(n)) {
-        if (!visited[i]) {
-            firstDFS(i);
-        }
+
+template <typename T>
+inline void unique(vector<T>& v) {
+    v.resize(unique(all(v)) - v.begin());
+}
+
+arri createOrder(int n) {
+    arri order(n);
+    for (int i = 0; i < n; i++) {
+        order[i] = i;
     }
-    fill(all(visited), false);
-    Graph<BaseEdge> result(0);
-    int index = 0;
-    arri next(n, -1);
-    vi queue;
-    int key;
-    Graph<BaseEdge> gt(n);
-    for (int i : range(n)) {
-        for (auto& e : graph[i]) {
-            gt.addEdge(e.to, i);
-        }
+    return order;
+}
+
+arri inverse(const arri& p) {
+    arri res(p.size());
+    for (int i : range(p.size())) {
+        res[p[i]] = i;
     }
-#if __cplusplus >= 201700L
-    RecursiveFunction secondDFS = [&](const auto& self, int vert) -> void {
-#else
-        function<void(int)> secondDFS = [&](int vert) -> void {
-#endif
-        if (visited[vert]) {
-            if (condensed[vert] != index) {
-                if (next[condensed[vert]] != key) {
-                    next[condensed[vert]] = key;
-                    queue.push_back(condensed[vert]);
-                }
-            }
-            return;
-        }
-        condensed[vert] = index;
-        visited[vert] = true;
-        for (auto& e : gt[vert]) {
-#if __cplusplus >= 201700L
-            self(e.to);
-#else
-            secondDFS(e.to);
-#endif
-        }
-    };
-    for (int i : RevRange(n)) {
-        if (!visited[order[i]]) {
-            key = i;
-            queue.clear();
-            secondDFS(order[i]);
-            result.addVertices(1);
-            for (int j : queue) {
-                result.addEdge(j, index);
-            }
-            index++;
-        }
+    return res;
+}
+
+template <typename T, typename Iterator>
+inline void addAll(vector<T>& v, Iterator begin, Iterator end) {
+    v.insert(v.end(), begin, end);
+}
+
+template <class Collection, typename Iterator>
+inline void addAll(Collection& v, Iterator begin, Iterator end) {
+    v.insert(begin, end);
+}
+
+template <typename Iterator>
+arri getQty(Iterator begin, Iterator end, int length) {
+    arri res(length, 0);
+    for (Iterator it = begin; it != end; it++) {
+        res[*it]++;
     }
-    return {condensed, result};
+    return res;
+}
+
+template <typename Iterator>
+arri getQty(Iterator begin, Iterator end) {
+    return getQty(begin, end, *max_element(begin, end) + 1);
+}
+
+template <class Collection>
+void collect(Collection&) {}
+
+template <class Collection, class Other, class ...Vs>
+void collect(Collection& all, Other& a, Vs& ...vs) {
+    addAll(all, all(a));
+    collect(all, vs...);
+}
+
+void replace(const vi&) {}
+
+template <class ...Vs>
+void replace(const vi& all, vi& a, Vs& ...vs) {
+    for (int& i : a) {
+        i = lower_bound(all(all), i) - all.begin();
+    }
+    replace(all, vs...);
+}
+
+template <class ...Vs>
+void replace(const vi& all, arri& a, Vs& ...vs) {
+    for (int& i : a) {
+        i = lower_bound(all(all), i) - all.begin();
+    }
+    replace(all, vs...);
+}
+
+template <class ...Vs>
+vi compress(Vs& ...vs) {
+    vi vals;
+    collect(vals, vs...);
+    sort(all(vals));
+    unique(vals);
+    replace(vals, vs...);
+    return vals;
 }
 
 
-class CapitalCity {
+class ERandomPawn {
 public:
     void solve() {
         int n = in.readInt();
-        int m = in.readInt();
-        arri u, v;
-        in.readArrays(m, u, v);
-        decreaseByOne(u, v);
+        auto a = in.readLongArray(n);
+        auto b = in.readIntArray(n);
 
-        Graph<BaseEdge> graph(n);
-        for (int i : range(m)) {
-            graph.addEdge(u[i], v[i]);
+        int at = max_element(all(a)) - a.begin();
+        arr<ll> aa(n + 1);
+        arri bb(n + 1);
+        for (int i : range(n - at)) {
+            aa[i] = a[at + i];
+            bb[i] = b[at + i];
         }
-        auto res = stronglyConnectedComponents(graph);
-        int sz = res.second.vertexCount;
-        arr<bool> reachable(sz, false);
-        reachable[sz - 1] = true;
-        for (int i : RevRange(sz)) {
-            for (auto& e : res.second[i]) {
-                if (reachable[e.to]) {
-                    reachable[i] = true;
+        for (int i : range(at)) {
+            aa[i + n - at] = a[i];
+            bb[i + n - at] = b[i];
+        }
+        aa[n] = a[at];
+        bb[n] = b[at];
+        a = aa;
+        b = bb;
+        FenwickTree<ll> sumB(n);
+        FenwickTree<ll> sumBI(n);
+        for (int i : range(n)) {
+            sumB.add(i, b[i]);
+            sumBI.add(i, i * b[i]);
+        }
+        auto f = [&](int i, int left, int right) -> ll {
+            int k = right - left;
+            int j = i - left;
+            ll base = j * a[right] + (k - j) * a[left];
+            ll lb = 2 * ll(j) * k * sumB.get(i, right) -
+                    2 * j * (sumBI.get(i, right) - left * sumB.get(i, right));
+            ll rb = 2 * (k - j) * (sumBI.get(left + 1, i) - left * sumB.get(left + 1, i));
+            ll c = base - (lb + rb);
+            return c;
+        };
+        /*set<int> poi;
+        for (int i : range(n + 1)) {
+            poi.insert(i);
+        }
+        que<int> toCheck;
+        arr<bool> inQueue(n + 1, true);
+        for (int i : range(1, n)) {
+            toCheck.push(i);
+        }
+        while (!toCheck.empty()) {
+            int i = toCheck.pop();
+            inQueue[i] = false;
+            poi.erase(i);
+            auto it = poi.lower_bound(i);
+            int right = *it;
+            it--;
+            int left = *it;
+            ld c = f(i, left, right);
+            if (c >= a[i]) {
+                if (!inQueue[left]) {
+                    inQueue[left] = true;
+                    toCheck.push(left);
+                }
+                if (!inQueue[right]) {
+                    inQueue[right] = true;
+                    toCheck.push(right);
+                }
+            } else {
+                poi.insert(i);
+            }
+        }*/
+
+/*        poi.insert(0);
+        poi.insert(n);
+        arri order(n - 1);
+        for (int i : range(1, n)) {
+            order[i - 1] = i;
+        }
+        sort(all(order), [&](int x, int y) -> bool {
+            return a[x] > a[y];
+        });
+//        ld answer = a[0];
+        for (int i : order) {
+            auto it = poi.lower_bound(i);
+            int right = *it;
+            it--;
+            int left = *it;
+            int k = right - left;
+            int j = i - left;
+            ld base = ld(j) / k * a[right] + ld(k - j) / k * a[left];
+            ld lb = 2 * j * k * sumB.get(i, right) -
+                        2 * j * (sumBI.get(i, right) - left * sumB.get(i, right));
+            ld rb = 2 * (k - j) * (sumBI.get(left + 1, i) - left * sumB.get(left + 1, i));
+            ld c = base - (lb + rb) / k;
+            if (c < a[i]) {
+                poi.insert(i);
+//                answer += a[i];
+            } else {
+//                answer += c;
+            }
+        }*/
+        vi q;
+        for (int i : range(n + 1)) {
+            while (q.size() >= 2) {
+                int last = q.back();
+                int before = q[q.size() - 2];
+                if (f(last, before, i) > a[last] * (i - before)) {
+                    q.pop_back();
+                } else {
                     break;
                 }
             }
+            q.push_back(i);
         }
-        if (count(all(reachable), false)) {
-            out.printLine(0);
-            return;
-        }
-        vi answer;
+        set<int> poi;
+        addAll(poi, all(q));
+        ld answer = 0;
         for (int i : range(n)) {
-            if (res.first[i] == sz - 1) {
-                answer.push_back(i + 1);
+            if (poi.count(i)) {
+                answer += a[i];
+            } else {
+                auto it = poi.lower_bound(i);
+                int right = *it;
+                it--;
+                int left = *it;
+//                int k = right - left;
+//                int j = i - left;
+//                ld base = ld(j) / k * a[right] + ld(k - j) / k * a[left];
+//                ld lb = 2 * j * k * sumB.get(i, right) -
+//                        2 * j * (sumBI.get(i, right) - left * sumB.get(i, right));
+//                ld rb = 2 * (k - j) * (sumBI.get(left + 1, i) - left * sumB.get(left + 1, i));
+//                ld c = base - (lb + rb) / k;
+                answer += ld(f(i, left, right)) / (right - left);
             }
         }
-        out.printLine(answer.size());
+        answer /= n;
+        out.setPrecision(20);
         out.printLine(answer);
     }
 };
 
 
 int main() {
-#ifdef LOCAL
-    signal(SIGABRT, &signalHandler);
-#endif
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 #ifdef LOCAL_RELEASE
@@ -999,7 +1054,7 @@ int main() {
     freopen("output.txt", "w", stdout);
     auto time = clock();
 #endif
-    CapitalCity solver;
+    ERandomPawn solver;
 
 
     solver.solve();

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <cmath>
-#include <iomanip>
 #include "../general.h"
 #include "../range/range.h"
 #include "modulo.h"

@@ -1,10 +1,9 @@
 #pragma once
 
-#include <unordered_map>
 #include "../general.h"
 #include "arr.h"
 
-template <typename T, class Map = unordered_map<T, int>>
+template <typename T, class Map = map<T, int>>
 class Id {
     Map map;
     int next = 0;

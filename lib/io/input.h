@@ -1,9 +1,5 @@
 #pragma once
 
-#include <cstdio>
-#include <cctype>
-#include <string>
-#include <cstring>
 #include "../general.h"
 #include "../numbers/doubles.h"
 #include "../collections/arr.h"

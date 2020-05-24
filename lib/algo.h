@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include "general.h"
 #include "collections/arr.h"
 #include "range/range.h"

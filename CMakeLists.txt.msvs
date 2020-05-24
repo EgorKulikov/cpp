@@ -23,9 +23,9 @@ ADD_DEFINITIONS(/EHa -Wno-header-hygiene -Wno-c++98-compat-pedantic -Wno-c++98-c
 
 set_target_properties(task PROPERTIES LINKER_LANGUAGE CXX)
 
-set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd -Xclang -ftrapv -Xclang -ftrapping-math -Xclang -fno-inline-functions -Xclang -fno-unroll-loops -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_FORTIFY_SOURCE=2 -DLOCAL -fsanitize=undefined -fsanitize-undefined-trap-on-error -fno-sanitize-recover=all")
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 /MTd -Xclang -ftrapv -Xclang -ftrapping-math -Xclang -fno-inline-functions -Xclang -fno-unroll-loops -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_FORTIFY_SOURCE=2 -DLOCAL -fsanitize=undefined -fsanitize-undefined-trap-on-error -fno-sanitize-recover=all")
 
-set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Xclang -ftrapping-math -Xclang -fno-inline-functions -Xclang -fno-unroll-loops -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -DLOCAL -fsanitize=undefined -fsanitize-undefined-trap-on-error -fno-sanitize-recover=all")
+set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O0 -Xclang -ftrapping-math -Xclang -fno-inline-functions -Xclang -fno-unroll-loops -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -DLOCAL -fsanitize=undefined -fsanitize-undefined-trap-on-error -fno-sanitize-recover=all")
 
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DLOCAL_RELEASE")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG:FULL /stack:268435456")

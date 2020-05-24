@@ -1,19 +1,12 @@
 #pragma once
 
-#include <ostream>
-#include <bits/random.h>
 #include "../general.h"
 #include "../range/range.h"
 #include "numbers.h"
 
-const ll MOD7 = 1000000007;
-const ll MOD9 = 1000000009;
-const ll MODF = 998244353;
+ll mod = 1000000007;
 
-ll mod = MOD7;
-
-template <typename T>
-T gcd(T a, T b, T& x, T& y) {
+li gcd(li a, li b, li& x, li& y) {
     if (a == 0) {
         x = 0;
         y = 1;
@@ -28,7 +21,7 @@ class bigmod {
 public:
     ll n;
     bigmod() : n(0) {}
-    bigmod(__int128 n) {
+    bigmod(ll n) {
         if (n >= 0 && n < mod) {
             this->n = n;
             return;
@@ -54,7 +47,7 @@ public:
         return *this;
     }
     bigmod& operator *=(const bigmod& other) {
-        n = __int128(n) * other.n % mod;
+        n = li(n) * other.n % mod;
         return *this;
     }
     bigmod& operator /=(const bigmod& other) {
@@ -72,8 +65,8 @@ public:
         return bigmod(mod - n);
     }
     bigmod inverse() const {
-        __int128 x, y;
-        __int128 g = gcd(__int128(n), __int128(mod), x, y);
+        li x, y;
+        li g = gcd(__int128(n), __int128(mod), x, y);
 #ifdef LOCAL
         if (g != 1) {
             throw "not inversable";

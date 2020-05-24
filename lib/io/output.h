@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <iomanip>
 #include "../general.h"
 #include "../collections/arr.h"
 #include "../collections/mdarr.h"
@@ -63,11 +61,12 @@ public:
     bool autoflush;
 
     Output(ostream& out, bool autoflush) : out(&out), autoflush(autoflush) {
-        out << fixed << setprecision(20);
+        setPrecision(20);
     }
 
     void setOut(ostream& nOut) {
         out = &nOut;
+        setPrecision(20);
     }
 
     inline void print() {}

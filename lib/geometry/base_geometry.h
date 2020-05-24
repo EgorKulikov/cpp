@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cmath>
 #include "../general.h"
 
 using DoubleType = long double;
