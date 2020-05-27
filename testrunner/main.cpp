@@ -1,4 +1,4 @@
-#include "../tasks/ERandomPawn.cpp"
+#include "../tasks/FVkusnayaPechenka.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -30,25 +30,25 @@ bool check(std::string expected, std::string actual) {
 
 int main() {
     std::vector<jhelper::Test> tests = {
-		{"5\n4 2 6 3 5\n1 1 1 1 1\n", "4.700000000000\n", true, true},{"4\n100 0 100 0\n0 100 0 100\n", "50.000000000000\n", true, true},{"14\n4839 5400 6231 5800 6001 5200 6350 7133 7986 8012 7537 7013 6477 5912\n34 54 61 32 52 61 21 43 65 12 45 21 1 4\n", "7047.142857142857\n", true, true},{"10\n470606482521 533212137322 116718867454 746976621474 457112271419 815899162072 641324977314 88281100571 9231169966 455007126951\n26 83 30 59 100 88 84 91 54 61\n", "815899161079.400024414062\n", true, true},
+		{"2\n5 7\n5 7\n", "SMALL\n0\n\n", true, true},{"2\n1 1\n300000 1\n", "BIG\n299999\n", true, true},{"2\n10 1\n13 14\n", "SMALL\n6\nRPPPRP\n", true, true},{"3\n1 2 1\n2 1 2\n", "IMPOSSIBLE\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
 	std::cout << std::fixed;
 	double maxTime = 0.0;
 	for(const jhelper::Test& test: tests ) {
-		std::cout << "Test #" << ++testID << std::endl;
+		std::cout << "\x1B[34mTest #" << ++testID << "\033[0m" << std::endl;
 		if (!test.active) {
-            std::cout << "SKIPPED\n";
+            std::cout << "\x1B[33mSKIPPED\033[0m\n";
             std::cout << std::endl;
             continue;
 		}
-		std::cout << "Input: \n" << test.input << std::endl;
+		std::cout << "\x1B[34mInput:\033[0m \n" << test.input << std::endl;
 		if (test.has_output) {
-			std::cout << "Expected output: \n" << test.output << std::endl;
+			std::cout << "\x1B[34mExpected output:\033[0m \n" << test.output << std::endl;
 		}
 		else {
-			std::cout << "Expected output: \n" << "N/A" << std::endl;
+			std::cout << "\x1B[34mExpected output:\033[0m \n" << "\x1B[33mN/A\033[0m" << std::endl;
 		}
 		if (test.active) {
             std::ofstream inw;
@@ -61,7 +61,7 @@ int main() {
             try {
                 in = Input();
                 out.setOut(fout);
-                ERandomPawn solver;
+                FVkusnayaPechenka solver;
                 solver.solve();
                 out.flush();
                 fout.close();
@@ -69,7 +69,7 @@ int main() {
                 std::cerr << e << std::endl;
             }
             if (!in.isExhausted() && in.skipWhitespace() != EOF) {
-                cerr << "Input is not exhausted" << endl;
+                cout << "\x1B[31mInput is not exhausted\033[0m" << endl;
             }
             std::clock_t finish = std::clock();
             double currentTime = double(finish - start) / CLOCKS_PER_SEC;
@@ -77,26 +77,23 @@ int main() {
             std::ifstream t("jhelperoutput.txt");
             std::stringstream output;
             output << t.rdbuf();
-            std::cout << "Actual output: \n" << output.str() << std::endl;
+            std::cout << "\x1B[34mActual output:\033[0m \n" << output.str() << std::endl;
             if (test.has_output) {
                 bool result = jhelper::check(test.output, output.str());
                 allOK = allOK && result;
-                std::cout << "Result: " << (result ? "OK" : "Wrong answer") << std::endl;
+                std::cout << "\x1B[34mResult:\033[0m " << (result ? "\x1B[32mOK\033[0m" : "\x1B[31mWrong answer\033[0m") << std::endl;
             }
-            std::cout << "Time: " << int(currentTime) << "." << (int(currentTime * 10) % 10) << (int(currentTime * 100) % 10) << (int(currentTime * 1000) % 10) << "s" << std::endl;
+            std::cout << "\x1B[34mTime: " << int(currentTime) << "." << (int(currentTime * 10) % 10) << (int(currentTime * 100) % 10) << (int(currentTime * 1000) % 10) << "s\033[0m" << std::endl;
             t.close();
-		}
-		else {
-			std::cout << "SKIPPED\n";
 		}
 
 		std::cout << std::endl;
 	}
 	if (allOK) {
-		std::cout << "All OK" << std::endl;
+		std::cout << "\x1B[32mAll OK\033[0m" << std::endl;
 	} else {
-		std::cout << "Some cases failed" << std::endl;
+		std::cout << "\x1B[31mSome cases failed\033[0m" << std::endl;
 	}
-	std::cout << "Maximal time: " << int(maxTime) << "." << (int(maxTime * 10) % 10) << (int(maxTime * 100) % 10) << (int(maxTime * 1000) % 10) << "s." << std::endl;
+	std::cout << "\x1B[34mMaximal time: " << int(maxTime) << "." << (int(maxTime * 10) % 10) << (int(maxTime * 100) % 10) << (int(maxTime * 1000) % 10) << "s.\033[0m" << std::endl;
 	return 0;
 }

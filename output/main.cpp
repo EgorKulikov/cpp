@@ -706,11 +706,12 @@ public:
     bool autoflush;
 
     Output(ostream& out, bool autoflush) : out(&out), autoflush(autoflush) {
-        out << fixed << setprecision(20);
+        setPrecision(20);
     }
 
     void setOut(ostream& nOut) {
         out = &nOut;
+        setPrecision(20);
     }
 
     inline void print() {}
@@ -749,298 +750,135 @@ Output out(cout, false);
 Output err(cerr, true);
 
 
-template <typename T>
-class FenwickTree {
-    arr<T> value;
-
-    T get(int to) const {
-        minim(to, int(value.size()) - 1);
-        T result = 0;
-        while (to >= 0) {
-            result += value[to];
-            to = (to & (to + 1)) - 1;
-        }
-        return result;
-    }
-
+class ReverseNumberIterator : public NumberIterator {
 public:
-    FenwickTree(int size) {
-        value = arr<T>(size, 0);
-    }
+    ReverseNumberIterator(int v) : NumberIterator(v) {}
 
-    void add(int at, T val) {
-        while (at < value.size()) {
-            value[at] += val;
-            at = at | (at + 1);
-        }
-    }
-
-    T get(int from, int to) const {
-        if (from >= to) {
-            return 0;
-        }
-        return get(to - 1) - get(from - 1);
-    }
-
-    void clear() {
-        fill(all(value), 0);
-    }
-};
-
-
-template <typename T>
-class que : public queue<T> {
-    using parent = queue<T>;
-public:
-    que() : parent() {}
-
-    que(const que<T>& q) : parent(q) {}
-
-    que(que<T>&& q) noexcept: parent(move(q)) {}
-
-    T pop() {
-#ifdef LOCAL
-        if (parent::empty()) {
-            throw "Pop on empty queue";
-        }
-#endif
-        T res = parent::front();
-        parent::pop();
-        return res;
-    }
-
-    que<T>& operator=(que<T>&& __x) noexcept {
-        parent::operator=(__x);
-        return *this;
-    }
-
-    que<T>& operator=(const que<T>& __x) {
-        parent::operator=(__x);
+    ReverseNumberIterator& operator++() {
+        --v;
         return *this;
     }
 };
 
-using qi = que<int>;
+class RevRange : pii {
+public:
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
 
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
 
-template <typename T>
-inline void unique(vector<T>& v) {
-    v.resize(unique(all(v)) - v.begin());
-}
-
-arri createOrder(int n) {
-    arri order(n);
-    for (int i = 0; i < n; i++) {
-        order[i] = i;
+    ReverseNumberIterator begin() {
+        return first;
     }
-    return order;
-}
 
-arri inverse(const arri& p) {
-    arri res(p.size());
-    for (int i : range(p.size())) {
-        res[p[i]] = i;
+    ReverseNumberIterator end() {
+        return second;
     }
-    return res;
-}
-
-template <typename T, typename Iterator>
-inline void addAll(vector<T>& v, Iterator begin, Iterator end) {
-    v.insert(v.end(), begin, end);
-}
-
-template <class Collection, typename Iterator>
-inline void addAll(Collection& v, Iterator begin, Iterator end) {
-    v.insert(begin, end);
-}
-
-template <typename Iterator>
-arri getQty(Iterator begin, Iterator end, int length) {
-    arri res(length, 0);
-    for (Iterator it = begin; it != end; it++) {
-        res[*it]++;
-    }
-    return res;
-}
-
-template <typename Iterator>
-arri getQty(Iterator begin, Iterator end) {
-    return getQty(begin, end, *max_element(begin, end) + 1);
-}
-
-template <class Collection>
-void collect(Collection&) {}
-
-template <class Collection, class Other, class ...Vs>
-void collect(Collection& all, Other& a, Vs& ...vs) {
-    addAll(all, all(a));
-    collect(all, vs...);
-}
-
-void replace(const vi&) {}
-
-template <class ...Vs>
-void replace(const vi& all, vi& a, Vs& ...vs) {
-    for (int& i : a) {
-        i = lower_bound(all(all), i) - all.begin();
-    }
-    replace(all, vs...);
-}
-
-template <class ...Vs>
-void replace(const vi& all, arri& a, Vs& ...vs) {
-    for (int& i : a) {
-        i = lower_bound(all(all), i) - all.begin();
-    }
-    replace(all, vs...);
-}
-
-template <class ...Vs>
-vi compress(Vs& ...vs) {
-    vi vals;
-    collect(vals, vs...);
-    sort(all(vals));
-    unique(vals);
-    replace(vals, vs...);
-    return vals;
-}
+};
 
 
-class ERandomPawn {
+class FVkusnayaPechenka {
 public:
     void solve() {
         int n = in.readInt();
         auto a = in.readLongArray(n);
-        auto b = in.readIntArray(n);
+        auto b = in.readLongArray(n);
 
-        int at = max_element(all(a)) - a.begin();
-        arr<ll> aa(n + 1);
-        arri bb(n + 1);
-        for (int i : range(n - at)) {
-            aa[i] = a[at + i];
-            bb[i] = b[at + i];
-        }
-        for (int i : range(at)) {
-            aa[i + n - at] = a[i];
-            bb[i + n - at] = b[i];
-        }
-        aa[n] = a[at];
-        bb[n] = b[at];
-        a = aa;
-        b = bb;
-        FenwickTree<ll> sumB(n);
-        FenwickTree<ll> sumBI(n);
-        for (int i : range(n)) {
-            sumB.add(i, b[i]);
-            sumBI.add(i, i * b[i]);
-        }
-        auto f = [&](int i, int left, int right) -> ll {
-            int k = right - left;
-            int j = i - left;
-            ll base = j * a[right] + (k - j) * a[left];
-            ll lb = 2 * ll(j) * k * sumB.get(i, right) -
-                    2 * j * (sumBI.get(i, right) - left * sumB.get(i, right));
-            ll rb = 2 * (k - j) * (sumBI.get(left + 1, i) - left * sumB.get(left + 1, i));
-            ll c = base - (lb + rb);
-            return c;
-        };
-        /*set<int> poi;
-        for (int i : range(n + 1)) {
-            poi.insert(i);
-        }
-        que<int> toCheck;
-        arr<bool> inQueue(n + 1, true);
-        for (int i : range(1, n)) {
-            toCheck.push(i);
-        }
-        while (!toCheck.empty()) {
-            int i = toCheck.pop();
-            inQueue[i] = false;
-            poi.erase(i);
-            auto it = poi.lower_bound(i);
-            int right = *it;
-            it--;
-            int left = *it;
-            ld c = f(i, left, right);
-            if (c >= a[i]) {
-                if (!inQueue[left]) {
-                    inQueue[left] = true;
-                    toCheck.push(left);
-                }
-                if (!inQueue[right]) {
-                    inQueue[right] = true;
-                    toCheck.push(right);
-                }
-            } else {
-                poi.insert(i);
+        if (n == 1) {
+            if (a[0] == b[0]) {
+                out.printLine("SMALL");
+                out.printLine(0);
+                return;
             }
-        }*/
-
-/*        poi.insert(0);
-        poi.insert(n);
-        arri order(n - 1);
-        for (int i : range(1, n)) {
-            order[i - 1] = i;
+            out.printLine("IMPOSSIBLE");
+            return;
         }
-        sort(all(order), [&](int x, int y) -> bool {
-            return a[x] > a[y];
-        });
-//        ld answer = a[0];
-        for (int i : order) {
-            auto it = poi.lower_bound(i);
-            int right = *it;
-            it--;
-            int left = *it;
-            int k = right - left;
-            int j = i - left;
-            ld base = ld(j) / k * a[right] + ld(k - j) / k * a[left];
-            ld lb = 2 * j * k * sumB.get(i, right) -
-                        2 * j * (sumBI.get(i, right) - left * sumB.get(i, right));
-            ld rb = 2 * (k - j) * (sumBI.get(left + 1, i) - left * sumB.get(left + 1, i));
-            ld c = base - (lb + rb) / k;
-            if (c < a[i]) {
-                poi.insert(i);
-//                answer += a[i];
-            } else {
-//                answer += c;
+        ll sumA = accumulate(all(a), 0ll);
+        if (n == 2) {
+            vector<pair<ll, char>> ops;
+            ll ps = 0;
+            while (b[0] + b[1] > sumA && b[0] > 0) {
+                ll times = min((b[0] + b[1] - sumA + b[0] - 1) / b[0], b[1] / b[0]);
+                ps += times;
+                b[1] -= b[0] * times;
+                ops.emplace_back(times, 'P');
+                swap(b[0], b[1]);
+                ops.emplace_back(1, 'R');
             }
-        }*/
-        vi q;
-        for (int i : range(n + 1)) {
-            while (q.size() >= 2) {
-                int last = q.back();
-                int before = q[q.size() - 2];
-                if (f(last, before, i) > a[last] * (i - before)) {
-                    q.pop_back();
+            if (b[0] == a[1] && b[1] == a[0]) {
+                swap(b[0], b[1]);
+                ops.emplace_back(1, 'R');
+            }
+            if (b[0] == a[0] && b[1] == a[1]) {
+                if (ps <= 200000) {
+                    reverse(all(ops));
+                    string answer = "";
+                    for (const auto& p : ops) {
+                        answer += string(p.first, p.second);
+                    }
+                    out.printLine("SMALL");
+                    out.printLine(answer.size());
+                    out.printLine(answer);
+                    return;
                 } else {
-                    break;
+                    out.printLine("BIG");
+                    out.printLine(ps);
+                    return;
                 }
             }
-            q.push_back(i);
+            out.printLine("IMPOSSIBLE");
+            return;
         }
-        set<int> poi;
-        addAll(poi, all(q));
-        ld answer = 0;
-        for (int i : range(n)) {
-            if (poi.count(i)) {
-                answer += a[i];
-            } else {
-                auto it = poi.lower_bound(i);
-                int right = *it;
-                it--;
-                int left = *it;
-//                int k = right - left;
-//                int j = i - left;
-//                ld base = ld(j) / k * a[right] + ld(k - j) / k * a[left];
-//                ld lb = 2 * j * k * sumB.get(i, right) -
-//                        2 * j * (sumBI.get(i, right) - left * sumB.get(i, right));
-//                ld rb = 2 * (k - j) * (sumBI.get(left + 1, i) - left * sumB.get(left + 1, i));
-//                ld c = base - (lb + rb) / k;
-                answer += ld(f(i, left, right)) / (right - left);
+        string answer = "";
+        ll ps = 0;
+        while (accumulate(all(b), 0ll) > sumA) {
+            bool direct = true;
+            bool rev = true;
+            for (int i : range(1, n)) {
+                if (b[i] >= b[i - 1]) {
+                    rev = false;
+                }
+                if (b[i] <= b[i - 1]) {
+                    direct = false;
+                }
+            }
+            if (!direct && !rev) {
+                out.printLine("IMPOSSIBLE");
+                return;
+            }
+            if (rev) {
+                reverse(all(b));
+                answer += "R";
+            }
+            answer += "P";
+            ps++;
+            for (int i : RevRange(n - 1)) {
+                b[i + 1] -= b[i];
             }
         }
-        answer /= n;
-        out.setPrecision(20);
+        bool needRev = true;
+        for (int i : range(n)) {
+            if (a[i] != b[n - i - 1]) {
+                needRev = false;
+            }
+        }
+        if (needRev) {
+            reverse(all(b));
+            answer += "R";
+        }
+        for (int i : range(n)) {
+            if (a[i] != b[i]) {
+                out.printLine("IMPOSSIBLE");
+                return;
+            }
+        }
+        if (ps > 200000) {
+            out.printLine("BIG");
+            out.printLine(ps);
+            return;
+        }
+        reverse(all(answer));
+        out.printLine("SMALL");
+        out.printLine(answer.size());
         out.printLine(answer);
     }
 };
@@ -1054,7 +892,7 @@ int main() {
     freopen("output.txt", "w", stdout);
     auto time = clock();
 #endif
-    ERandomPawn solver;
+    FVkusnayaPechenka solver;
 
 
     solver.solve();
