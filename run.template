@@ -9,6 +9,32 @@
 #include <ctime>
 #include "../lib/general.h"
 
+namespace Color {
+enum Code {
+  FG_RED = 31,
+  FG_GREEN = 32,
+  FG_BLUE = 34,
+  FG_ORANGE = 208,
+  FG_DEFAULT = 39,
+  BG_RED = 41,
+  BG_GREEN = 42,
+  BG_BLUE = 44,
+  BG_DEFAULT = 49
+};
+class Modifier {
+  Code code;
+public:
+  Modifier(Code pCode) : code(pCode) {}
+  friend std::ostream&
+  operator<<(std::ostream& os, const Modifier& mod) {
+    return os << "\033[" << mod.code << "m";
+  }
+};
+}
+Color::Modifier red(Color::FG_RED);
+Color::Modifier green(Color::FG_GREEN);
+Color::Modifier def(Color::FG_DEFAULT);
+
 namespace jhelper {
 
 struct Test {
@@ -81,7 +107,11 @@ int main() {
             if (test.has_output) {
                 bool result = jhelper::check(test.output, output.str());
                 allOK = allOK && result;
-                std::cout << "Result: " << (result ? "OK" : "Wrong answer") << std::endl;
+		if(result){
+			std::cout << green << "OK" << def << std::endl;
+		} else {
+			std::cout << red << "Wrong Answer" << def << std::endl;
+		}
             }
             std::cout << "Time: " << int(currentTime) << "." << (int(currentTime * 10) % 10) << (int(currentTime * 100) % 10) << (int(currentTime * 1000) % 10) << "s" << std::endl;
             t.close();
@@ -93,9 +123,9 @@ int main() {
 		std::cout << std::endl;
 	}
 	if (allOK) {
-		std::cout << "All OK" << std::endl;
+		std::cout << green << "All OK" << def << std::endl;
 	} else {
-		std::cout << "Some cases failed" << std::endl;
+		std::cout << red << "Some cases failed" << def << std::endl;
 	}
 	std::cout << "Maximal time: " << int(maxTime) << "." << (int(maxTime * 10) % 10) << (int(maxTime * 100) % 10) << (int(maxTime * 1000) % 10) << "s." << std::endl;
 	return 0;
