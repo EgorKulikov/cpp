@@ -23,6 +23,7 @@ file(GLOB DIRECT "direct/*.cpp")
 
 add_executable(task ${TASKS} ${HEADERS})
 add_executable(direct "direct/main.cpp" ${HEADERS})
+add_executable(gen "direct/gen.cpp" ${HEADERS})
 
 ADD_DEFINITIONS(-static -std=c++17 -Wall -Wextra -Wno-sign-compare -Wno-reorder -Wno-logical-op-parentheses)
 

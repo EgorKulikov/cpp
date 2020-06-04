@@ -4,11 +4,11 @@
 
 template <typename T>
 struct TreapSet {
-    using Node = Node<T, SizeData>;
-    mutable Node* root = nullptr;
+    using TNode = Node<T, SizeData>;
+    mutable TNode* root = nullptr;
 
     bool insert(const T& element) {
-        auto* node = new Node(element);
+        auto* node = new TNode(element);
         if (root == nullptr) {
             root = node;
             return true;
@@ -41,7 +41,7 @@ struct TreapSet {
 
     int index(const T& element) const {
         auto split = root->split(element);
-        if (split.second == nullptr || split.second->leftmost() != element) {
+        if (split.second == nullptr || split.second->leftmost()->key != element) {
             root = merge(split.first, split.second);
             return -1;
         }
@@ -70,7 +70,7 @@ struct TreapSet {
             throw "Index out of bounds";
         }
 #endif
-        Node* node = root;
+        TNode* node = root;
         while (true) {
             int leftSize = node->left == nullptr ? 0 : node->left->data.size;
             if (leftSize == index) {

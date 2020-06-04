@@ -56,3 +56,23 @@ public:
         return invFactorial[n];
     }
 };
+
+arr<modint> bernoulli(int length, Combinations* c = nullptr) {
+    arr<modint> b(length);
+    if (c == nullptr) {
+        c = new Combinations(length + 1);
+    }
+    if (length > 0) {
+        b[0] = 1;
+    }
+    for (int i : range(1, length)) {
+        b[i] = 0;
+        for (int j : range(1, i + 1)) {
+            b[i] += (*c)(i + 1, j + 1) * b[i - j];
+        }
+        b[i] = -b[i];
+        b[i] /= i + 1;
+    }
+    return b;
+}
+

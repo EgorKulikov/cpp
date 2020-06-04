@@ -5,6 +5,10 @@
 
 class Rational {
     void normalize() {
+        if (den < 0) {
+            den = -den;
+            num = -num;
+        }
         ll g = gcd(num, den);
         num /= g;
         den /= g;
@@ -52,6 +56,17 @@ public:
         den *= other.num;
         normalize();
         return *this;
+    }
+
+    Rational operator -() const {
+        return Rational(-num, den);
+    }
+
+    Rational abs() const {
+        if (num >= 0) {
+            return *this;
+        }
+        return -(*this);
     }
 };
 

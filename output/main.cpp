@@ -750,136 +750,258 @@ Output out(cout, false);
 Output err(cerr, true);
 
 
-class ReverseNumberIterator : public NumberIterator {
-public:
-    ReverseNumberIterator(int v) : NumberIterator(v) {}
+const int DX_KNIGHT[] = {2, 1, -1, -2, -2, -1, 1, 2};
+const int DY_KNIGHT[] = {1, 2, 2, 1, -1, -2, -2, -1};
+const int DX4[] = {1, 0, -1, 0};
+const int DY4[] = {0, 1, 0, -1};
+const int DX8[] = {1, 1, 1, 0, -1, -1, -1, 0};
+const int DY8[] = {-1, 0, 1, 1, 1, 0, -1, -1};
 
-    ReverseNumberIterator& operator++() {
-        --v;
-        return *this;
-    }
-};
-
-class RevRange : pii {
-public:
-    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
-
-    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
-
-    ReverseNumberIterator begin() {
-        return first;
-    }
-
-    ReverseNumberIterator end() {
-        return second;
-    }
-};
+bool isValidCell(int r, int c, int n, int m) {
+    return r >= 0 && c >= 0 && r < n && c < m;
+}
 
 
-class FVkusnayaPechenka {
+class MateInTwo {
 public:
     void solve() {
-        int n = in.readInt();
-        auto a = in.readLongArray(n);
-        auto b = in.readLongArray(n);
+        struct MoveLine {
+            bool canMove;
+            bool canCapture;
+            vector<pii> moves;
+            set<pii>& sources;
 
-        if (n == 1) {
-            if (a[0] == b[0]) {
-                out.printLine("SMALL");
-                out.printLine(0);
-                return;
+            MoveLine(bool canMove, bool canCapture, const vector<pii>& moves, set<pii>& sources) : canMove(
+                    canMove), canCapture(canCapture), moves(moves), sources(sources) {}
+        };
+        set<pii> wholeBoard;
+        for (int i : range(8)) {
+            for (int j : range(8)) {
+                wholeBoard.emplace(i, j);
             }
-            out.printLine("IMPOSSIBLE");
-            return;
         }
-        ll sumA = accumulate(all(a), 0ll);
-        if (n == 2) {
-            vector<pair<ll, char>> ops;
-            ll ps = 0;
-            while (b[0] + b[1] > sumA && b[0] > 0) {
-                ll times = min((b[0] + b[1] - sumA + b[0] - 1) / b[0], b[1] / b[0]);
-                ps += times;
-                b[1] -= b[0] * times;
-                ops.emplace_back(times, 'P');
-                swap(b[0], b[1]);
-                ops.emplace_back(1, 'R');
+        set<pii> secondRow;
+        for (int i : range(8)) {
+            secondRow.emplace(1, i);
+        }
+        auto buildLine = [](int dx, int dy) -> vector<pii> {
+            int x = dx;
+            int y = dy;
+            vector<pii> res;
+            for (int i : range(7)) {
+                res.emplace_back(x, y);
+                x += dx;
+                y += dy;
             }
-            if (b[0] == a[1] && b[1] == a[0]) {
-                swap(b[0], b[1]);
-                ops.emplace_back(1, 'R');
-            }
-            if (b[0] == a[0] && b[1] == a[1]) {
-                if (ps <= 200000) {
-                    reverse(all(ops));
-                    string answer = "";
-                    for (const auto& p : ops) {
-                        answer += string(p.first, p.second);
+            return res;
+        };
+        MoveLine upLine(true, true, buildLine(1, 0), wholeBoard);
+        MoveLine downLine(true, true, buildLine(-1, 0), wholeBoard);
+        MoveLine rightLine(true, true, buildLine(0, 1), wholeBoard);
+        MoveLine leftLine(true, true, buildLine(0, -1), wholeBoard);
+        MoveLine upRightLine(true, true, buildLine(1, 1), wholeBoard);
+        MoveLine upLeftLine(true, true, buildLine(1, -1), wholeBoard);
+        MoveLine downRightLine(true, true, buildLine(-1, 1), wholeBoard);
+        MoveLine downLeftLine(true, true, buildLine(-1, -1), wholeBoard);
+        struct PieceType {
+            vector<MoveLine> lines;
+            bool isKing;
+
+            PieceType(const vector<MoveLine>& lines, bool isKing) : lines(lines), isKing(isKing) {}
+        };
+        PieceType* king = new PieceType({
+                                                MoveLine(true, true, {{1, 1}}, wholeBoard),
+                                                MoveLine(true, true, {{1, 0}}, wholeBoard),
+                                                MoveLine(true, true, {{1, -1}}, wholeBoard),
+                                                MoveLine(true, true, {{0, 1}}, wholeBoard),
+                                                MoveLine(true, true, {{-1, 1}}, wholeBoard),
+                                                MoveLine(true, true, {{0, -1}}, wholeBoard),
+                                                MoveLine(true, true, {{-1, -1}}, wholeBoard),
+                                                MoveLine(true, true, {{-1, 0}}, wholeBoard)
+                                        }, true);
+        PieceType* queen = new PieceType({
+                                                 upLine, downLine, leftLine, rightLine, upLeftLine, upRightLine,
+                                                 downLeftLine, downRightLine
+                                         }, false);
+        PieceType* rook = new PieceType({
+                                                upLine, downLine, leftLine, rightLine
+                                        }, false);
+        PieceType* bishop = new PieceType({
+                                                  upLeftLine, upRightLine, downLeftLine, downRightLine
+                                          }, false);
+        PieceType* knight = new PieceType({
+                                                  MoveLine(true, true, {{2, 1}}, wholeBoard),
+                                                  MoveLine(true, true, {{2, -1}}, wholeBoard),
+                                                  MoveLine(true, true, {{-2, 1}}, wholeBoard),
+                                                  MoveLine(true, true, {{-2, -1}}, wholeBoard),
+                                                  MoveLine(true, true, {{1, 2}}, wholeBoard),
+                                                  MoveLine(true, true, {{1, -2}}, wholeBoard),
+                                                  MoveLine(true, true, {{-1, 2}}, wholeBoard),
+                                                  MoveLine(true, true, {{-1, -2}}, wholeBoard)
+                                          }, false);
+        PieceType* pawn = new PieceType({
+                                                MoveLine(true, false, {{1, 0}}, wholeBoard),
+                                                MoveLine(true, false, {{1, 0},
+                                                                       {2, 0}}, secondRow),
+                                                MoveLine(false, true, {{1, 1}}, wholeBoard),
+                                                MoveLine(false, true, {{1, -1}}, wholeBoard)
+                                        }, false);
+        struct Cell {
+            PieceType* piece;
+            bool color;
+
+            Cell(PieceType* piece, bool color) : piece(piece), color(color) {}
+        };
+        struct Board {
+            arr2d<Cell> cells = arr2d<Cell>(8, 8, Cell(nullptr, false));
+
+            Board flip() {
+                Board result;
+                for (int i : range(8)) {
+                    for (int j : range(8)) {
+                        if (cells(i, j).piece != nullptr) {
+                            result.cells(7 - i, j) = Cell(cells(i, j).piece, !cells(i, j).color);
+                        }
                     }
-                    out.printLine("SMALL");
-                    out.printLine(answer.size());
-                    out.printLine(answer);
-                    return;
-                } else {
-                    out.printLine("BIG");
-                    out.printLine(ps);
-                    return;
+                }
+                return result;
+            }
+
+            bool isBlackChecked() {
+                for (int i : range(8)) {
+                    for (int j : range(8)) {
+                        if (cells(i, j).piece == nullptr || !cells(i, j).color) {
+                            continue;
+                        }
+                        for (const MoveLine& line : cells(i, j).piece->lines) {
+                            if (!line.canCapture) {
+                                continue;
+                            }
+                            if (line.sources.count({i, j}) == 0) {
+                                continue;
+                            }
+                            for (const pii& shift : line.moves) {
+                                int ni = i + shift.first;
+                                int nj = j + shift.second;
+                                if (!isValidCell(ni, nj, 8, 8)) {
+                                    break;
+                                }
+                                if (cells(ni, nj).piece != nullptr) {
+                                    if (cells(ni, nj).piece->isKing && !cells(ni, nj).color) {
+                                        return true;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            vector<Board> allMoves() {
+                vector<Board> result;
+                for (int i : range(8)) {
+                    for (int j : range(8)) {
+                        if (cells(i, j).piece == nullptr || !cells(i, j).color) {
+                            continue;
+                        }
+                        for (const MoveLine& line : cells(i, j).piece->lines) {
+                            if (line.sources.count({i, j}) == 0) {
+                                continue;
+                            }
+                            for (const pii& shift : line.moves) {
+                                int ni = i + shift.first;
+                                int nj = j + shift.second;
+                                if (!isValidCell(ni, nj, 8, 8)) {
+                                    break;
+                                }
+                                bool isCapture = false;
+                                if (cells(ni, nj).piece != nullptr) {
+                                    if (!line.canCapture || cells(ni, nj).color) {
+                                        break;
+                                    }
+                                    isCapture = true;
+                                } else if (!line.canMove) {
+                                    break;
+                                }
+                                Board after = flip();
+                                after.cells(7 - i, j).piece = nullptr;
+                                after.cells(7 - ni, nj).piece = cells(i, j).piece;
+                                after.cells(7 - ni, nj).color = false;
+                                if (!after.isBlackChecked()) {
+                                    result.push_back(after);
+                                }
+                                if (isCapture) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                return result;
+            }
+
+            bool isWhiteCheckmated() {
+                return flip().isBlackChecked() && allMoves().empty();
+            }
+        };
+
+        Board start;
+        for (int i : range(8)) {
+            for (int j : range(8)) {
+                char p = in.readChar();
+                char c = in.readChar();
+                if (p == '-') {
+                    continue;
+                }
+                start.cells(7 - i, j).color = c == 'w';
+                if (p == 'K') {
+                    start.cells(7 - i, j).piece = king;
+                } else if (p == 'Q') {
+                    start.cells(7 - i, j).piece = queen;
+                } else if (p == 'R') {
+                    start.cells(7 - i, j).piece = rook;
+                } else if (p == 'B') {
+                    start.cells(7 - i, j).piece = bishop;
+                } else if (p == 'N') {
+                    start.cells(7 - i, j).piece = knight;
+                } else if (p == 'P') {
+                    start.cells(7 - i, j).piece = pawn;
                 }
             }
-            out.printLine("IMPOSSIBLE");
-            return;
         }
-        string answer = "";
-        ll ps = 0;
-        while (accumulate(all(b), 0ll) > sumA) {
-            bool direct = true;
-            bool rev = true;
-            for (int i : range(1, n)) {
-                if (b[i] >= b[i - 1]) {
-                    rev = false;
-                }
-                if (b[i] <= b[i - 1]) {
-                    direct = false;
+        auto canMateInOne = [](Board board) -> bool {
+            auto moves = board.allMoves();
+            for (Board& b : moves) {
+                if (b.isWhiteCheckmated()) {
+                    return true;
                 }
             }
-            if (!direct && !rev) {
-                out.printLine("IMPOSSIBLE");
-                return;
+            return false;
+        };
+        auto canAvoidMateInOne = [&](Board board) -> bool {
+            auto moves = board.allMoves();
+            if (moves.empty()) {
+                return true;
             }
-            if (rev) {
-                reverse(all(b));
-                answer += "R";
+            for (Board& b : moves) {
+                if (!canMateInOne(b)) {
+                    return true;
+                }
             }
-            answer += "P";
-            ps++;
-            for (int i : RevRange(n - 1)) {
-                b[i + 1] -= b[i];
+            return false;
+        };
+        auto canMateInTwo = [&](Board board) -> bool {
+            auto moves = board.allMoves();
+            for (Board& b : moves) {
+                if (b.isWhiteCheckmated() || !canAvoidMateInOne(b)) {
+                    return true;
+                }
             }
-        }
-        bool needRev = true;
-        for (int i : range(n)) {
-            if (a[i] != b[n - i - 1]) {
-                needRev = false;
-            }
-        }
-        if (needRev) {
-            reverse(all(b));
-            answer += "R";
-        }
-        for (int i : range(n)) {
-            if (a[i] != b[i]) {
-                out.printLine("IMPOSSIBLE");
-                return;
-            }
-        }
-        if (ps > 200000) {
-            out.printLine("BIG");
-            out.printLine(ps);
-            return;
-        }
-        reverse(all(answer));
-        out.printLine("SMALL");
-        out.printLine(answer.size());
-        out.printLine(answer);
+            return false;
+        };
+        out.printLine(canMateInTwo(start) ? "YES" : "NO");
     }
 };
 
@@ -892,10 +1014,15 @@ int main() {
     freopen("output.txt", "w", stdout);
     auto time = clock();
 #endif
-    FVkusnayaPechenka solver;
+    MateInTwo solver;
 
 
-    solver.solve();
+    int n;
+    scanf("%d", &n);
+    for (int i = 0; i < n; ++i) {
+        solver.solve();
+    }
+
     fflush(stdout);
 #ifdef LOCAL_RELEASE
     cerr << clock() - time << endl;

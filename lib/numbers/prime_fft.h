@@ -119,7 +119,7 @@ void multiply(const It fBegin, const It fEnd, const It sBegin, const It sEnd, It
     }
 }
 
-vector<modint> multiply(vector<modint>& first, vector<modint>& second) {
+vector<modint> multiply(vector<modint>&& first, vector<modint>&& second) {
     auto len = first.size() + second.size() - 1;
     vector<modint> res(len);
     multiply(all(first), all(second), res.begin());

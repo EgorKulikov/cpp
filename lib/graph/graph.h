@@ -15,24 +15,22 @@ public:
     Graph(int vertexCount) : vertexCount(vertexCount), edges(vertexCount, vector<Edge>()) {}
 
     template <typename...Ts>
-    Edge& addEdge(int from, int to, Ts... args) {
+    int addEdge(int from, int to, Ts... args) {
 #ifdef LOCAL
         if (from < 0 || to < 0 || from >= vertexCount || to >= vertexCount) {
             throw "Out of bounds";
         }
 #endif
         edges[from].emplace_back(to, edgeCount, args...);
-        Edge& direct = edges[from].back();
         int directId = edges[from].size() - 1;
         if (Edge::reversable) {
-            edges[to].push_back(direct.reverseEdge(from));
-            Edge& reverse = edges[to].back();
+            edges[to].push_back(edges[from][directId].reverseEdge(from));
             int revId = edges[to].size() - 1;
-            direct.setReverseId(revId);
-            reverse.setReverseId(directId);
+            edges[from][directId].setReverseId(revId);
+            edges[to][revId].setReverseId(directId);
         }
         edgeCount++;
-        return direct;
+        return directId;
     }
 
     vector<Edge>& operator [](int at) {

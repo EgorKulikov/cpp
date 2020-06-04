@@ -5,23 +5,17 @@
 #include "../lib/io/output.h"
 
 int main() {
-    auto maxDigit = [&](ll prefix) -> int {
-        int res = 0;
-        while (prefix != 0) {
-            maxim(res, int(prefix % 10));
-            prefix /= 10;
+    arr2d<ll> ans(11, 11, 0);
+    for (int i : range(1, 11)) {
+        for (int j : range(1, 11)) {
+            for (int dx : range(1, min(i, j) + 1)) {
+                for (int dy : range(0, min(i, j) - dx + 1)) {
+                    int sum = dx + dy;
+                    ans(i, j) += (dx * dx + dy * dy) * (i + 1 - sum) * (j + 1 - sum);
+                }
+            }
         }
-        return res;
-    };
-    int a = 123;
-    int m = 876543;
-    int n = 369277;
-    for (int i : range(n)) {
-        a += maxDigit(a);
-        if (a >= m) {
-            out.printLine(i + 1, a - m);
-        }
-        a %= m;
     }
-    out.printLine(a);
+    out.printLine(ans);
+    out.flush();
 }
