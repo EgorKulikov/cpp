@@ -442,6 +442,10 @@ public:
         return readInteger<ll>();
     }
 
+    inline unsigned readUnsigned() {
+        return readInteger<unsigned>();
+    }
+
     string readString() {
         int c = skipWhitespace();
         if (c == EOF) {
@@ -637,6 +641,11 @@ inline ll Input::readType() {
 }
 
 template <>
+inline unsigned Input::readType() {
+    return readUnsigned();
+}
+
+template <>
 inline char Input::readType() {
     return readChar();
 }
@@ -750,258 +759,61 @@ Output out(cout, false);
 Output err(cerr, true);
 
 
-const int DX_KNIGHT[] = {2, 1, -1, -2, -2, -1, 1, 2};
-const int DY_KNIGHT[] = {1, 2, 2, 1, -1, -2, -2, -1};
-const int DX4[] = {1, 0, -1, 0};
-const int DY4[] = {0, 1, 0, -1};
-const int DX8[] = {1, 1, 1, 0, -1, -1, -1, 0};
-const int DY8[] = {-1, 0, 1, 1, 1, 0, -1, -1};
-
-bool isValidCell(int r, int c, int n, int m) {
-    return r >= 0 && c >= 0 && r < n && c < m;
-}
-
-
-class MateInTwo {
+class EXOR {
 public:
     void solve() {
-        struct MoveLine {
-            bool canMove;
-            bool canCapture;
-            vector<pii> moves;
-            set<pii>& sources;
+        in.setBufSize(1);
+        out.autoflush = true;
+        int n = in.readInt();
+        random_device rd;
+        uniform_int_distribution gen(0);
 
-            MoveLine(bool canMove, bool canCapture, const vector<pii>& moves, set<pii>& sources) : canMove(
-                    canMove), canCapture(canCapture), moves(moves), sources(sources) {}
-        };
-        set<pii> wholeBoard;
-        for (int i : range(8)) {
-            for (int j : range(8)) {
-                wholeBoard.emplace(i, j);
+        map<pii, int> results;
+        auto query = [&](int i, int j) -> int {
+            if (i > j) {
+                swap(i, j);
             }
-        }
-        set<pii> secondRow;
-        for (int i : range(8)) {
-            secondRow.emplace(1, i);
-        }
-        auto buildLine = [](int dx, int dy) -> vector<pii> {
-            int x = dx;
-            int y = dy;
-            vector<pii> res;
-            for (int i : range(7)) {
-                res.emplace_back(x, y);
-                x += dx;
-                y += dy;
+            pii key = {i, j};
+            if (results.count(key)) {
+                return results[key];
             }
+            out.printLine("?", i + 1, j + 1);
+            out.flush();
+            int res = in.readInt();
+            if (res == -1) {
+                while (true);
+            }
+            results[key] = res;
             return res;
         };
-        MoveLine upLine(true, true, buildLine(1, 0), wholeBoard);
-        MoveLine downLine(true, true, buildLine(-1, 0), wholeBoard);
-        MoveLine rightLine(true, true, buildLine(0, 1), wholeBoard);
-        MoveLine leftLine(true, true, buildLine(0, -1), wholeBoard);
-        MoveLine upRightLine(true, true, buildLine(1, 1), wholeBoard);
-        MoveLine upLeftLine(true, true, buildLine(1, -1), wholeBoard);
-        MoveLine downRightLine(true, true, buildLine(-1, 1), wholeBoard);
-        MoveLine downLeftLine(true, true, buildLine(-1, -1), wholeBoard);
-        struct PieceType {
-            vector<MoveLine> lines;
-            bool isKing;
 
-            PieceType(const vector<MoveLine>& lines, bool isKing) : lines(lines), isKing(isKing) {}
-        };
-        PieceType* king = new PieceType({
-                                                MoveLine(true, true, {{1, 1}}, wholeBoard),
-                                                MoveLine(true, true, {{1, 0}}, wholeBoard),
-                                                MoveLine(true, true, {{1, -1}}, wholeBoard),
-                                                MoveLine(true, true, {{0, 1}}, wholeBoard),
-                                                MoveLine(true, true, {{-1, 1}}, wholeBoard),
-                                                MoveLine(true, true, {{0, -1}}, wholeBoard),
-                                                MoveLine(true, true, {{-1, -1}}, wholeBoard),
-                                                MoveLine(true, true, {{-1, 0}}, wholeBoard)
-                                        }, true);
-        PieceType* queen = new PieceType({
-                                                 upLine, downLine, leftLine, rightLine, upLeftLine, upRightLine,
-                                                 downLeftLine, downRightLine
-                                         }, false);
-        PieceType* rook = new PieceType({
-                                                upLine, downLine, leftLine, rightLine
-                                        }, false);
-        PieceType* bishop = new PieceType({
-                                                  upLeftLine, upRightLine, downLeftLine, downRightLine
-                                          }, false);
-        PieceType* knight = new PieceType({
-                                                  MoveLine(true, true, {{2, 1}}, wholeBoard),
-                                                  MoveLine(true, true, {{2, -1}}, wholeBoard),
-                                                  MoveLine(true, true, {{-2, 1}}, wholeBoard),
-                                                  MoveLine(true, true, {{-2, -1}}, wholeBoard),
-                                                  MoveLine(true, true, {{1, 2}}, wholeBoard),
-                                                  MoveLine(true, true, {{1, -2}}, wholeBoard),
-                                                  MoveLine(true, true, {{-1, 2}}, wholeBoard),
-                                                  MoveLine(true, true, {{-1, -2}}, wholeBoard)
-                                          }, false);
-        PieceType* pawn = new PieceType({
-                                                MoveLine(true, false, {{1, 0}}, wholeBoard),
-                                                MoveLine(true, false, {{1, 0},
-                                                                       {2, 0}}, secondRow),
-                                                MoveLine(false, true, {{1, 1}}, wholeBoard),
-                                                MoveLine(false, true, {{1, -1}}, wholeBoard)
-                                        }, false);
-        struct Cell {
-            PieceType* piece;
-            bool color;
-
-            Cell(PieceType* piece, bool color) : piece(piece), color(color) {}
-        };
-        struct Board {
-            arr2d<Cell> cells = arr2d<Cell>(8, 8, Cell(nullptr, false));
-
-            Board flip() {
-                Board result;
-                for (int i : range(8)) {
-                    for (int j : range(8)) {
-                        if (cells(i, j).piece != nullptr) {
-                            result.cells(7 - i, j) = Cell(cells(i, j).piece, !cells(i, j).color);
-                        }
+        int cur = 0;
+        int cmp = gen(rd) % n;
+        for (int i : range(1, n)) {
+            while (cmp == i || cmp == cur) {
+                cmp = gen(rd) % n;
+            }
+            while (true) {
+                int r1 = query(i, cmp);
+                int r2 = query(cur, cmp);
+                if (r1 != r2) {
+                    if (r1 < r2) {
+                        cur = i;
                     }
+                    break;
                 }
-                return result;
-            }
-
-            bool isBlackChecked() {
-                for (int i : range(8)) {
-                    for (int j : range(8)) {
-                        if (cells(i, j).piece == nullptr || !cells(i, j).color) {
-                            continue;
-                        }
-                        for (const MoveLine& line : cells(i, j).piece->lines) {
-                            if (!line.canCapture) {
-                                continue;
-                            }
-                            if (line.sources.count({i, j}) == 0) {
-                                continue;
-                            }
-                            for (const pii& shift : line.moves) {
-                                int ni = i + shift.first;
-                                int nj = j + shift.second;
-                                if (!isValidCell(ni, nj, 8, 8)) {
-                                    break;
-                                }
-                                if (cells(ni, nj).piece != nullptr) {
-                                    if (cells(ni, nj).piece->isKing && !cells(ni, nj).color) {
-                                        return true;
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                return false;
-            }
-
-            vector<Board> allMoves() {
-                vector<Board> result;
-                for (int i : range(8)) {
-                    for (int j : range(8)) {
-                        if (cells(i, j).piece == nullptr || !cells(i, j).color) {
-                            continue;
-                        }
-                        for (const MoveLine& line : cells(i, j).piece->lines) {
-                            if (line.sources.count({i, j}) == 0) {
-                                continue;
-                            }
-                            for (const pii& shift : line.moves) {
-                                int ni = i + shift.first;
-                                int nj = j + shift.second;
-                                if (!isValidCell(ni, nj, 8, 8)) {
-                                    break;
-                                }
-                                bool isCapture = false;
-                                if (cells(ni, nj).piece != nullptr) {
-                                    if (!line.canCapture || cells(ni, nj).color) {
-                                        break;
-                                    }
-                                    isCapture = true;
-                                } else if (!line.canMove) {
-                                    break;
-                                }
-                                Board after = flip();
-                                after.cells(7 - i, j).piece = nullptr;
-                                after.cells(7 - ni, nj).piece = cells(i, j).piece;
-                                after.cells(7 - ni, nj).color = false;
-                                if (!after.isBlackChecked()) {
-                                    result.push_back(after);
-                                }
-                                if (isCapture) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                return result;
-            }
-
-            bool isWhiteCheckmated() {
-                return flip().isBlackChecked() && allMoves().empty();
-            }
-        };
-
-        Board start;
-        for (int i : range(8)) {
-            for (int j : range(8)) {
-                char p = in.readChar();
-                char c = in.readChar();
-                if (p == '-') {
-                    continue;
-                }
-                start.cells(7 - i, j).color = c == 'w';
-                if (p == 'K') {
-                    start.cells(7 - i, j).piece = king;
-                } else if (p == 'Q') {
-                    start.cells(7 - i, j).piece = queen;
-                } else if (p == 'R') {
-                    start.cells(7 - i, j).piece = rook;
-                } else if (p == 'B') {
-                    start.cells(7 - i, j).piece = bishop;
-                } else if (p == 'N') {
-                    start.cells(7 - i, j).piece = knight;
-                } else if (p == 'P') {
-                    start.cells(7 - i, j).piece = pawn;
-                }
+                do {
+                    cmp = gen(rd) % n;
+                } while (cmp == i || cmp == cur);
             }
         }
-        auto canMateInOne = [](Board board) -> bool {
-            auto moves = board.allMoves();
-            for (Board& b : moves) {
-                if (b.isWhiteCheckmated()) {
-                    return true;
-                }
+        arri p(n, 0);
+        for (int i : range(n)) {
+            if (i != cur) {
+                p[i] = query(i, cur);
             }
-            return false;
-        };
-        auto canAvoidMateInOne = [&](Board board) -> bool {
-            auto moves = board.allMoves();
-            if (moves.empty()) {
-                return true;
-            }
-            for (Board& b : moves) {
-                if (!canMateInOne(b)) {
-                    return true;
-                }
-            }
-            return false;
-        };
-        auto canMateInTwo = [&](Board board) -> bool {
-            auto moves = board.allMoves();
-            for (Board& b : moves) {
-                if (b.isWhiteCheckmated() || !canAvoidMateInOne(b)) {
-                    return true;
-                }
-            }
-            return false;
-        };
-        out.printLine(canMateInTwo(start) ? "YES" : "NO");
+        }
+        out.printLine("!", p);
     }
 };
 
@@ -1014,15 +826,10 @@ int main() {
     freopen("output.txt", "w", stdout);
     auto time = clock();
 #endif
-    MateInTwo solver;
+    EXOR solver;
 
 
-    int n;
-    scanf("%d", &n);
-    for (int i = 0; i < n; ++i) {
-        solver.solve();
-    }
-
+    solver.solve();
     fflush(stdout);
 #ifdef LOCAL_RELEASE
     cerr << clock() - time << endl;

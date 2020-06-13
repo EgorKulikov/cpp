@@ -1,0 +1,8 @@
+#include "../lib/io/input.h"
+#include "../lib/io/output.h"
+
+class %ClassName% {
+public:
+    void solve() {
+    }
+};

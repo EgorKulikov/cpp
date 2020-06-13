@@ -102,6 +102,10 @@ public:
         return readInteger<ll>();
     }
 
+    inline unsigned readUnsigned() {
+        return readInteger<unsigned>();
+    }
+
     string readString() {
         int c = skipWhitespace();
         if (c == EOF) {
@@ -295,6 +299,11 @@ inline int Input::readType() {
 template<>
 inline ll Input::readType() {
     return readLong();
+}
+
+template<>
+inline unsigned Input::readType() {
+    return readUnsigned();
 }
 
 template<>

@@ -121,6 +121,9 @@ bool isPrime(ll n) {
     mod = n;
     for (int x : range(20)) {
         bigmod a = gen() % (n - 1);
+        if (a == 0) {
+            continue;
+        }
         if (power(a, d) == 1) {
             continue;
         }
@@ -142,7 +145,10 @@ bool isPrime(ll n) {
     return true;
 }
 
-ll findPrimeDivisor(ll n) {
+ll findDivisor(ll n) {
+    if (n == 1) {
+        return 1;
+    }
     if (n % 2 == 0) {
         return 2;
     }
@@ -151,16 +157,58 @@ ll findPrimeDivisor(ll n) {
     }
     ll wasMod = mod;
     mod = n;
-    bigmod x = 2;
-    bigmod y = 2;
+    bigmod x = 0;
+    bigmod y = 0;
+    int i = 1;
     ll d = 1;
 
-    while (d == 1) {
-        x = x * x + 1;
-        y = y * y + 1;
-        y = y * y + 1;
-        d = gcd(abs(x.n - y.n), n);
+    while (true) {
+        x = ++i;
+        y = x * x + 1;
+        d = 1;
+        while (d == 1) {
+            x = x * x + 1;
+            y = y * y + 1;
+            y = y * y + 1;
+            d = gcd(abs(x.n - y.n), n);
+        }
+        if (d != n) {
+            break;
+        }
     }
     mod = wasMod;
     return d;
+}
+
+vector<pair<ll, int>> divisors(ll n) {
+    if (n == 1) {
+        return {};
+    }
+    ll d = findDivisor(n);
+    if (d == n) {
+        return {{d, 1}};
+    }
+    auto left = divisors(d);
+    auto right = divisors(n / d);
+    vector<pair<ll, int>> result;
+    int i = 0;
+    int j = 0;
+    while (i < left.size() && j < right.size()) {
+        if (left[i].first < right[j].first) {
+            result.push_back(left[i++]);
+        } else if (left[i].first > right[j].first) {
+            result.push_back(right[j++]);
+        } else {
+            result.emplace_back(left[i].first, left[i].second + right[j].second);
+            i++;
+            j++;
+        }
+    }
+    for (int k : range(i, left.size())) {
+        result.push_back(left[k]);
+    }
+    for (int k : range(j, right.size())) {
+        result.push_back(right[k]);
+    }
+    return result;
 }

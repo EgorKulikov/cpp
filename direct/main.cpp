@@ -1,21 +1,24 @@
-#include <cstdio>
-#include <random>
-#include "../lib/bits.h"
-#include "../lib/range/range.h"
-#include "../lib/io/output.h"
+#include "../tasks/GGCDExpress.cpp"
 
 int main() {
-    arr2d<ll> ans(11, 11, 0);
-    for (int i : range(1, 11)) {
-        for (int j : range(1, 11)) {
-            for (int dx : range(1, min(i, j) + 1)) {
-                for (int dy : range(0, min(i, j) - dx + 1)) {
-                    int sum = dx + dy;
-                    ans(i, j) += (dx * dx + dy * dy) * (i + 1 - sum) * (j + 1 - sum);
-                }
+    for (int i : range(1, 100000)) {
+        int w = i;
+        GGCDExpress g;
+        int res = g.solve(1, i);
+        int exp = 1;
+        for (int j = 2; j * j <= i; j++) {
+            if (i % j == 0) {
+                exp *= 2;
+                do {
+                    i /= j;
+                } while (i % j == 0);
             }
         }
+        if (i != 1) {
+            exp *= 2;
+        }
+        if (res != exp) {
+            throw "Jopa";
+        }
     }
-    out.printLine(ans);
-    out.flush();
 }

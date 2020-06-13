@@ -25,11 +25,11 @@ pair<ll, ll> minCostFlow(Graph<Edge>& orGraph, int source, int sink, bool onlyNe
         for (auto& e : orGraph[i]) {
             if (e.capacity > 0) {
                 base[e.id] = &e;
-                corresponding[e.id] = graph.addEdge(i, e.to, e.weight, 0).reverseEdge(graph).rev;
+                corresponding[e.id] = graph.addEdge(i, e.to, e.weight, 0);
             }
         }
     }
-    int back = graph.addEdge(sink, source, onlyNegative ? 0 : -large, 0).reverseEdge(graph).rev;
+    int back = graph.addEdge(sink, source, onlyNegative ? 0 : -large, 0);
     for (int i : range(n)) {
         graph.addEdge(n, i, 0, 1);
     }

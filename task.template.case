@@ -1,0 +1,11 @@
+#include "../lib/io/input.h"
+#include "../lib/io/output.h"
+
+int id = 1;
+
+class %ClassName% {
+public:
+    void solve() {
+        out.printLine("Case #" + to_string(id++) + ":");
+    }
+};
