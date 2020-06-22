@@ -14,7 +14,7 @@ int main() {
     %SolverCall%
     fflush(stdout);
 #ifdef LOCAL_RELEASE
-    cerr << clock() - time << endl;
+    cerr << setprecision(3) << double(clock() - time) / CLOCKS_PER_SEC << endl;
 #endif
     return 0;
 }

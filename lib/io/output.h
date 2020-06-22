@@ -54,7 +54,7 @@ private:
 
     template<typename T, typename U>
     inline void printSingle(const pair<T, U>& value) {
-        out << value.first << ' ' << value.second;
+        *out << value.first << ' ' << value.second;
     }
 
 public:

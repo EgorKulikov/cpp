@@ -376,6 +376,24 @@ public:
         return buf[bufAt++];
     }
 
+    inline int peek() {
+        if (exhausted) {
+#ifdef LOCAL
+            throw "Input exhausted";
+#endif
+            return EOF;
+        }
+        if (bufRead == bufAt) {
+            bufRead = fread(buf, sizeof(char), bufSize, stdin);
+            bufAt = 0;
+        }
+        if (bufRead == bufAt) {
+            exhausted = true;
+            return EOF;
+        }
+        return buf[bufAt];
+    }
+
 private:
     template <typename T>
     inline T readInteger() {
@@ -432,6 +450,13 @@ public:
         int c;
         while (isWhitespace(c = get()) && c != EOF);
         return c;
+    }
+
+    inline int peekNext() {
+        while (isWhitespace(peek()) && peek() != EOF) {
+            get();
+        }
+        return peek();
     }
 
     inline int readInt() {
@@ -708,7 +733,7 @@ private:
 
     template <typename T, typename U>
     inline void printSingle(const pair<T, U>& value) {
-        out << value.first << ' ' << value.second;
+        *out << value.first << ' ' << value.second;
     }
 
 public:
@@ -759,61 +784,11 @@ Output out(cout, false);
 Output err(cerr, true);
 
 
-class EXOR {
+class AMaksimalniiNOD {
 public:
     void solve() {
-        in.setBufSize(1);
-        out.autoflush = true;
         int n = in.readInt();
-        random_device rd;
-        uniform_int_distribution gen(0);
-
-        map<pii, int> results;
-        auto query = [&](int i, int j) -> int {
-            if (i > j) {
-                swap(i, j);
-            }
-            pii key = {i, j};
-            if (results.count(key)) {
-                return results[key];
-            }
-            out.printLine("?", i + 1, j + 1);
-            out.flush();
-            int res = in.readInt();
-            if (res == -1) {
-                while (true);
-            }
-            results[key] = res;
-            return res;
-        };
-
-        int cur = 0;
-        int cmp = gen(rd) % n;
-        for (int i : range(1, n)) {
-            while (cmp == i || cmp == cur) {
-                cmp = gen(rd) % n;
-            }
-            while (true) {
-                int r1 = query(i, cmp);
-                int r2 = query(cur, cmp);
-                if (r1 != r2) {
-                    if (r1 < r2) {
-                        cur = i;
-                    }
-                    break;
-                }
-                do {
-                    cmp = gen(rd) % n;
-                } while (cmp == i || cmp == cur);
-            }
-        }
-        arri p(n, 0);
-        for (int i : range(n)) {
-            if (i != cur) {
-                p[i] = query(i, cur);
-            }
-        }
-        out.printLine("!", p);
+        out.printLine(n / 2);
     }
 };
 
@@ -826,13 +801,18 @@ int main() {
     freopen("output.txt", "w", stdout);
     auto time = clock();
 #endif
-    EXOR solver;
+    AMaksimalniiNOD solver;
 
 
-    solver.solve();
+    int n;
+    scanf("%d", &n);
+    for (int i = 0; i < n; ++i) {
+        solver.solve();
+    }
+
     fflush(stdout);
 #ifdef LOCAL_RELEASE
-    cerr << clock() - time << endl;
+    cerr << double(clock() - time) / CLOCKS_PER_SEC << endl;
 #endif
     return 0;
 }

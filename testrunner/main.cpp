@@ -1,4 +1,4 @@
-#include "../tasks/EXOR.cpp"
+#include "../tasks/AMaksimalniiNOD.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -35,7 +35,7 @@ int main() {
     string yellow = "\x1B[33m";
     string def = "\033[0m";
     std::vector<jhelper::Test> tests = {
-		{"3\n1\n3\n2\n", "? 1 2\n? 1 3\n? 2 3\n! 1 0 2\n", true, true},
+		{"2\n3\n5\n", "1\n2\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -66,8 +66,13 @@ int main() {
             try {
                 in = Input();
                 out.setOut(fout);
-                EXOR solver;
-                solver.solve();
+                AMaksimalniiNOD solver;
+                int n;
+scanf("%d", &n);
+for(int i = 0; i < n; ++i) {
+	solver.solve();
+}
+
                 out.flush();
                 fout.close();
             } catch (const char* e) {

@@ -82,6 +82,6 @@ public:
     }
 
     int pathLength(int first, int second) const {
-        return level[first] + level[second] - 2 * level[lcaArr(first, second)];
+        return level[first] + level[second] - 2 * level[lca(first, second)];
     }
 };

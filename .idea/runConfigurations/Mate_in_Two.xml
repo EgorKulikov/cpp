@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Mate in Two" type="name.admitriev.jhelper.configuration.TaskConfigurationType" className="MateInTwo" cppPath="tasks/MateInTwo.cpp" inputType="STANDARD" inputFile="input.txt" outputType="STANDARD" outputFile="output.txt" testType="MULTI_NUMBER">
-    <tests>
-      <test input="1&#10;-- -- -- -- Rb -- Kb --&#10;-- -- -- -- -- -- Pb Pb&#10;Pb Pb -- -- -- -- -- --&#10;Pw Pw -- -- -- -- -- --&#10;Nb Nw -- -- -- -- -- --&#10;-- -- -- -- -- -- -- --&#10;-- -- -- -- Bw Qw -- --&#10;-- -- -- -- Kw Rw -- --&#10;" output="YES&#10;" active="true" />
-    </tests>
-    <method v="2" />
-  </configuration>
-</component>

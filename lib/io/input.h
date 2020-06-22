@@ -36,6 +36,24 @@ public:
         return buf[bufAt++];
     }
 
+    inline int peek() {
+        if (exhausted) {
+#ifdef LOCAL
+            throw "Input exhausted";
+#endif
+            return EOF;
+        }
+        if (bufRead == bufAt) {
+            bufRead = fread(buf, sizeof(char), bufSize, stdin);
+            bufAt = 0;
+        }
+        if (bufRead == bufAt) {
+            exhausted = true;
+            return EOF;
+        }
+        return buf[bufAt];
+    }
+
 private:
     template<typename T>
     inline T readInteger() {
@@ -92,6 +110,13 @@ public:
         int c;
         while (isWhitespace(c = get()) && c != EOF);
         return c;
+    }
+
+    inline int peekNext() {
+        while (isWhitespace(peek()) && peek() != EOF) {
+            get();
+        }
+        return peek();
     }
 
     inline int readInt() {
