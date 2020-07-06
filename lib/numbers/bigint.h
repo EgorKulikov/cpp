@@ -228,7 +228,13 @@ struct bigint {
         return res * sign;
     }
 
-    friend bigint gcd(const bigint& a, const bigint& b) {
+    friend bigint gcd(bigint a, bigint b) {
+        if (a < 0) {
+            a = a.abs();
+        }
+        if (b < 0) {
+            b = b.abs();
+        }
         if (b.isZero()) {
             return a;
         }
@@ -333,8 +339,8 @@ struct bigint {
             res.sign = sign * v.sign;
             return res;
         }
-        auto a = convert(z);
-        auto b = convert(v.z);
+        vector<modint> a = convert(z);
+        vector<modint> b = convert(v.z);
         int wasMod = mod;
         mod = MODF;
         auto c = multiply(a, b);

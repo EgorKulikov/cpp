@@ -127,13 +127,13 @@ public:
 
 template <class Hash>
 struct SubstringHash {
-    const Hash& base;
-    const int from;
-    const int to;
+    Hash* base;
+    int from;
+    int to;
 
-    SubstringHash(const Hash& base, int from, int to) : base(base), from(from), to(to) {}
+    SubstringHash(Hash* base, int from, int to) : base(base), from(from), to(to) {}
 
-    SubstringHash(const Hash& base, int from) : SubstringHash(base, from, base.length()) {}
+    SubstringHash(Hash* base, int from) : SubstringHash(base, from, base->length()) {}
 
     ll hash(int from, int to) const {
 #ifdef LOCAL
@@ -141,7 +141,7 @@ struct SubstringHash {
             throw "Out of bounds";
         }
 #endif
-        return base.hash(from + this->from, to + this->to);
+        return base->hash(from + this->from, to + this->from);
     }
 
     int length() const {
@@ -154,51 +154,51 @@ struct SubstringHash {
 };
 
 template <class Hash>
-SubstringHash<Hash> substringHash(const Hash& base, int from, int to) {
-    return SubstringHash<Hash>(base, from, to);
+SubstringHash<Hash>* substringHash(Hash* base, int from, int to) {
+    return new SubstringHash<Hash>(base, from, to);
 }
 
 template <class Hash>
-SubstringHash<Hash> substringHash(const Hash& base, int from) {
-    return SubstringHash<Hash>(base, from);
+SubstringHash<Hash>* substringHash(Hash* base, int from) {
+    return new SubstringHash<Hash>(base, from);
 }
 
 template <class Hash1, class Hash2>
 struct CompositeHash {
-    const Hash1& base1;
-    const Hash2& base2;
+    Hash1* base1;
+    Hash2* base2;
 
-    CompositeHash(const Hash1& base1, const Hash2& base2) : base1(base1), base2(base2) {
+    CompositeHash(Hash1* base1, Hash2* base2) : base1(base1), base2(base2) {
         using namespace string_hash;
-        ensureCapacity(base1.length() + 1);
+        ensureCapacity(base1->length() + 1);
     }
 
-    ll hash(int from, int to) {
+    ll hash(int from, int to) const {
 #ifdef LOCAL
         if (from < 0 || to < from || to > length()) {
             throw "Out of bounds";
         }
 #endif
         using namespace string_hash;
-        if (to <= base1.length()) {
-            return base1.hash(from, to);
+        if (to <= base1->length()) {
+            return base1->hash(from, to);
         }
-        if (from >= base1.length()) {
-            return base2.hash(from - base1.length(), to - base1.length());
+        if (from >= base1->length()) {
+            return base2->hash(from - base1->length(), to - base1->length());
         }
-        ll h1 = base1.hash(from);
-        ll h2 = base2.hash(0, to - base1.length());
+        ll h1 = base1->hash(from);
+        ll h2 = base2->hash(0, to - base1->length());
         int wasMod = mod;
         mod = firstMod;
-        ll first = (modint(h1 >> 32) * firstPower[base1.length() - from] + modint(h2 >> 32)).n;
+        ll first = (modint(h2 >> 32) * firstPower[base1->length() - from] + modint(h1 >> 32)).n;
         mod = secondMod;
-        ll second = (modint(h1 & numeric_limits<unsigned>::max()) * firstPower[base1.length() - from] + modint(h2 & numeric_limits<unsigned>::max())).n;
+        ll second = (modint(h2 & numeric_limits<unsigned>::max()) * secondPower[base1->length() - from] + modint(h1 & numeric_limits<unsigned>::max())).n;
         mod = wasMod;
         return (first << 32) + second;
     }
 
     int length() const {
-        return base1.length() + base2.length();
+        return base1->length() + base2->length();
     }
 
     ll hash(int from) const {
@@ -207,6 +207,6 @@ struct CompositeHash {
 };
 
 template <class Hash1, class Hash2>
-CompositeHash<Hash1, Hash2> compositeHash(const Hash1& base1, const Hash2& base2) {
-    return CompositeHash<Hash1, Hash2>(base1, base2);
+CompositeHash<Hash1, Hash2>* compositeHash(Hash1* base1, Hash2* base2) {
+    return new CompositeHash<Hash1, Hash2>(base1, base2);
 }

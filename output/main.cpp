@@ -4,6 +4,8 @@
  * @author Egor Kulikov
  */
 
+// Actual solution is at the bottom
+
 
 
 
@@ -131,7 +133,7 @@ public:
 #endif
     }
 
-    arr(initializer_list<T> l) : arr(l.size()) {
+    arr(initializer_list <T> l) : arr(l.size()) {
         if (n > 0) {
             memcpy(b, l.begin(), n * sizeof(T));
         }
@@ -197,7 +199,7 @@ public:
         return true;
     }
 
-    vector<T> view() {
+    vector <T> view() {
         return vector<T>(b, b + min(n, 50));
     }
 };
@@ -216,11 +218,15 @@ void decreaseByOne(arr<T>& array, Vs& ...vs) {
 }
 
 template <typename T, typename U>
-void decreaseByOne(arr<pair<T, U>>& v) {
-    for (auto& p : v) {
-        p.first--;
-        p.second--;
-    }
+void decreaseByOne(arr<pair < T, U>>
+
+& v) {
+for (
+auto& p
+: v) {
+p.first--;
+p.second--;
+}
 }
 
 
@@ -329,8 +335,8 @@ public:
         return arr<T>(b + at * d2, d2);
     }
 
-    vector<vector<T>> view() {
-        vector<vector<T>> res(min(d1, 50));
+    vector <vector<T>> view() {
+        vector <vector<T>> res(min(d1, 50));
         for (int i : range(res.size())) {
             res[i] = (*this)[i].view();
         }
@@ -427,7 +433,7 @@ private:
     }
 
     template <typename T, class...Vs>
-    void initArrays(int n, vector<T>&, Vs& ...vs) {
+    void initArrays(int n, vector <T>&, Vs& ...vs) {
         initArrays(n, vs...);
     }
 
@@ -440,7 +446,7 @@ private:
     }
 
     template <typename T, class...Vs>
-    void readImpl(int i, vector<T>& arr, Vs& ...vs) {
+    void readImpl(int i, vector <T>& arr, Vs& ...vs) {
         arr.push_back(readType<T>());
         readImpl(i, vs...);
     }
@@ -512,7 +518,7 @@ public:
     }
 
     template <typename U, typename V>
-    pair<U, V> readType() {
+    pair <U, V> readType() {
         U first = readType<U>();
         V second = readType<V>();
         return make_pair(first, second);
@@ -537,8 +543,10 @@ public:
     }
 
     template <typename U, typename V>
-    arr<pair<U, V>> readArray(int n) {
-        arr<pair<U, V>> res(n);
+    arr<pair < U, V> >
+
+    readArray(int n) {
+        arr<pair < U, V> > res(n);
         for (int i : range(n)) {
             res[i] = readType<U, V>();
         }
@@ -693,7 +701,7 @@ private:
     }
 
     template <typename T>
-    void printSingle(const vector<T>& array) {
+    void printSingle(const vector <T>& array) {
         size_t n = array.size();
         for (int i : range(n)) {
             *out << array[i];
@@ -732,7 +740,7 @@ private:
     }
 
     template <typename T, typename U>
-    inline void printSingle(const pair<T, U>& value) {
+    inline void printSingle(const pair <T, U>& value) {
         *out << value.first << ' ' << value.second;
     }
 
@@ -784,11 +792,58 @@ Output out(cout, false);
 Output err(cerr, true);
 
 
-class AMaksimalniiNOD {
+class ReverseNumberIterator : public NumberIterator {
+public:
+    ReverseNumberIterator(int v) : NumberIterator(v) {}
+
+    ReverseNumberIterator& operator++() {
+        --v;
+        return *this;
+    }
+};
+
+class RevRange : pii {
+public:
+    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
+
+    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
+
+    ReverseNumberIterator begin() {
+        return first;
+    }
+
+    ReverseNumberIterator end() {
+        return second;
+    }
+};
+
+
+class ESortirovkaInversiyami {
 public:
     void solve() {
         int n = in.readInt();
-        out.printLine(n / 2);
+        auto a = in.readIntArray(n);
+
+        arr<set < pii>>
+        inv(n, set<pii>());
+        for (int i : range(n)) {
+            for (int j : range(i)) {
+                if (a[i] < a[j]) {
+                    inv[i].emplace(a[j], j);
+                }
+            }
+        }
+        vector <pii> answer;
+        for (int i : RevRange(n)) {
+            for (const auto& p : inv[i]) {
+                swap(a[p.second], a[i]);
+                answer.emplace_back(p.second + 1, i + 1);
+            }
+        }
+        out.printLine(answer.size());
+        for (const auto& p : answer) {
+            out.printLine(p);
+        }
     }
 };
 
@@ -801,18 +856,13 @@ int main() {
     freopen("output.txt", "w", stdout);
     auto time = clock();
 #endif
-    AMaksimalniiNOD solver;
+    ESortirovkaInversiyami solver;
 
 
-    int n;
-    scanf("%d", &n);
-    for (int i = 0; i < n; ++i) {
-        solver.solve();
-    }
-
+    solver.solve();
     fflush(stdout);
 #ifdef LOCAL_RELEASE
-    cerr << double(clock() - time) / CLOCKS_PER_SEC << endl;
+    cerr << setprecision(3) << double(clock() - time) / CLOCKS_PER_SEC << endl;
 #endif
     return 0;
 }

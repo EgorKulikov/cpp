@@ -11,4 +11,12 @@ public:
 
     WeightedEdge(int to, int id, W weight) : BaseEdge(to, id), weight(weight) {
     }
+
+    WeightedEdge<W> reverseEdge(int) {
+        throw "Unsupported operation exception";
+    }
+
+    void setReverseId(int) {
+        throw "Unsupported operation exception";
+    }
 };
