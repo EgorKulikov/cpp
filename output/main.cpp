@@ -97,6 +97,57 @@ public:
 
 
 template <typename T>
+class NeedFill {
+    struct Fallback {
+        int begin;
+    }; // add member name "find"
+    struct Derived : T, Fallback {
+    };
+
+    template <typename U, U>
+    struct Check;
+
+    typedef char Yes[1];  // typedef for an array of size one.
+    typedef char No[2];  // typedef for an array of size two.
+
+    template <typename U>
+    static No& func(Check<int Fallback::*, &U::begin>*);
+
+    template <typename U>
+    static Yes& func(...);
+
+public:
+    typedef NeedFill type;
+    enum {
+        value = sizeof(func<Derived>(0)) == sizeof(Yes)
+    };
+};
+
+template <>
+class NeedFill<int> {
+public:
+    const static bool value = false;
+};
+
+template <>
+class NeedFill<bool> {
+public:
+    const static bool value = true;
+};
+
+template <>
+class NeedFill<ll> {
+public:
+    const static bool value = false;
+};
+
+template <>
+class NeedFill<double> {
+public:
+    const static bool value = false;
+};
+
+template <typename T>
 class arr {
     T* b;
     int n;
@@ -118,6 +169,11 @@ class arr {
 public:
     arr(int n = 0) {
         allocate(n);
+        if (NeedFill<T>::value) {
+            for (int i : range(n)) {
+                ::new((void*) (b + i)) T();
+            }
+        }
 #ifdef LOCAL
         view();
 #endif
@@ -133,15 +189,15 @@ public:
 #endif
     }
 
-    arr(initializer_list <T> l) : arr(l.size()) {
+    arr(T* b, int n) : arr(b, b + n) {}
+
+    arr(T* b, T* e) : b(b), n(e - b) {}
+
+    arr(initializer_list<T> l) : arr(l.size()) {
         if (n > 0) {
             memcpy(b, l.begin(), n * sizeof(T));
         }
     }
-
-    arr(T* b, int n) : arr(b, b + n) {}
-
-    arr(T* b, T* e) : b(b), n(e - b) {}
 
     int size() const {
         return n;
@@ -199,8 +255,8 @@ public:
         return true;
     }
 
-    vector <T> view() {
-        return vector<T>(b, b + min(n, 50));
+    vector<T> view() {
+        return vector<T>(b, b + n);
     }
 };
 
@@ -215,18 +271,6 @@ void decreaseByOne(arr<T>& array, Vs& ...vs) {
         array[i]--;
     }
     decreaseByOne(vs...);
-}
-
-template <typename T, typename U>
-void decreaseByOne(arr<pair < T, U>>
-
-& v) {
-for (
-auto& p
-: v) {
-p.first--;
-p.second--;
-}
 }
 
 
@@ -335,19 +379,14 @@ public:
         return arr<T>(b + at * d2, d2);
     }
 
-    vector <vector<T>> view() {
-        vector <vector<T>> res(min(d1, 50));
+    vector<vector<T>> view() {
+        vector<vector<T>> res(min(d1, 50));
         for (int i : range(res.size())) {
             res[i] = (*this)[i].view();
         }
         return res;
     }
 
-    arr2d<T> clone() {
-        arr2d<T> res(d1, d2);
-        copy(b, b + sz, res.b);
-        return res;
-    }
 };
 
 
@@ -433,7 +472,7 @@ private:
     }
 
     template <typename T, class...Vs>
-    void initArrays(int n, vector <T>&, Vs& ...vs) {
+    void initArrays(int n, vector<T>&, Vs& ...vs) {
         initArrays(n, vs...);
     }
 
@@ -446,7 +485,7 @@ private:
     }
 
     template <typename T, class...Vs>
-    void readImpl(int i, vector <T>& arr, Vs& ...vs) {
+    void readImpl(int i, vector<T>& arr, Vs& ...vs) {
         arr.push_back(readType<T>());
         readImpl(i, vs...);
     }
@@ -518,7 +557,7 @@ public:
     }
 
     template <typename U, typename V>
-    pair <U, V> readType() {
+    pair<U, V> readType() {
         U first = readType<U>();
         V second = readType<V>();
         return make_pair(first, second);
@@ -543,10 +582,8 @@ public:
     }
 
     template <typename U, typename V>
-    arr<pair < U, V> >
-
-    readArray(int n) {
-        arr<pair < U, V> > res(n);
+    arr<pair<U, V>> readArray(int n) {
+        arr<pair<U, V>> res(n);
         for (int i : range(n)) {
             res[i] = readType<U, V>();
         }
@@ -701,7 +738,7 @@ private:
     }
 
     template <typename T>
-    void printSingle(const vector <T>& array) {
+    void printSingle(const vector<T>& array) {
         size_t n = array.size();
         for (int i : range(n)) {
             *out << array[i];
@@ -740,7 +777,7 @@ private:
     }
 
     template <typename T, typename U>
-    inline void printSingle(const pair <T, U>& value) {
+    inline void printSingle(const pair<T, U>& value) {
         *out << value.first << ' ' << value.second;
     }
 
@@ -792,58 +829,16 @@ Output out(cout, false);
 Output err(cerr, true);
 
 
-class ReverseNumberIterator : public NumberIterator {
-public:
-    ReverseNumberIterator(int v) : NumberIterator(v) {}
-
-    ReverseNumberIterator& operator++() {
-        --v;
-        return *this;
-    }
-};
-
-class RevRange : pii {
-public:
-    RevRange(int begin, int end) : pii(begin - 1, min(begin, end) - 1) {}
-
-    RevRange(int n) : pii(n - 1, min(n, 0) - 1) {}
-
-    ReverseNumberIterator begin() {
-        return first;
-    }
-
-    ReverseNumberIterator end() {
-        return second;
-    }
-};
-
-
-class ESortirovkaInversiyami {
+class Task {
 public:
     void solve() {
-        int n = in.readInt();
-        auto a = in.readIntArray(n);
+        arri a(10);
+        arr<vi> b(10);
+        arr<string> c(10);
 
-        arr<set < pii>>
-        inv(n, set<pii>());
-        for (int i : range(n)) {
-            for (int j : range(i)) {
-                if (a[i] < a[j]) {
-                    inv[i].emplace(a[j], j);
-                }
-            }
-        }
-        vector <pii> answer;
-        for (int i : RevRange(n)) {
-            for (const auto& p : inv[i]) {
-                swap(a[p.second], a[i]);
-                answer.emplace_back(p.second + 1, i + 1);
-            }
-        }
-        out.printLine(answer.size());
-        for (const auto& p : answer) {
-            out.printLine(p);
-        }
+        b[3] = {1, 2, 3};
+        c[2] = "abc";
+        out.printLine(a);
     }
 };
 
@@ -856,7 +851,7 @@ int main() {
     freopen("output.txt", "w", stdout);
     auto time = clock();
 #endif
-    ESortirovkaInversiyami solver;
+    Task solver;
 
 
     solver.solve();

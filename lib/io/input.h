@@ -82,7 +82,7 @@ private:
 
     template <typename T, class...Vs>
     void initArrays(int n, arr<T>& array, Vs&...vs) {
-        array = arr<T>(n, T());
+        array = arr<T>(n);
         initArrays(n, vs...);
     }
 

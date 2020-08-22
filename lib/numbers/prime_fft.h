@@ -125,3 +125,10 @@ vector<modint> multiply(vector<modint>& first, vector<modint>& second) {
     multiply(all(first), all(second), res.begin());
     return res;
 }
+
+arr<modint> multiply(arr<modint>& first, arr<modint>& second) {
+    auto len = first.size() + second.size() - 1;
+    arr<modint> res(len);
+    multiply(all(first), all(second), res.begin());
+    return res;
+}

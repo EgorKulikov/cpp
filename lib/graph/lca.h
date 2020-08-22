@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../general.h"
-#include "../collections/segment_tree.h"
 #include "graph.h"
 #include "../misc.h"
 #include "../collections/mdarr.h"
@@ -81,7 +80,4 @@ public:
         return getMin(lcaArr(lv, from), lcaArr(lv, to + 1 - (1 << lv)));
     }
 
-    int pathLength(int first, int second) const {
-        return level[first] + level[second] - 2 * level[lca(first, second)];
-    }
 };

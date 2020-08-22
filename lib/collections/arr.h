@@ -3,6 +3,52 @@
 #include "../general.h"
 #include "../range/range.h"
 
+template<typename T>
+class NeedFill
+{
+    struct Fallback { int begin; }; // add member name "find"
+    struct Derived : T, Fallback { };
+
+    template<typename U, U> struct Check;
+
+    typedef char Yes[1];  // typedef for an array of size one.
+    typedef char No[2];  // typedef for an array of size two.
+
+    template<typename U>
+    static No& func(Check<int Fallback::*, &U::begin> *);
+
+    template<typename U>
+    static Yes& func(...);
+
+public:
+    typedef NeedFill type;
+    enum { value = sizeof(func<Derived>(0)) == sizeof(Yes) };
+};
+
+template <>
+class NeedFill<int> {
+public:
+    const static bool value = false;
+};
+
+template <>
+class NeedFill<bool> {
+public:
+    const static bool value = true;
+};
+
+template <>
+class NeedFill<ll> {
+public:
+    const static bool value = false;
+};
+
+template <>
+class NeedFill<double> {
+public:
+    const static bool value = false;
+};
+
 template <typename T>
 class arr {
     T* b;
@@ -25,6 +71,11 @@ class arr {
 public:
     arr(int n = 0) {
         allocate(n);
+        if (NeedFill<T>::value) {
+            for (int i : range(n)) {
+                ::new((void*)(b + i)) T;
+            }
+        }
 #ifdef LOCAL
         view();
 #endif
@@ -40,14 +91,14 @@ public:
 #endif
     }
 
+    arr(T* b, int n) : arr(b, b + n) {}
+    arr(T* b, T* e) : b(b), n(e - b) {}
+
     arr(initializer_list<T> l) : arr(l.size()) {
         if (n > 0) {
             memcpy(b, l.begin(), n * sizeof(T));
         }
     }
-
-    arr(T* b, int n) : arr(b, b + n) {}
-    arr(T* b, T* e) : b(b), n(e - b) {}
 
     int size() const {
         return n;
@@ -106,7 +157,7 @@ public:
     }
 
     vector<T> view() {
-        return vector<T>(b, b + min(n, 50));
+        return vector<T>(b, b + n);
     }
 };
 
@@ -123,10 +174,3 @@ void decreaseByOne(arr<T>& array, Vs&...vs) {
     decreaseByOne(vs...);
 }
 
-template <typename T, typename U>
-void decreaseByOne(arr<pair<T, U>>& v) {
-    for (auto& p : v) {
-        p.first--;
-        p.second--;
-    }
-}

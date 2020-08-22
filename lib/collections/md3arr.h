@@ -32,8 +32,10 @@ public:
         }
 #endif
         allocate(sz);
-        for (int i : range(sz)) {
-            ::new((void*)(b + i)) T;
+        if (NeedFill<T>::value) {
+            for (int i : range(sz)) {
+                ::new((void*)(b + i)) T;
+            }
         }
 #ifdef LOCAL
         view();

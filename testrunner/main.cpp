@@ -1,4 +1,4 @@
-#include "../tasks/ESortirovkaInversiyami.cpp"
+#include "../tasks/Task.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -35,7 +35,7 @@ int main() {
     string yellow = "\x1B[33m";
     string def = "\033[0m";
     std::vector<jhelper::Test> tests = {
-		{"3\n3 1 2\n", "2\n1 3\n1 2\n", true, true},{"4\n1 8 1 6\n", "2\n2 4\n2 3\n", true, true},{"5\n1 1 1 2 2\n", "0\n", true, true},{"5\n3 2 3 2 1\n", "", true, false},
+		{"", "", true, false},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -66,7 +66,7 @@ int main() {
             try {
                 in = Input();
                 out.setOut(fout);
-                ESortirovkaInversiyami solver;
+                Task solver;
                 solver.solve();
                 out.flush();
                 fout.close();

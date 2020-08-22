@@ -31,6 +31,11 @@ public:
         }
 #endif
         allocate(sz);
+        if (NeedFill<T>::value) {
+            for (int i : range(sz)) {
+                ::new((void*)(b + i)) T;
+            }
+        }
 #ifdef LOCAL
         view();
 #endif
@@ -116,10 +121,5 @@ public:
         return res;
     }
 
-    arr2d<T> clone() {
-        arr2d<T> res(d1, d2);
-        copy(b, b + sz, res.b);
-        return res;
-    }
 };
 

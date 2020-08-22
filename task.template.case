@@ -6,6 +6,8 @@ int id = 1;
 class %ClassName% {
 public:
     void solve() {
+        err.printLine("Test", id);
+
         out.printLine("Case #" + to_string(id++) + ":");
     }
 };

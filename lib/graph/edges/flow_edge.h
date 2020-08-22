@@ -16,7 +16,7 @@ public:
         return FlowEdge<C>(from, id, 0);
     }
 
-    FlowEdge<C>& reverseEdge(Graph<FlowEdge<C>>& graph) {
+    FlowEdge<C>& reverseEdge(Graph<FlowEdge<C>>& graph) const {
         return graph[to][rev];
     }
 

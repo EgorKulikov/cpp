@@ -131,11 +131,3 @@ inline ull allBitsLL(int n) {
     return (1ull << n) - 1;
 }
 
-inline uli allBits128(int n) {
-#ifdef LOCAL
-    if (n < 0 || n >= 128) {
-        throw "Bad index";
-    }
-#endif
-    return (uli(1) << n) - 1;
-}
