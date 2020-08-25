@@ -1,4 +1,4 @@
-#include "../tasks/Task.cpp"
+#include "../tasks/FUdobochitaemost.cpp"
 
 #include <iostream>
 #include <fstream>
@@ -35,7 +35,7 @@ int main() {
     string yellow = "\x1B[33m";
     string def = "\033[0m";
     std::vector<jhelper::Test> tests = {
-		{"", "", true, false},
+		{"codecode 5\n0 3 code\n0 7 code\n2 7 co\n2 7 de\n1 5 o\n", "1\n2\n1\n2\n2\n", true, true},
 	};
 	bool allOK = true;
 	int testID = 0;
@@ -66,7 +66,7 @@ int main() {
             try {
                 in = Input();
                 out.setOut(fout);
-                Task solver;
+                FUdobochitaemost solver;
                 solver.solve();
                 out.flush();
                 fout.close();

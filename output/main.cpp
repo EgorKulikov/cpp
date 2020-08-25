@@ -147,6 +147,12 @@ public:
     const static bool value = false;
 };
 
+template <>
+class NeedFill<char> {
+public:
+    const static bool value = false;
+};
+
 template <typename T>
 class arr {
     T* b;
@@ -171,7 +177,7 @@ public:
         allocate(n);
         if (NeedFill<T>::value) {
             for (int i : range(n)) {
-                ::new((void*) (b + i)) T();
+                ::new((void*) (b + i)) T;
             }
         }
 #ifdef LOCAL
@@ -302,6 +308,11 @@ public:
         }
 #endif
         allocate(sz);
+        if (NeedFill<T>::value) {
+            for (int i : range(sz)) {
+                ::new((void*) (b + i)) T;
+            }
+        }
 #ifdef LOCAL
         view();
 #endif
@@ -467,7 +478,7 @@ private:
 
     template <typename T, class...Vs>
     void initArrays(int n, arr<T>& array, Vs& ...vs) {
-        array = arr<T>(n, T());
+        array = arr<T>(n);
         initArrays(n, vs...);
     }
 
@@ -829,16 +840,116 @@ Output out(cout, false);
 Output err(cerr, true);
 
 
-class Task {
+struct SuffixAutomaton {
+    int length;
+    SuffixAutomaton* link;
+    arr<SuffixAutomaton*> edges;
+    int ways = 1;
+
+    SuffixAutomaton(SuffixAutomaton* link, int length, int alphabetSize = 26) : link(link), length(length) {
+        edges = arr<SuffixAutomaton*>(alphabetSize, nullptr);
+    }
+
+    SuffixAutomaton* addLetter(SuffixAutomaton* head, int c, int alphabetSize = 26) {
+        auto current = new SuffixAutomaton(nullptr, length + 1, alphabetSize);
+        for (SuffixAutomaton* previous = this;; previous = previous->link) {
+            if (previous == nullptr) {
+                current->link = head;
+                break;
+            }
+            SuffixAutomaton* curLink = previous->edges[c];
+            if (curLink != nullptr) {
+                if (previous->length + 1 == curLink->length) {
+                    current->link = curLink;
+                    curLink->ways++;
+                    for (auto* next = curLink->link; next != nullptr; next = next->link) {
+                        next->ways++;
+                    }
+                } else {
+                    auto clone = new SuffixAutomaton(curLink->link, previous->length + 1, alphabetSize);
+                    for (int j = 0; j < alphabetSize; j++) {
+                        clone->edges[j] = curLink->edges[j];
+                    }
+                    clone->ways = curLink->ways + 1;
+                    for (; previous != nullptr; previous = previous->link) {
+                        SuffixAutomaton* to = previous->edges[c];
+                        if (to != curLink) {
+                            break;
+                        }
+                        previous->edges[c] = clone;
+                    }
+                    for (auto* next = clone->link; next != nullptr; next = next->link) {
+                        next->ways++;
+                    }
+                    current->link = curLink->link = clone;
+                }
+                break;
+            }
+            previous->edges[c] = current;
+        }
+        return current;
+    }
+};
+
+template <>
+class NeedFill<SuffixAutomaton*> {
+public:
+    const static bool value = false;
+};
+
+template <typename Iterator>
+SuffixAutomaton* buildAutomaton(Iterator beg, Iterator end, int first = 'a', int last = 'z') {
+    int alphabetSize = last - first + 1;
+    auto tail = new SuffixAutomaton(nullptr, 0, alphabetSize);
+    SuffixAutomaton* head = tail;
+
+    for (; beg != end; beg++) {
+        int c = *beg - first;
+        tail = tail->addLetter(head, c, alphabetSize);
+    }
+    return head;
+}
+
+
+class FUdobochitaemost {
 public:
     void solve() {
-        arri a(10);
-        arr<vi> b(10);
-        arr<string> c(10);
+        auto s = in.readString();
+        int q = in.readInt();
+        arri l, r;
+        arr<string> m;
+        in.readArrays(q, l, r, m);
 
-        b[3] = {1, 2, 3};
-        c[2] = "abc";
-        out.printLine(a);
+        arr<vector<pair<string, pii>>> adds(s.size());
+        arri answer(q, 0);
+        for (int i : range(q)) {
+            if (r[i] - l[i] + 1 >= m[i].size()) {
+                adds[r[i]].emplace_back(m[i], pii(i, 1));
+                if (l[i] + m[i].size() >= 2) {
+                    adds[l[i] + m[i].size() - 2].emplace_back(m[i], pii(i, -1));
+                }
+            }
+        }
+        auto tail = new SuffixAutomaton(nullptr, 0);
+        auto head = tail;
+        for (int i : range(s.size())) {
+            tail = tail->addLetter(head, s[i] - 'a');
+            for (const auto& p : adds[i]) {
+                auto cur = head;
+                for (char c : p.first) {
+                    cur = cur->edges[c - 'a'];
+                    if (cur == nullptr) {
+                        break;
+                    }
+                }
+                if (cur != nullptr) {
+                    answer[p.second.first] += p.second.second * cur->ways;
+                }
+            }
+        }
+        for (int i : answer) {
+            out.printLine(i);
+        }
     }
 };
 
@@ -851,7 +962,7 @@ int main() {
     freopen("output.txt", "w", stdout);
     auto time = clock();
 #endif
-    Task solver;
+    FUdobochitaemost solver;
 
 
     solver.solve();

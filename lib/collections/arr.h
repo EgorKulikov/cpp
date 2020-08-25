@@ -49,6 +49,12 @@ public:
     const static bool value = false;
 };
 
+template <>
+class NeedFill<char> {
+public:
+    const static bool value = false;
+};
+
 template <typename T>
 class arr {
     T* b;

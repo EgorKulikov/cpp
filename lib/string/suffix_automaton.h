@@ -8,11 +8,11 @@ struct SuffixAutomaton {
     SuffixAutomaton* link;
     arr<SuffixAutomaton*> edges;
 
-    SuffixAutomaton(SuffixAutomaton* link, int length, int alphabetSize) : link(link), length(length) {
+    SuffixAutomaton(SuffixAutomaton* link, int length, int alphabetSize = 26) : link(link), length(length) {
         edges = arr<SuffixAutomaton*>(alphabetSize, nullptr);
     }
     
-    SuffixAutomaton* addLetter(SuffixAutomaton* head, int c, int alphabetSize) {
+    SuffixAutomaton* addLetter(SuffixAutomaton* head, int c, int alphabetSize = 26) {
         auto current = new SuffixAutomaton(nullptr, length + 1, alphabetSize);
         for (SuffixAutomaton* previous = this; ; previous = previous->link) {
             if (previous == nullptr) {
@@ -43,6 +43,12 @@ struct SuffixAutomaton {
         }
         return current;
     }
+};
+
+template <>
+class NeedFill<SuffixAutomaton*> {
+public:
+    const static bool value = false;
 };
 
 template<typename Iterator>
