@@ -5,6 +5,8 @@
 using namespace std;
 
 #define all(v) (v).begin(), (v).end()
+#define val const auto&
+#define st_mtimespec st_mtim
 
 using ll = long long;
 using ull = unsigned long long;

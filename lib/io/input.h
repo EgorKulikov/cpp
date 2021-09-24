@@ -38,9 +38,6 @@ public:
 
     inline int peek() {
         if (exhausted) {
-#ifdef LOCAL
-            throw "Input exhausted";
-#endif
             return EOF;
         }
         if (bufRead == bufAt) {
@@ -49,6 +46,7 @@ public:
         }
         if (bufRead == bufAt) {
             exhausted = true;
+            getchar();
             return EOF;
         }
         return buf[bufAt];
@@ -61,6 +59,8 @@ private:
         int sgn = 1;
         if (c == '-') {
             sgn = -1;
+            c = get();
+        } else if (c == '+') {
             c = get();
         }
         T res = 0;
@@ -234,10 +234,13 @@ public:
             return "";
         }
         string res;
-        do {
+        while (c != '\n' && c != '\r' && c != EOF) {
             res.push_back(c);
             c = get();
-        } while (c != '\n' && c != '\r' && c != EOF);
+        }
+        if (c == '\r' && peek() == '\n') {
+            get();
+        }
         return res;
     }
 

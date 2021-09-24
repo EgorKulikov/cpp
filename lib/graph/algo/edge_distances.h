@@ -23,3 +23,21 @@ arri edgeDistances(Graph<Edge>& graph, int source) {
     }
     return dist;
 }
+
+template <class Edge>
+vi centers(Graph<Edge>& graph) {
+    auto d0 = edgeDistances(graph, 0);
+    int first = max_element(all(d0)) - d0.begin();
+    auto d1 = edgeDistances(graph, first);
+    int second = max_element(all(d1)) - d1.begin();
+    auto d2 = edgeDistances(graph, second);
+    vi res;
+    int r1 = d1[second] / 2;
+    int r2 = (d1[second] + 1) / 2;
+    for (int i : range(d0.size())) {
+        if (d1[i] == r1 && d2[i] == r2 || d1[i] == r2 && d2[i] == r1) {
+            res.push_back(i);
+        }
+    }
+    return res;
+}

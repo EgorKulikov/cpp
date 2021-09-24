@@ -13,7 +13,11 @@ public:
     }
 
     WeightedFlowEdge<W, C> reverseEdge(int from) {
-        return WeightedFlowEdge<W, C>(from, BaseEdge::id, -weight, 0);
+        auto edge = WeightedFlowEdge<W, C>(from, BaseEdge::id, -weight, 0);
+#ifdef LOCAL
+        edge.direct = false;
+#endif
+        return edge;
     }
 
     WeightedFlowEdge<W, C>& reverseEdge(Graph<WeightedFlowEdge<W, C>>& graph) const {
@@ -35,3 +39,15 @@ public:
     }
 };
 
+#ifdef LOCAL
+template <typename W, typename C>
+void printFlow(Output& out, Graph<WeightedFlowEdge<W, C>>& graph) {
+    for (int i : range(graph.vertexCount)) {
+        for (auto& e : graph[i]) {
+            if (e.direct && e.flow(graph)) {
+                out.template printLine(i, e.to, e.flow(graph));
+            }
+        }
+    }
+}
+#endif

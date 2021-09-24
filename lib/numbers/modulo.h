@@ -129,8 +129,8 @@ modint operator /(const modint& a, const modint& b) {
     return modint(a) /= b;
 }
 
-ostream& operator <<(ostream& out, const modint& val) {
-    return out << val.n;
+ostream& operator <<(ostream& out, const modint& v) {
+    return out << v.n;
 }
 
 bool operator==(const modint& a, const modint& b) {

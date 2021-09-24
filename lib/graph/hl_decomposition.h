@@ -68,6 +68,5 @@ struct HLDecomposition {
             }
         };
         build(root, -1);
-        delete[] size.begin();
     }
 };

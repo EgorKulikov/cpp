@@ -18,10 +18,6 @@ inline int bitCount(uli x) {
     return __builtin_popcountll(x) + __builtin_popcountll(x >> 64);
 }
 
-inline int highestOneBit(unsigned x) {
-    return 1 << (31 - __builtin_clz(x | 1));
-}
-
 inline int binaryDigits(unsigned x) {
     return 32 - __builtin_clz(x | 1);
 }
@@ -52,7 +48,11 @@ inline uli setBit(uli mask, int bit) {
         throw "Bad index";
     }
 #endif
-    mask |= uli(1) << bit;
+    uli add = 1;
+    for (int i : range(bit)) {
+        add *= 2;
+    }
+    mask |= add;
     return mask;
 }
 
@@ -131,3 +131,35 @@ inline ull allBitsLL(int n) {
     return (1ull << n) - 1;
 }
 
+inline ull allBitsULL(int n) {
+#ifdef LOCAL
+    if (n < 0 || n >= 128) {
+        throw "Bad index";
+    }
+#endif
+    return setBit(uli(0), n) - 1;
+}
+
+inline int trailingZeroes(unsigned n) {
+    return n == 0 ? 32 : __builtin_ctz(n);
+}
+
+inline int trailingOnes(unsigned n) {
+    return trailingZeroes(~n);
+}
+
+inline int leadingZeroes(unsigned n) {
+    return n == 0 ? 32 : __builtin_clz(n);
+}
+
+inline int leadingZeroes(ull n) {
+    return n == 0 ? 32 : __builtin_clzl(n);
+}
+
+inline int leadingOnes(unsigned n) {
+    return leadingZeroes(~n);
+}
+
+inline int leadingOnes(ull n) {
+    return leadingZeroes(~n);
+}

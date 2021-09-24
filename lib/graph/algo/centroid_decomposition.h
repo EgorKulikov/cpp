@@ -6,7 +6,8 @@
 #include "../../recursive_function.h"
 
 template <class Edge>
-void centroidDecomposition(Graph<Edge>& graph, const function<void(int, int, const arr<bool>&, const vi&)>& callback) {
+void centroidDecomposition(Graph<Edge>& graph, const function<void(int, int, const arr<bool>&, const vi&)>& callback,
+                           const function<void(int, int, const arr<bool>&, const vi&)>& pop = [](int, int, const arr<bool>&, const vi&){}) {
     int n = graph.vertexCount;
     arr<bool> forb(n, false);
     arri size(n);
@@ -68,6 +69,7 @@ void centroidDecomposition(Graph<Edge>& graph, const function<void(int, int, con
 #endif
             }
         }
+        pop(end, last, forb, part);
     };
     doWork(0, -1);
 }

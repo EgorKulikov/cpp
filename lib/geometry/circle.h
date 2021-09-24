@@ -6,8 +6,8 @@
 
 class Circle {
 public:
-    const Point center;
-    const DoubleType r;
+    Point center;
+    DoubleType r;
 
     Circle(const Point &center, const DoubleType r) : center(center), r(r) {}
 };

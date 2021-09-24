@@ -47,21 +47,21 @@ public:
             throw "Out of bounds";
         }
 #endif
-        int val = heap[index];
+        int v = heap[index];
         while (index) {
             int parent = (index - 1) >> 1;
             int parVal = heap[parent];
-            if (!cmp(val, parVal)) {
-                heap[index] = val;
-                pos[val] = index;
+            if (!cmp(v, parVal)) {
+                heap[index] = v;
+                pos[v] = index;
                 return;
             }
             heap[index] = parVal;
             pos[parVal] = index;
             index = parent;
         }
-        heap[0] = val;
-        pos[val] = 0;
+        heap[0] = v;
+        pos[v] = 0;
     }
 
     void siftDown(int index) {

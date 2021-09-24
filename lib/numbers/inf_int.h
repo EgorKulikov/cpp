@@ -5,29 +5,29 @@
 ll INFTY = 1000000000000000000ll;
 
 struct infint {
-    ll val;
+    ll vl;
 
     infint(ll v) {
         if (v >= INFTY) {
             v = INFTY;
         }
-        val = v;
+        vl = v;
     }
 
     infint& operator +=(const infint& a) {
-        if (INFTY - a.val <= val) {
-            val = INFTY;
+        if (INFTY - a.vl <= vl) {
+            vl = INFTY;
         } else {
-            val += a.val;
+            vl += a.vl;
         }
         return *this;
     }
 
     infint& operator *=(const infint& a) {
-        if (a.val != 0 && INFTY / a.val <= val) {
-            val = INFTY;
+        if (a.vl != 0 && INFTY / a.vl < vl) {
+            vl = INFTY;
         } else {
-            val *= a.val;
+            vl *= a.vl;
         }
         return *this;
     }
@@ -46,17 +46,17 @@ infint operator *(const infint& a, const infint& b) {
 }
 
 bool operator <(const infint& a, const infint& b) {
-    return a.val < b.val;
+    return a.vl < b.vl;
 }
 
 bool operator >(const infint& a, const infint& b) {
-    return a.val > b.val;
+    return a.vl > b.vl;
 }
 
 bool operator <=(const infint& a, const infint& b) {
-    return a.val <= b.val;
+    return a.vl <= b.vl;
 }
 
 bool operator >=(const infint& a, const infint& b) {
-    return a.val >= b.val;
+    return a.vl >= b.vl;
 }

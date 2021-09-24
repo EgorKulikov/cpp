@@ -22,9 +22,9 @@ public:
         value = arr<T>(size, 0);
     }
 
-    void add(int at, T val) {
+    void add(int at, T v) {
         while (at < value.size()) {
-            value[at] += val;
+            value[at] += v;
             at = at | (at + 1);
         }
     }

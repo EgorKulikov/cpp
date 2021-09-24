@@ -8,12 +8,22 @@ class FlowEdge : public BiEdge {
 public:
     const static bool reversable = true;
     C capacity;
+#ifdef LOCAL
+    bool direct;
+#endif
 
     FlowEdge(int to, int id, C capacity) : BiEdge(to, id), capacity(capacity) {
+#ifdef LOCAL
+        direct = true;
+#endif
     }
 
     FlowEdge<C> reverseEdge(int from) {
-        return FlowEdge<C>(from, id, 0);
+        auto edge = FlowEdge<C>(from, id, 0);
+#ifdef LOCAL
+        edge.direct = false;
+#endif
+        return edge;
     }
 
     FlowEdge<C>& reverseEdge(Graph<FlowEdge<C>>& graph) const {
@@ -34,3 +44,16 @@ public:
         return reverseEdge(graph).capacity;
     }
 };
+
+#ifdef LOCAL
+template <typename C>
+void printFlow(Output& out, Graph<FlowEdge<C>>& graph) {
+    for (int i : range(graph.vertexCount)) {
+        for (auto& e : graph[i]) {
+            if (e.direct && e.flow(graph)) {
+                out.template printLine(i, e.to, e.flow(graph));
+            }
+        }
+    }
+}
+#endif

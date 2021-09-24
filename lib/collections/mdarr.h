@@ -24,18 +24,13 @@ class arr2d {
     }
 
 public:
-    arr2d(int d1 = 0, int d2 = 0) : d1(d1), d2(d2), sz(d1 * d2) {
+    explicit arr2d(int d1 = 0, int d2 = 0) : d1(d1), d2(d2), sz(d1 * d2) {
 #ifdef LOCAL
         if (d1 < 0 || d2 < 0) {
             throw "bad alloc";
         }
 #endif
         allocate(sz);
-        if (NeedFill<T>::value) {
-            for (int i : range(sz)) {
-                ::new((void*)(b + i)) T;
-            }
-        }
 #ifdef LOCAL
         view();
 #endif

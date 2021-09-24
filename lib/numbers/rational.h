@@ -123,6 +123,6 @@ bool operator !=(const Rational& a, const Rational& b) {
     return !(b == a);
 }
 
-ostream& operator <<(ostream& out, const Rational& val) {
-    return out << val.num << '/' << val.den;
+ostream& operator <<(ostream& out, const Rational& v) {
+    return out << v.num << '/' << v.den;
 }

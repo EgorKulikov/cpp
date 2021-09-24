@@ -8,11 +8,17 @@
 #include "../lib/graph/edges/biweighted_edge.h"
 #include "../lib/graph/algo/floyd_warshall.h"
 
+random_device rd;
+mt19937_64 gen(rd());
+
 int main() {
-    freopen("input.txt", "w", stdout);
-    out.printLine(200000);
-    for (int i : range(3, 200003)) {
-        out.printLine(i);
+    int n = 21;
+    arr2d<int> p(n, n);
+    for (int i : range(n)) {
+        for (int j : range(n)) {
+            p(i, j) = gen() % 10000;
+        }
     }
-    out.flush();
+    out.printLine(n);
+    out.printLine(p);
 }

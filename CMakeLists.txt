@@ -14,7 +14,8 @@ add_executable(output output/main.cpp lib/graph/lca.h lib/collections/segment_tr
         lib/graph/algo/centroid_decomposition.h lib/graph/edges/weighted_flow_edge.h lib/graph/edges/flow_edge.h
         lib/graph/edges/weighted_edge.h lib/graph/edges/biweighted_edge.h lib/graph/edges/biedge.h
         lib/graph/edges/base_edge.h lib/bits.h lib/geometry/point.h lib/geometry/base_geometry.h lib/geometry/line.h
-        lib/geometry/circle.h lib/geometry/segment.h lib/geometry/polygon.h lib/recursive_function.h lib/chess.h lib/numbers/inf_int.h)
+        lib/geometry/circle.h lib/geometry/segment.h lib/geometry/polygon.h lib/recursive_function.h lib/chess.h
+        lib/numbers/inf_int.h lib/string/string_utils.h lib/numbers/fwht.h)
 add_executable(testrunner testrunner/main.cpp)
 
 file(GLOB TASKS "tasks/*.cpp")
@@ -29,5 +30,5 @@ ADD_DEFINITIONS(-static -std=c++17 -Wall -Wextra -Wno-sign-compare -Wno-reorder 
 
 set_target_properties(task PROPERTIES LINKER_LANGUAGE CXX)
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ftrapping-math -g3 -gfull -ggdb -fno-inline-functions -fno-unroll-loops -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_FORTIFY_SOURCE=2 -DLOCAL -fsanitize=undefined -fsanitize-undefined-trap-on-error -fno-sanitize-recover=all -fstack-protector -fsanitize=address")
-set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O0 -ftrapping-math -g3 -gfull -ggdb -fno-inline-functions -fno-unroll-loops -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_FORTIFY_SOURCE=2 -DLOCAL -fsanitize-undefined-trap-on-error -fno-sanitize-recover=all -fstack-protector -fsanitize=address")
+set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O0 -ftrapping-math -g3 -gfull -ggdb -fno-inline-functions -fno-unroll-loops -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -DLOCAL -D_FORTIFY_SOURCE=2 -DLOCAL -fsanitize-undefined-trap-on-error -fno-sanitize-recover=all -fstack-protector -fsanitize=address")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DLOCAL_RELEASE")

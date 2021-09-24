@@ -103,3 +103,9 @@ public:
 
 Output out(cout, false);
 Output err(cerr, true);
+
+#ifdef LOCAL
+#define debug(x) err.printLine(#x, '=', x);
+#else
+#define debug(x)
+#endif

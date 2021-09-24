@@ -9,7 +9,7 @@ struct MultiplicativeFunction {
     MultiplicativeFunction(const function<ll(ll, int, ll)>& value) : value(value) {}
 
     ll operator ()(ll argument) {
-        ll val = 1;
+        ll v = 1;
         for (ll i = 2; i * i <= argument; i++) {
             if (argument % i == 0) {
                 int exponent = 0;
@@ -19,13 +19,13 @@ struct MultiplicativeFunction {
                     power *= i;
                     argument /= i;
                 } while (argument % i == 0);
-                val *= value(i, exponent, power);
+                v *= value(i, exponent, power);
             }
         }
         if (argument != 1) {
-            val *= value(argument, 1, argument);
+            v *= value(argument, 1, argument);
         }
-        return val;
+        return v;
     }
 
     arr<ll> calculateUpTo(int n) {
