@@ -53,6 +53,12 @@ public:
 
     arr2d(T* b, int d1, int d2) : b(b), d1(d1), d2(d2), sz(d1 * d2) {}
 
+    arr2d<T> clone() {
+        arr2d<T> res(d1, d2);
+        copy(all(*this), res.b);
+        return res;
+    }
+
     int size() const {
         return sz;
     }

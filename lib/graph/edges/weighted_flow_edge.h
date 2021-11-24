@@ -40,6 +40,8 @@ public:
 };
 
 #ifdef LOCAL
+#include "../../io/output.h"
+
 template <typename W, typename C>
 void printFlow(Output& out, Graph<WeightedFlowEdge<W, C>>& graph) {
     for (int i : range(graph.vertexCount)) {

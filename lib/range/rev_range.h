@@ -26,3 +26,11 @@ public:
         return second;
     }
 };
+
+RevRange RevRangeIncl(int begin, int end) {
+    return RevRange(begin + 1, end);
+}
+
+RevRange RevRangeIncl(int n) {
+    return RevRange(n + 1);
+}

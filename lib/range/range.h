@@ -27,3 +27,11 @@ public:
         return second;
     }
 };
+
+range rangeIncl(int begin, int end) {
+    return range(begin, end + 1);
+}
+
+range rangeIncl(int n) {
+    return range(n + 1);
+}

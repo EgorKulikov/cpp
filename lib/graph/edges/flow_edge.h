@@ -46,6 +46,8 @@ public:
 };
 
 #ifdef LOCAL
+#include "../../io/output.h"
+
 template <typename C>
 void printFlow(Output& out, Graph<FlowEdge<C>>& graph) {
     for (int i : range(graph.vertexCount)) {

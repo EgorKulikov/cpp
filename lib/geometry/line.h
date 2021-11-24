@@ -14,6 +14,8 @@ public:
     Line(const DoubleType a, const DoubleType b, const DoubleType c) : a(a), b(b), c(c) {}
 };
 
+DoubleType value(const Line& l, const Point& p);
+
 Line getLine(DoubleType a, DoubleType b, DoubleType c) {
     DoubleType g = hypot(a, b);
     return Line(a / g, b / g, c / g);
@@ -27,8 +29,10 @@ Line line(const Point& p, const Point& q) {
 }
 
 DoubleType distance(const Line& l, const Point& p) {
-    return abs(l.a * p.x + l.b * p.y + l.c);
+    return abs(value(l, p));
 }
+
+DoubleType value(const Line& l, const Point& p) { return l.a * p.x + l.b * p.y + l.c; }
 
 Line perpendicular(const Line& l, const Point& p) {
     return Line(-l.b, l.a, p.x * l.b - p.y * l.a);

@@ -17,6 +17,15 @@ arri createOrder(int n) {
     return order;
 }
 
+template <typename T>
+arri createOrder(const T& v) {
+    auto order = createOrder(v.size());
+    sort(all(order), [&](int a, int b) -> bool {
+        return v[a] < v[b];
+    });
+    return order;
+}
+
 arri inverse(const arri& p) {
     arri res(p.size());
     for (int i : range(p.size())) {

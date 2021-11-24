@@ -116,7 +116,7 @@ bool operator!=(const bigmod& a, const bigmod& b) {
 random_device rd;
 mt19937_64 gen(rd());
 
-bool isPrime(ll n) {
+bool isPrimeFast(ll n) {
     if (n == 1) {
         return false;
     }
@@ -201,7 +201,7 @@ ll findDivisor(ll n) {
     if (n % 2 == 0) {
         return 2;
     }
-    if (isPrime(n)) {
+    if (isPrimeFast(n)) {
         return n;
     }
     while (true) {
